@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../Constants/app_dimensions.dart';
+import '../../../Utils/image_assets.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/CustomCards/homeInfoCard.dart';
@@ -42,23 +43,18 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
     },
   ];
   void _pickDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
+  final DateTime? picked = await pickDate(
+    context: context,
+    initialDate: selectedDate,
+  );
 
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
+  if (picked != null && picked != selectedDate) {
+    setState(() {
+      selectedDate = picked;
+    });
   }
-
-  void _addNewLead() {
-   // Navigator.pushNamed(context, AppRoutes.addNewPurchaseRequestPage);
-  }
+}
+  
 
   @override
   Widget build(BuildContext context) {
@@ -76,20 +72,12 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
         child: Column(
           children: [
             // Custom search field
-            TextField(
+            ReusableSearchField(
               controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search by Farmer Name/City/Town',
-                hintStyle: AppTextStyles.searchFieldFont,
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor,),
-                filled: true,
-                fillColor: AppColors.primaryColor.withOpacity(0.16),
-                contentPadding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.01),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(61),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+              hintText: 'Search by Farmer Name/City/Town',
+              onChanged: (value) {
+                // handle search logic
+              },
             ),
               AppDimensions.h20(context),
 
@@ -110,17 +98,26 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                         style: AppTextStyles.dateText,
                       ),
                       const SizedBox(width: 8),
-                      Icon(Icons.calendar_month_outlined, color: AppColors.primaryColor),
+                      Image.asset(ImageAssets.calender, height: height * 0.025),
                     ],
                   ),
                 ),
 
-                // Add New Leads button
+                
                 CustomRoundedButton(
-                  onTap: _addNewLead,
-                  child: Text(
-                    'Add New Leads',
-                    style: AppTextStyles.dateText,
+                  onTap: () {
+                    // TODO: Implement filter logic or open filter bottom sheet
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Filter',
+                        style: AppTextStyles.dateText,
+                      ),
+                      AppDimensions.w10(context),
+                      Icon(Icons.tune, color: AppColors.primaryColor),
+                    ],
                   ),
                 ),
               ],
@@ -134,18 +131,26 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                 final data = homeCardsData[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                     widget.isQCPage ?
-                     Navigator.pushNamed(
-                       context,
-                       AppRoutes.deliveryDetailPage,
-                       arguments: {
-                         'data': data,
-                         'isPendingQC': true,
-                       },
-                     )
-                     : Navigator.pushNamed(
+                  child: HomeInfoCard(
+                    cardType: widget.isQCPage ? CardType.qc : CardType.delivery,
+                    farmerName: data!['name'],
+                    date: data['date']!,
+                    vehicleNumber: data['vehicleNumber'],
+                    brokerName: data['driverName'],
+                    height: height,
+                    width: width,
+                    isPending: true,
+                    onPressed: () {
+                      widget.isQCPage ?
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.deliveryDetailPage,
+                        arguments: {
+                          'data': data,
+                          'isPendingQC': true,
+                        },
+                      )
+                          : Navigator.pushNamed(
                         context,
                         AppRoutes.deliveryDetailPage,
                         arguments: {
@@ -154,17 +159,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                         },
                       );
                     },
-                    child: HomeInfoCard(
-                      cardType: widget.isQCPage ? CardType.qc : CardType.delivery,
-                      farmerName: data!['name'],
-                      date: data['date']!,
-                      vehicleNumber: data['vehicleNumber'],
-                      brokerName: data['driverName'],
-                      height: height,
-                      width: width,
-                  ),
-
-                ),
+                                    ),
                 );
               }),
             )

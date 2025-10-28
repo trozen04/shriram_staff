@@ -6,6 +6,7 @@ import '../../../utils/app_routes.dart';
 import '../../../widgets/CustomCards/SuperUser/sub_user_card.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../utils/flutter_font_styles.dart';
+import '../../../widgets/reusable_functions.dart';
 
 class SubUsersList extends StatefulWidget {
   const SubUsersList({super.key});
@@ -47,7 +48,7 @@ class _SubUsersListState extends State<SubUsersList> {
     return Scaffold(
       appBar: CustomAppBar(
         isHomePage: false,
-        title: 'Sales',
+        title: 'Sub User',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
@@ -60,20 +61,12 @@ class _SubUsersListState extends State<SubUsersList> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
+                      child: ReusableSearchField(
                         controller: searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search by name',
-                          hintStyle: AppTextStyles.searchFieldFont,
-                          prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor,),
-                          filled: true,
-                          fillColor: AppColors.primaryColor.withOpacity(0.16),
-                          contentPadding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.01),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(61),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
+                        hintText: 'Search by name',
+                        onChanged: (value) {
+                          // handle search logic
+                        },
                       ),
                     ),
                     AppDimensions.w10(context),
@@ -126,22 +119,12 @@ class _SubUsersListState extends State<SubUsersList> {
             
               ],
             ),
-            Positioned(
-              bottom: width * 0.05,
-                right: width * 0.05,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.createSubUserPage, arguments: null);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(width * 0.04),
-                                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  shape: BoxShape.circle
-                                ),
-                    child: Icon(Icons.add, color: Colors.white,),
-                              ),
-                ))
+            CustomFAB(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.createSubUserPage, arguments: null);
+              },
+            ),
+
           ],
         ),
       ),

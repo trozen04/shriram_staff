@@ -96,7 +96,7 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
                 _buildUploadField('Driver Aadhar Card', aadharFile, (file) => aadharFile = file),
 
                 AppDimensions.h20(context),
-                OutlinedButton(
+                ReusableOutlinedButton(
                   text: 'Save',
                   onPressed: _onSavePressed,
                 ),

@@ -61,28 +61,28 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Purchase Request',
                   imagePath: ImageAssets.purchaseRequest,
                   ontap: () {
-                    //Navigator.pushNamed(context, AppRoutes.deliveryPage);
+                    Navigator.pushNamed(context, AppRoutes.purchaseRequestScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Initial QC',
                   imagePath: ImageAssets.qc,
                   ontap: () {
-                    //Navigator.pushNamed(context, AppRoutes.deliveryPage, arguments: true);
+                    Navigator.pushNamed(context, AppRoutes.initialQcScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Attendance',
                   imagePath: ImageAssets.attendance,
                   ontap: () {
-                    //Navigator.pushNamed(context, AppRoutes.deliveryPage, arguments: true);
+                    Navigator.pushNamed(context, AppRoutes.attendanceScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Sales',
                   imagePath: ImageAssets.sales,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: null);
+                    Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: true);
                   },
                 ),
                 ActionButton(
@@ -96,14 +96,14 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Expense',
                   imagePath: ImageAssets.expense,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.factoryScreen, arguments: null);
+                    Navigator.pushNamed(context, AppRoutes.expenseScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Billing',
                   imagePath: ImageAssets.billing,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.billingScreen);
+                    Navigator.pushNamed(context, AppRoutes.billingScreen, arguments: true);
                   },
                 ),
 
@@ -111,7 +111,7 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Salary',
                   imagePath: ImageAssets.salary,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.deliveryPage);
+                    Navigator.pushNamed(context, AppRoutes.salaryScreen);
                   },
                 ),
 
@@ -119,28 +119,34 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Report',
                   imagePath: ImageAssets.report,
                   ontap: () {
-                    // Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: null);
-                  },
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.reportScreen,
+                      arguments: {
+                        'reportData': null, // e.g. fetched data or empty list/map
+                        'isSuperUser': true, // or false depending on user type
+                      },
+                    );
+                    },
                 ),
                 ActionButton(
                   title: 'Broker',
                   imagePath: ImageAssets.broker,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.reportScreen, arguments: null);
+                    Navigator.pushNamed(context, AppRoutes.brokerScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Labour',
                   imagePath: ImageAssets.labour,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.reportScreen, arguments: null);
+                    Navigator.pushNamed(context, AppRoutes.labourScreen);
                   },
                 ),
                 ActionButton(
                   title: 'Products',
                   imagePath: ImageAssets.broker,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.reportScreen, arguments: null);
                   },
                 ),
 

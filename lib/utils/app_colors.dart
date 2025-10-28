@@ -14,6 +14,7 @@ class AppColors {
   static const Color logoutColor = Color(0xFFCC0000);
   static const Color readOnlyFillColor = Color(0xFFE5E5E5);
   static const Color bottomBorder = Color(0xFFEBEBEB);
+  static const Color successColor = Color(0xFF07D000);
 
   static const Color textColor = Colors.black87;
   static const Color hintColor = Colors.grey;

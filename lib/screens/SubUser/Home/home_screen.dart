@@ -88,8 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: 'Report',
                   imagePath: ImageAssets.report,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.reportScreen, arguments: null);
-                  },
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.reportScreen,
+                      arguments: {
+                        'reportData': null,
+                      },
+                    );                  },
                 ),
               ],
             ),

@@ -31,7 +31,7 @@ class PrimaryButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
-          elevation: 2,
+          elevation: 0,
         ),
         child: isLoading
             ? const CircularProgressIndicator(
@@ -58,12 +58,12 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
-class OutlinedButton extends StatelessWidget {
+class ReusableOutlinedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isLoading;
 
-  const OutlinedButton({
+  const ReusableOutlinedButton({
     super.key,
     required this.text,
     required this.onPressed,

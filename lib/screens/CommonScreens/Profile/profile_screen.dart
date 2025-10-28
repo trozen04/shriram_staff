@@ -7,7 +7,8 @@ import '../../../utils/pref_utils.dart';
 import '../../../widgets/primary_and_outlined_button.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final bool isSuperUser;
+  const ProfileScreen({super.key, required this.isSuperUser});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,9 @@ class ProfileScreen extends StatelessWidget {
             ProfileRow(label: 'Address', value: '122/22, Tilak Nagar'),
             ProfileRow(label: 'City/Town', value: 'New Delhi'),
             ProfileRow(label: 'State', value: 'Delhi'),
+            if(isSuperUser)
+              ProfileRow(label: 'Factory', value: 'Factory1'),
+
             AppDimensions.h30(context),
             PrimaryButton(
               text: 'Logout',

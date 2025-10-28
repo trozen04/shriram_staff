@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart';
@@ -10,7 +11,7 @@ String formatAmount(dynamic amount) {
   try {
     final number = amount is String ? double.parse(amount) : amount.toDouble();
     final formatter = NumberFormat('#,##0', 'en_IN');
-    return formatter.format('₹ $number');
+    return '₹ ${formatter.format(number)}';
   } catch (e) {
     return '₹ ${amount.toString()}';
   }
@@ -391,6 +392,8 @@ class TableCellWidget extends StatelessWidget {
   }
 }
 
+
+
 class ReusableTextField extends StatelessWidget {
   final String label;
   final String? hint;
@@ -400,6 +403,11 @@ class ReusableTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool readOnly;
   final int maxLines;
+  final VoidCallback? onTap;
+  final String? actionLabel;
+  final VoidCallback? onActionTap;
+  final IconData? actionIcon;
+  final VoidCallback? onIconTap;
 
   const ReusableTextField({
     super.key,
@@ -411,6 +419,11 @@ class ReusableTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.readOnly = false,
     this.maxLines = 1,
+    this.onTap,
+    this.actionLabel,
+    this.onActionTap,
+    this.actionIcon,
+    this.onIconTap,
   });
 
   @override
@@ -418,28 +431,85 @@ class ReusableTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.label),
+        // Label + Optional Action Button
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: AppTextStyles.label),
+            if (onActionTap != null)
+              InkWell(
+                onTap: onActionTap,
+                borderRadius: BorderRadius.circular(8),
+                child: Row(
+                  children: [
+                    if (actionIcon != null)
+                      Icon(actionIcon, size: 18, color: Colors.red),
+                    if (actionLabel != null) ...[
+                      const SizedBox(width: 4),
+                      Text(
+                        actionLabel!,
+                        style: AppTextStyles.underlineText,
+                      ),
+                    ],
+                  ],
+                ),
+              )
+            else if (actionIcon != null && onIconTap != null)
+              InkWell(
+                onTap: onIconTap,
+                child: Icon(actionIcon, color: Colors.redAccent, size: 20),
+              ),
+          ],
+        ),
+
         AppDimensions.h5(context),
-        TextFormField(
-          controller: controller,
-          onChanged: onChanged,
-          validator: validator,
-          keyboardType: keyboardType,
-          readOnly: readOnly,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+
+        // Text Field
+        InkWell(
+          onTap: onTap,
+          child: TextFormField(
+            controller: controller,
+            onChanged: onChanged,
+            validator: validator,
+            keyboardType: keyboardType,
+            readOnly: readOnly,
+            maxLines: maxLines,
+            inputFormatters: keyboardType == TextInputType.number ||
+                keyboardType == TextInputType.phone
+                ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
+                : [],
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTextStyles.hintText,
+              filled: true,
+              fillColor: readOnly
+                  ? AppColors.readOnlyFillColor
+                  : Colors.white, // same logic
+              contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                BorderSide(color: AppColors.cardBorder),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                    color: AppColors.primaryColor, width: 2),
+              ),
             ),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
         ),
       ],
     );
   }
 }
+
 
 class ReusableNotificationCard extends StatelessWidget {
   final String title;
@@ -490,6 +560,149 @@ class ReusableNotificationCard extends StatelessWidget {
             ],
           )
         ],
+      ),
+    );
+  }
+}
+
+
+///Date Functions
+String formatReadableDate(DateTime? date) {
+  if (date == null) return '';
+
+  // Convert to Indian Standard Time (UTC+5:30)
+  final istDate = date.toUtc().add(const Duration(hours: 5, minutes: 30));
+
+  // Format as: 23 September, 2025
+  return DateFormat('d MMMM, yyyy').format(istDate);
+}
+
+///
+
+class ReusableSearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final IconData prefixIcon;
+  final void Function(String)? onChanged;
+
+  const ReusableSearchField({
+    Key? key,
+    required this.controller,
+    this.hintText = 'Search...',
+    this.prefixIcon = Icons.search,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: AppTextStyles.searchFieldFont,
+        prefixIcon: Icon(prefixIcon, color: AppColors.primaryColor),
+        filled: true,
+        fillColor: AppColors.primaryColor.withOpacity(0.16),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.01,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(61),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
+
+/// A reusable function to pick a date and return it as [DateTime].
+
+Future<DateTime?> pickDate({
+  required BuildContext context,
+  DateTime? initialDate,
+  DateTime? firstDate,
+  DateTime? lastDate,
+}) async {
+  final DateTime now = DateTime.now();
+
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: initialDate ?? now,
+    firstDate: firstDate ?? DateTime(2000),
+    lastDate: lastDate ?? DateTime(2100),
+    builder: (BuildContext context, Widget? child) {
+      // Optional: Customize theme for date picker
+      return Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: Colors.teal, // header color
+            onPrimary: Colors.white, // header text color
+            onSurface: Colors.black, // body text color
+          ),
+        ),
+        child: child!,
+      );
+    },
+  );
+
+  return picked;
+}
+
+/// Optional helper to format the date as string (e.g., 'dd-MM-yy')
+String formatDate(DateTime? date) {
+  return date != null ? DateFormat('dd-MM-yy').format(date) : 'Select Date';
+}
+
+
+class CustomFAB extends StatelessWidget {
+  final VoidCallback onTap;
+  final IconData icon;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final double? padding;
+  final Alignment alignment;
+
+  const CustomFAB({
+    Key? key,
+    required this.onTap,
+    this.icon = Icons.add,
+    this.backgroundColor,
+    this.iconColor,
+    this.padding,
+    this.alignment = Alignment.bottomRight,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
+    return Align(
+      alignment: alignment,
+      child: Padding(
+        padding: EdgeInsets.only(
+          right: width * 0.05,
+          bottom: width * 0.05,
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(100),
+          child: Container(
+            padding: EdgeInsets.all(padding ?? width * 0.04),
+            decoration: BoxDecoration(
+              color: backgroundColor ?? AppColors.primaryColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: iconColor ?? Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }

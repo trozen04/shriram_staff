@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 import '../screens/CommonScreens/Notification/notification_screen.dart';
 import '../screens/CommonScreens/Profile/profile_screen.dart';
+import '../screens/CommonScreens/Report/report_screen.dart';
+import '../screens/CommonScreens/Sales/create_sales_lead_screen.dart';
+import '../screens/CommonScreens/Sales/sales_details_page.dart';
+import '../screens/CommonScreens/Sales/sales_screen.dart';
 import '../screens/CommonScreens/auth/login_screen.dart';
 import '../screens/CommonScreens/auth/registration_screen.dart';
 import '../screens/SubUser/Billing/billing_details.dart';
 import '../screens/SubUser/Billing/billing_fill_details_screen.dart';
-import '../screens/SubUser/Billing/billing_screen.dart';
+import '../screens/CommonScreens/BillingCommonScreen/billing_screen.dart';
 import '../screens/SubUser/DetailsPage/delivery_qc_detail_page.dart';
 import '../screens/SubUser/Delivery/delivery_qc_page.dart';
 import '../screens/SubUser/Factory/factory_screen.dart';
 import '../screens/SubUser/LoadingProducts/loading_product_screen.dart';
 import '../screens/SubUser/QualityCheck/quality_check_submit_page.dart';
-import '../screens/SubUser/Report/report_screen.dart';
-import '../screens/SubUser/Sales/sales_screen.dart';
 import '../screens/SubUser/WeightConfirmationPage/weight_confirmation_page.dart';
+import '../screens/SuperUser/Attendance/attendance_screen.dart';
+import '../screens/SuperUser/Attendance/mark_attendance_screen.dart';
+import '../screens/SuperUser/BillingSuperUser/billing_fill_details_super_user.dart';
+import '../screens/SuperUser/Broker/broker_detail_screen.dart';
+import '../screens/SuperUser/Broker/broker_screen.dart';
+import '../screens/SuperUser/Expense/expense_screen.dart';
 import '../screens/SuperUser/Home/super_user_home_screen.dart';
+import '../screens/SuperUser/InitialQC/initial_qc_approval_screen.dart';
+import '../screens/SuperUser/InitialQC/initial_qc_screen.dart';
+import '../screens/SuperUser/Labour/add_labour_charges_screen.dart';
+import '../screens/SuperUser/Labour/labour_screen.dart';
+import '../screens/SuperUser/Purchase/purchase_request_detail.dart';
+import '../screens/SuperUser/Purchase/purchase_request_screen.dart';
+import '../screens/SuperUser/Salary/salary_rollout_screen.dart';
+import '../screens/SuperUser/Salary/salary_screen.dart';
 import '../screens/SuperUser/SubUsers/create_subusers.dart';
 import '../screens/SuperUser/SubUsers/staff_details.dart';
 import '../screens/SuperUser/SubUsers/sub_users_list.dart';
@@ -42,6 +58,22 @@ class AppRoutes {
   static const String subUsersList = '/subUsersList';
   static const String createSubUserPage = '/createSubUserPage';
   static const String staffDetails = '/staffDetails';
+  static const String attendanceScreen = '/attendanceScreen';
+  static const String markAttendanceScreen = '/markAttendanceScreen';
+  static const String initialQcScreen = '/initialQcScreen';
+  static const String initialQcApprovalScreen = '/initialQcApprovalScreen';
+  static const String createSalesLeadScreen = '/createSalesLeadScreen';
+  static const String salesDetailScreen = '/salesDetailScreen';
+  static const String billingFillDetailsSuperUser = '/billingFillDetailsSuperUser';
+  static const String expenseScreen = '/expenseScreen';
+  static const String salaryScreen = '/salaryScreen';
+  static const String salaryRolloutScreen = '/salaryRolloutScreen';
+  static const String purchaseRequestScreen = '/purchaseRequestScreen';
+  static const String purchaseRequestDetail = '/purchaseRequestDetail';
+  static const String brokerScreen = '/brokerScreen';
+  static const String brokerDetailScreen = '/brokerDetailScreen';
+  static const String labourScreen = '/labourScreen';
+  static const String addLabourChargesScreen = '/addLabourChargesScreen';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -79,17 +111,31 @@ class AppRoutes {
       case AppRoutes.factoryScreen:
         return _buildPageRoute(FactoryScreen(),settings);
       case AppRoutes.salesScreen:
-        return _buildPageRoute(SalesScreen(),settings);
+        final bool isSuperUser = settings.arguments as bool? ?? false;
+        return _buildPageRoute(
+          SalesScreen(isSuperUser: isSuperUser),
+          settings,
+        );
+
       case AppRoutes.profileScreen:
-        return _buildPageRoute(ProfileScreen(),settings);
+        final bool isSuperUser = settings.arguments as bool? ?? false;
+        return _buildPageRoute(ProfileScreen(isSuperUser: isSuperUser),settings);
       case AppRoutes.loadingProductScreen:
         final data = settings.arguments;
         return _buildPageRoute(LoadingProductScreen(userData: data),settings);
       case AppRoutes.reportScreen:
-        final data = settings.arguments;
-        return _buildPageRoute(ReportScreen(reportData: data),settings);
+        final args = settings.arguments as Map?;
+        return _buildPageRoute(
+          ReportScreen(
+            reportData: args?['reportData'],
+            isSuperUser: args?['isSuperUser'] ?? false,
+          ),
+          settings,
+        );
+
       case AppRoutes.billingScreen:
-        return _buildPageRoute(BillingScreen(),settings);
+        final bool isSuperUser = settings.arguments as bool? ?? false;
+        return _buildPageRoute(BillingScreen(isSuperUser: isSuperUser),settings);
       case AppRoutes.billingFillDetailsScreen:
         final data = settings.arguments;
         return _buildPageRoute(BillingFillDetailsScreen(billingData: data),settings);
@@ -110,7 +156,40 @@ class AppRoutes {
       case staffDetails:
         final data = settings.arguments;
         return _buildPageRoute(StaffDetails(subUserData: data,), settings);
-
+      case attendanceScreen:
+        return _buildPageRoute(AttendanceScreen(), settings);
+      case markAttendanceScreen:
+        return _buildPageRoute(MarkAttendanceScreen(), settings);
+      case initialQcScreen:
+        return _buildPageRoute(InitialQcScreen(), settings);
+      case initialQcApprovalScreen:
+        final data = settings.arguments;
+        return _buildPageRoute(InitialQcApprovalScreen(qcData: data), settings);
+      case createSalesLeadScreen:
+        return _buildPageRoute(CreateSalesLeadScreen(), settings);
+      case salesDetailScreen:
+        final data = settings.arguments;
+        return _buildPageRoute(SalesDetailScreen(salesData: data), settings);
+      case billingFillDetailsSuperUser:
+        return _buildPageRoute(BillingFillDetailsSuperUser(), settings);
+      case expenseScreen:
+        return _buildPageRoute(ExpenseScreen(), settings);
+      case salaryScreen:
+        return _buildPageRoute(SalaryScreen(), settings);
+      case salaryRolloutScreen:
+        return _buildPageRoute(SalaryRolloutScreen(), settings);
+      case purchaseRequestScreen:
+        return _buildPageRoute(PurchaseRequestScreen(), settings);
+      case purchaseRequestDetail:
+        return _buildPageRoute(PurchaseRequestDetail(), settings);
+      case brokerScreen:
+        return _buildPageRoute(BrokerScreen(), settings);
+      case brokerDetailScreen:
+        return _buildPageRoute(BrokerDetailScreen(), settings);
+      case labourScreen:
+        return _buildPageRoute(LabourScreen(), settings);
+      case addLabourChargesScreen:
+        return _buildPageRoute(AddLabourChargesScreen(), settings);
 
       default:
         return _buildPageRoute(const RegistrationScreen(), settings); // Changed to DashboardScreen

@@ -96,7 +96,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         AppDimensions.w10(context),
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.profileScreen);
+                            Navigator.pushNamed(context, AppRoutes.profileScreen, arguments: superUser);
                           },
                           child: Image.asset(
                             ImageAssets.profileImage,

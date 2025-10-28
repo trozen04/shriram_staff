@@ -32,6 +32,8 @@ class ImageAssets {
   static const String call = "assets/SuperUserImages/call.png";
   static const String qcPng = "assets/SuperUserImages/qcPng.png";
   static const String editImage = "assets/SuperUserImages/editImage.png";
+  static const String calender = "assets/SuperUserImages/Calender.png";
+  static const String salaryPng = "assets/SuperUserImages/salaryPng.png";
 
 
 }

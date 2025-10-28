@@ -47,6 +47,11 @@ class AppTextStyles {
     color: AppColors.bodyTextColor,
     fontWeight: FontWeight.w500,
   );
+  static final TextStyle grandTotalText = GoogleFonts.dmSans(
+    fontSize: 12,
+    color: AppColors.bodyTextColor,
+    fontWeight: FontWeight.w600,
+  );
 
   static final TextStyle hintText = GoogleFonts.dmSans(
     fontSize: 14,

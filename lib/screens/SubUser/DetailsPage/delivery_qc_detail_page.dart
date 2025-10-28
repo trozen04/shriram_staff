@@ -37,7 +37,8 @@ class DeliveryQcDetailPage extends StatelessWidget {
             AppDimensions.h20(context),
 
             //if (isAfterQC && data['_id'] != null && data['_id'].toString().isNotEmpty)
-            if (isAfterQC || isPendingQC) ProfileRow(label: 'Unit ID', value: '#221212'),
+            if (isAfterQC || isPendingQC)
+              ProfileRow(label: 'Unit ID', value: '#221212'),
             ProfileRow(label: 'Name', value: 'Ramesh Yadav'),
             ProfileRow(label: 'Broker', value: 'Rahul'),
             ProfileRow(label: 'Quantity', value: '50 Qntl'),

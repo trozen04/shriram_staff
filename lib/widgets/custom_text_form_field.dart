@@ -86,13 +86,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
 
             suffixIcon: widget.suffix,
             filled: true,
-            fillColor: widget.isReadOnly! ? AppColors.readOnlyFillColor : Colors.grey[50],
+            fillColor: widget.isReadOnly! ? AppColors.readOnlyFillColor : Colors.white,
             contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+              BorderSide(color: AppColors.cardBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

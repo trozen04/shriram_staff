@@ -9,8 +9,10 @@ class SalesCard extends StatelessWidget {
   final String date;
   final String? address;
   final String? city;
+  final String? staffName;
   final double height;
   final double width;
+  final bool? isPending;
 
   const SalesCard({
     super.key,
@@ -18,8 +20,10 @@ class SalesCard extends StatelessWidget {
     required this.date,
     this.address,
     this.city,
+    this.staffName,
     required this.height,
     required this.width,
+    this.isPending = false,
   });
 
   @override
@@ -49,7 +53,8 @@ class SalesCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-
+                    AppDimensions.w10(context),
+                    _buildStatusTag(isPending!)
                   ],
                 ),
               ),
@@ -73,6 +78,11 @@ class SalesCard extends StatelessWidget {
               _buildInfoRow(text: 'Address', value: address!),
                 AppDimensions.h10(context),
               _buildInfoRow(text: 'City/Town', value: city!),
+              if(staffName!.isNotEmpty || staffName != null) ...[
+                AppDimensions.h10(context),
+                _buildInfoRow(text: 'Staff', value: staffName!),
+              ]
+
             ],
           ),
 
@@ -101,16 +111,20 @@ class SalesCard extends StatelessWidget {
   }
 }
 
-Widget _buildStatusTag(String status) {
+Widget _buildStatusTag(bool isPending) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: AppColors.pendingColor.withOpacity(0.21),
+      color: isPending ? AppColors.pendingColor.withOpacity(0.21)
+      : AppColors.successColor.withOpacity(0.21),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(
-      status,
-      style: AppTextStyles.statusFont,
+      isPending ? 'Loading Pending' : 'Dispatched',
+      style: AppTextStyles.statusFont.copyWith(
+        color: isPending ? AppColors.pendingColor
+            : AppColors.successColor
+      ),
       maxLines: 1,
     ),
   );

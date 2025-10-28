@@ -17,19 +17,17 @@ class _FactoryScreenState extends State<FactoryScreen> {
   DateTime? selectedDate;
 
   void _pickDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
+  final DateTime? picked = await pickDate(
+    context: context,
+    initialDate: selectedDate,
+  );
 
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
+  if (picked != null && picked != selectedDate) {
+    setState(() {
+      selectedDate = picked;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {

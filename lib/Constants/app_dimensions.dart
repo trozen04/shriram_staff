@@ -33,5 +33,7 @@ class AppDimensions {
       SizedBox(width: MediaQuery.of(context).size.width * 0.025);
   static SizedBox w20(BuildContext context) =>
       SizedBox(width: MediaQuery.of(context).size.width * 0.05);
+  static SizedBox w40(BuildContext context) =>
+      SizedBox(width: MediaQuery.of(context).size.width * 0.1);
 
 }
