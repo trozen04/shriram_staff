@@ -57,7 +57,7 @@ class HomeInfoCard extends StatelessWidget {
                     children: [
                       // Name
                       Text(
-                        cardType == CardType.qc
+                        cardType == CardType.qc || cardType == CardType.billing
                             ? '#22311'
                         : vehicleNumber!,
                         style: AppTextStyles.cardHeading,

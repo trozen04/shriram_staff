@@ -20,6 +20,7 @@ class DeliveryQcDetailPage extends StatelessWidget {
     final data = userData;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: ReusableAppBar(
         title: isPendingQC ? "#22311" : data['vehicleNumber'] ?? 'Details',
       ),

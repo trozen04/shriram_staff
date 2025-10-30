@@ -192,12 +192,13 @@ class ReusableDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
+      icon: const Icon(Icons.keyboard_arrow_down_outlined),
       decoration: InputDecoration(
         isDense: true,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
         errorStyle: const TextStyle(
           height: 1, // reduce vertical gap
           color: Colors.red,
@@ -388,7 +389,13 @@ class TableCellWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(text, style: textStyle),
+      child: Text(
+        text,
+        style: textStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false
+      ),
     );
   }
 }
@@ -466,43 +473,40 @@ class ReusableTextField extends StatelessWidget {
         AppDimensions.h5(context),
 
         // Text Field
-        InkWell(
+        TextFormField(
+          controller: controller,
+          onChanged: onChanged,
+          validator: validator,
+          keyboardType: keyboardType,
+          readOnly: readOnly,
+          maxLines: maxLines,
           onTap: onTap,
-          child: TextFormField(
-            controller: controller,
-            onChanged: onChanged,
-            validator: validator,
-            keyboardType: keyboardType,
-            readOnly: readOnly,
-            maxLines: maxLines,
-            inputFormatters: keyboardType == TextInputType.number ||
-                keyboardType == TextInputType.phone
-                ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
-                : [],
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: AppTextStyles.hintText,
-              filled: true,
-              fillColor: readOnly
-                  ? AppColors.readOnlyFillColor
-                  : Colors.white, // same logic
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: AppColors.cardBorder),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                    color: AppColors.primaryColor, width: 2),
-              ),
+          inputFormatters: keyboardType == TextInputType.number ||
+              keyboardType == TextInputType.phone
+              ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
+              : [],
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: AppTextStyles.hintText,
+            filled: true,
+            fillColor: readOnly
+                ? AppColors.readOnlyFillColor
+                : Colors.white, // same logic
+            contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+              BorderSide(color: AppColors.cardBorder),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+              BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                  color: AppColors.primaryColor, width: 2),
             ),
           ),
         ),
@@ -719,7 +723,7 @@ Future<DateTime?> pickDate({
 
 /// Optional helper to format the date as string (e.g., 'dd-MM-yy')
 String formatDate(DateTime? date) {
-  return date != null ? DateFormat('dd-MM-yy').format(date) : 'Select Date';
+  return date != null ? DateFormat('dd-MM-yy').format(date) : 'Date';
 }
 
 
@@ -772,4 +776,55 @@ class CustomFAB extends StatelessWidget {
   }
 }
 
+class StaffTable extends StatelessWidget {
+  final data;
+
+  const StaffTable({
+    super.key,
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final headerTextStyle = AppTextStyles.bodyText;
+    final cellTextStyle = AppTextStyles.bodyText;
+
+    return Table(
+      border: TableBorder.all(
+        color: Colors.transparent, // ✅ ensures no horizontal or vertical lines
+        width: 0,
+      ),
+      columnWidths: const {
+        0: FlexColumnWidth(1.5),
+        1: FlexColumnWidth(1),
+        2: FlexColumnWidth(1),
+      },
+      children: [
+        TableRow(
+          children: [
+            TableHeaderCell(text: 'Staff Name', textStyle: headerTextStyle),
+            TableHeaderCell(text: 'Total Present', textStyle: headerTextStyle),
+            TableHeaderCell(text: 'Total Absent', textStyle: headerTextStyle),
+          ],
+        ),
+        ...data.map((row) => TableRow(
+          children: [
+            TableCellWidget(
+              text: row['name'].toString(),
+              textStyle: AppTextStyles.profileDataText,
+            ),
+            TableCellWidget(
+              text: row['present'].toString(),
+              textStyle: cellTextStyle,
+            ),
+            TableCellWidget(
+              text: row['absent'].toString(),
+              textStyle: cellTextStyle,
+            ),
+          ],
+        )),
+      ],
+    );
+  }
+}
 

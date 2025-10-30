@@ -17,7 +17,7 @@ class InitialQcScreen extends StatefulWidget {
 
 class _InitialQcScreenState extends State<InitialQcScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate = DateTime.now();
+  DateTime? selectedDate;
 
 
   dynamic homeCardsData = [
@@ -61,6 +61,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Initial QC', preferredHeight: height * 0.12),
       body: Padding(
           padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
@@ -80,7 +81,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
               child: Row(
                 children: [
                   _buildIconContainer(
-                    text: 'Date',
+                    text: formatDate(selectedDate),
                     imagePath: ImageAssets.calender,
                     width: width,
                     height: height,
@@ -113,36 +114,47 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
 
             ),
             AppDimensions.h20(context),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(homeCardsData.length, (index) {
-                final data = homeCardsData[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.billingFillDetailsScreen, arguments: null);
-                    },
-                    child: HomeInfoCard(
-                      cardType: CardType.initialQC,
-                      farmerName: data!['name'],
-                      date: data['date']!,
-                      vehicleNumber: data['vehicleNumber'],
-                      brokerName: data['driverName'],
-                      staffName: 'Ram',
-                      height: height,
-                      width: width,
-                      isPending: false,
-                      isSuperUser: true,
-                      onPressed: (){
-                        Navigator.pushNamed(context, AppRoutes.initialQcApprovalScreen, arguments: null);
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 10),
+                itemCount: homeCardsData.length,
+                itemBuilder: (context, index) {
+                  final data = homeCardsData[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.billingFillDetailsScreen,
+                          arguments: null,
+                        );
                       },
+                      child: HomeInfoCard(
+                        cardType: CardType.initialQC,
+                        farmerName: data!['name'],
+                        date: data['date']!,
+                        vehicleNumber: data['vehicleNumber'],
+                        brokerName: data['driverName'],
+                        staffName: 'Ram',
+                        height: height,
+                        width: width,
+                        isPending: false,
+                        isSuperUser: true,
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.initialQcApprovalScreen,
+                            arguments: null,
+                          );
+                        },
+                      ),
                     ),
-
-                  ),
-                );
-              }),
+                  );
+                },
+              ),
             )
+
           ],
         ),
       ),

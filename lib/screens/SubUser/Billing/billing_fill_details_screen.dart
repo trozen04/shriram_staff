@@ -173,6 +173,7 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Paddy Type ${index + 1}', style: AppTextStyles.label),
+                AppDimensions.h5(context),
                 if (index == paddyEntries.length-1)
                   Row(
                     children: [
@@ -212,8 +213,6 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               hintText: 'Amount (auto calculate)',
               isReadOnly: true,
             ),
-            AppDimensions.h10(context),
-            Container(height: 1, color: AppColors.borderColor.withOpacity(0.5)),
           ],
         ),
       );
@@ -224,12 +223,14 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
   Widget _buildDropdown({String? selectedValue, required ValueChanged<String?> onChanged}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
+      width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          icon: Icon(Icons.keyboard_arrow_down_outlined),
           value: selectedValue,
           hint: Text('Select Paddy Type', style: AppTextStyles.hintText),
           items: paddyTypes

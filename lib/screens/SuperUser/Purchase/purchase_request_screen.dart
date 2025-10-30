@@ -71,19 +71,20 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Purchase Request',
         preferredHeight: height * 0.12,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
         child: Column(
           children: [
-            // Custom search field
+            // Search Field
             ReusableSearchField(
               controller: searchController,
-              hintText: 'Search by Farmer Name/City/Town',
+              hintText: 'Search by Truck No./Farmer/Broker',
               onChanged: (value) {
                 // handle search logic
               },
@@ -91,87 +92,85 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
 
             AppDimensions.h20(context),
 
-            // Date picker and Add New Leads button
+            // Date / Factory / Filter buttons
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width - (width * 0.07), // subtract total horizontal padding
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomRoundedButton(
-                      onTap: _pickDate,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            selectedDate != null
-                                ? DateFormat('dd-MM-yy').format(selectedDate!)
-                                : 'Date',
-                            style: AppTextStyles.dateText,
-                          ),
-                          const SizedBox(width: 8),
-                          Image.asset(ImageAssets.calender, height: height * 0.025),                        ],
-                      ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomRoundedButton(
+                    onTap: _pickDate,
+                    child: Row(
+                      children: [
+                        Text(
+                          formatDate(selectedDate),
+                          style: AppTextStyles.dateText,
+                        ),
+                        const SizedBox(width: 8),
+                        Image.asset(ImageAssets.calender, height: height * 0.025),
+                      ],
                     ),
-                    CustomRoundedButton(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Text('Factory', style: AppTextStyles.dateText),
-                          const SizedBox(width: 8),
-                          Image.asset(ImageAssets.factoryPNG, height: 20),
-                        ],
-                      ),
+                  ),
+                  SizedBox(width: width * 0.045),
+                  CustomRoundedButton(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Text('Factory', style: AppTextStyles.dateText),
+                        const SizedBox(width: 8),
+                        Image.asset(ImageAssets.factoryPNG, height: 20),
+                      ],
                     ),
-
-                    CustomRoundedButton(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Text('Filter', style: AppTextStyles.dateText),
-                          AppDimensions.w10(context),
-                          Icon(Icons.tune, color: AppColors.primaryColor),
-                        ],
-                      ),
+                  ),
+                  SizedBox(width: width * 0.045),
+                  CustomRoundedButton(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Text('Filter', style: AppTextStyles.dateText),
+                        const SizedBox(width: 8),
+                        Icon(Icons.tune, color: AppColors.primaryColor),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
-
             AppDimensions.h20(context),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(purchaseRequestData.length, (index) {
-                final data = purchaseRequestData[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: PurchaseRequestCard(
-                    farmerName: 'Ramesh Kumar',
-                    brokerName: 'Suresh Traders',
-                    date: '28-09-2025',
-                    paddy: 'Basmati 1121',
-                    height: height,
-                    width: width,
-                    isPending: true,
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.purchaseRequestDetail);
-                    },
-                  ),
-                );
-
-              }),
-            )
-
-
+            // ✅ Only this part scrolls
+            Expanded(
+              child: ListView.builder(
+                itemCount: purchaseRequestData.length,
+                padding: const EdgeInsets.only(bottom: 10),
+                itemBuilder: (context, index) {
+                  final data = purchaseRequestData[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: PurchaseRequestCard(
+                      farmerName: data['name'],
+                      brokerName: data['brokerName'],
+                      date: data['date'],
+                      paddy: data['paddy'],
+                      height: height,
+                      width: width,
+                      isPending: true,
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.purchaseRequestDetail,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
+
   }
 }

@@ -18,6 +18,7 @@ class StaffDetails extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: ReusableAppBar(title: 'Ram'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart' hide OutlinedButton;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../Constants/app_dimensions.dart';
+import '../../../Utils/image_assets.dart';
+import '../../../utils/app_colors.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_snackbar.dart';
 import '../../../widgets/primary_and_outlined_button.dart';
@@ -91,9 +93,15 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
                 AppDimensions.h10(context),
 
                 // ---- Upload Fields ----
-                _buildUploadField('Vehicle RC', rcFile, (file) => rcFile = file),
-                _buildUploadField('Driver License', licenseFile, (file) => licenseFile = file),
-                _buildUploadField('Driver Aadhar Card', aadharFile, (file) => aadharFile = file),
+                Text('Vehicle RC', style: AppTextStyles.label),
+                AppDimensions.h5(context),
+                _buildUploadField('Upload RC', rcFile, (file) => rcFile = file, height, width),
+                Text('Driver License', style: AppTextStyles.label),
+                AppDimensions.h5(context),
+                _buildUploadField('Upload License', licenseFile, (file) => licenseFile = file, height, width),
+                Text('Driver Aadhar Card', style: AppTextStyles.label),
+                AppDimensions.h5(context),
+                _buildUploadField('Upload Aadhar', aadharFile, (file) => aadharFile = file, height, width),
 
                 AppDimensions.h20(context),
                 ReusableOutlinedButton(
@@ -123,7 +131,7 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
 
                 _buildSectionTitle('Delivery Proof'),
                 AppDimensions.h10(context),
-                _buildUploadField('Upload Delivery Proof', deliveryProof, (file) => deliveryProof = file),
+                _buildUploadField('Upload Delivery Proof', deliveryProof, (file) => deliveryProof = file, height, width),
                 AppDimensions.h30(context),
 
                 PrimaryButton(
@@ -202,12 +210,13 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
 
   Widget _buildSectionTitle(String title) => Text(title, style: AppTextStyles.appbarTitle);
 
-  Widget _buildUploadField(String label, File? file, Function(File) onFilePicked) {
+  Widget _buildUploadField(String label, File? file, Function(File) onFilePicked, double height, double width) {
     return GestureDetector(
       onTap: () => _pickImage(onFilePicked),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
+
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade400),
@@ -218,7 +227,11 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
           children: [
             Text(file == null ? label : 'Uploaded: ${file.path.split('/').last}',
                 style: AppTextStyles.bodyText),
-            const Icon(Icons.upload, color: Colors.deepPurple),
+            Image.asset(
+              ImageAssets.uploadIcon,
+              color: AppColors.primaryColor,
+              height: 25,
+            ),
           ],
         ),
       ),

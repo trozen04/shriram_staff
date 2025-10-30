@@ -60,22 +60,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if(!superUser!)
                             Text(
-                              'Good Morning',
-                              style: AppTextStyles.bodyText.copyWith(
-                                color: Colors.white
-                              ),
-                            ),
-                            Text(
-                              'Rahul Sharma',
+                              'Sunil Pal',
                               style: AppTextStyles.appbarName
                             ),
-                            if(superUser!)
-                              Text(
-                                  'Worker',
-                                  style: AppTextStyles.appbarName
-                              ),
+                            Text(
+                              'Worker',
+                              style: AppTextStyles.appbarWork
+                            ),
                           ],
                         ),
                       ],

@@ -78,7 +78,7 @@ class SalesCard extends StatelessWidget {
               _buildInfoRow(text: 'Address', value: address!),
                 AppDimensions.h10(context),
               _buildInfoRow(text: 'City/Town', value: city!),
-              if(staffName!.isNotEmpty || staffName != null) ...[
+              if((staffName!.isNotEmpty || staffName != null) && !isPending!) ...[
                 AppDimensions.h10(context),
                 _buildInfoRow(text: 'Staff', value: staffName!),
               ]

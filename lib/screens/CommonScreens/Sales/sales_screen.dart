@@ -21,7 +21,7 @@ class SalesScreen extends StatefulWidget {
 class _SalesScreenState extends State<SalesScreen> {
   TextEditingController searchController = TextEditingController();
   DateTime? selectedDate;
-  dynamic homeCardsData = [
+  dynamic salesData = [
     {
       'name': 'Suresh Kumar',
       'date': '21-09-25',
@@ -62,6 +62,7 @@ class _SalesScreenState extends State<SalesScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Sales',
@@ -76,7 +77,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 // Custom search field
                 ReusableSearchField(
                   controller: searchController,
-                  hintText: 'Search by Farmer Name/City/Town',
+                  hintText: 'Search by Truck No./Farmer/Broker',
                   onChanged: (value) {
                     // handle search logic
                   },
@@ -101,9 +102,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                selectedDate != null
-                                    ? DateFormat('dd-MM-yy').format(selectedDate!)
-                                    : 'Date',
+                                formatDate(selectedDate),
                                 style: AppTextStyles.dateText,
                               ),
                               const SizedBox(width: 8),
@@ -111,7 +110,7 @@ class _SalesScreenState extends State<SalesScreen> {
                           ),
                         ),
 
-                        if (!widget.isSuperUser!) ...[
+                        if (widget.isSuperUser!) ...[
                           SizedBox(width: width * 0.045),
 
                           CustomRoundedButton(
@@ -149,35 +148,46 @@ class _SalesScreenState extends State<SalesScreen> {
 
                 AppDimensions.h20(context),
 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(homeCardsData.length, (index) {
-                    final data = homeCardsData[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: GestureDetector(
-                        onTap: widget.isSuperUser! ? () {
-                          Navigator.pushNamed(context, AppRoutes.salesDetailScreen, arguments: null);
-                        }
-                        : (){
-                          Navigator.pushNamed(context, AppRoutes.loadingProductScreen, arguments: null);
-
-                        },
-                        child: SalesCard(
-                          name: data!['name'],
-                          date: data['date']!,
-                          address: '112/22, Ram Colony',
-                          city: 'Gorakhpur',
-                          height: height,
-                          width: width,
-                          staffName: 'Ram',
-                          isPending: false,
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    itemCount: salesData.length,
+                    itemBuilder: (context, index) {
+                      final data = salesData[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: GestureDetector(
+                          onTap: widget.isSuperUser!
+                              ? () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.salesDetailScreen,
+                              arguments: null,
+                            );
+                          }
+                              : () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.loadingProductScreen,
+                              arguments: null,
+                            );
+                          },
+                          child: SalesCard(
+                            name: data!['name'],
+                            date: data['date']!,
+                            address: '112/22, Ram Colony',
+                            city: 'Gorakhpur',
+                            height: height,
+                            width: width,
+                            staffName: 'Ram',
+                            isPending: true,
+                          ),
                         ),
-
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 )
+
 
 
               ],

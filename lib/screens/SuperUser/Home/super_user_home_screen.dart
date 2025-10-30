@@ -15,7 +15,7 @@ class SuperUserHomeScreen extends StatefulWidget {
 }
 
 class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
-  DateTime? selectedDate;
+  DateTime? selectedDate  = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +31,7 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: true,
         title: 'Home',

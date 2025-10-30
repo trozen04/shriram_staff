@@ -20,41 +20,45 @@ class DeliveryQcPage extends StatefulWidget {
 class _DeliveryQcPageState extends State<DeliveryQcPage> {
   TextEditingController searchController = TextEditingController();
   DateTime? selectedDate;
-  dynamic homeCardsData = [
+
+  final dynamic deliveryData = [
     {
       'name': 'Suresh Kumar',
       'date': '21-09-25',
       'location': 'Lucknow, UP',
       'quantity': '30 Qntl',
       'item': 'Wheat',
-      'price': '15,000',
+      'price': '15000', // number only
       'vehicleNumber': 'DL 12 AB 2198',
       'driverName': 'Sunil Pal',
     },
     {
-      'name': 'Suresh Kumar',
+      'name': 'Ramesh Patel',
       'date': '21-09-25',
-      'location': 'Lucknow, UP',
-      'quantity': '30 Qntl',
-      'item': 'Wheat',
-      'price': '15,000',
-      'vehicleNumber': 'DL 12 AB 2198',
-      'driverName': 'Sunil Pal',
+      'location': 'Kanpur, UP',
+      'quantity': '25 Qntl',
+      'item': 'Rice',
+      'price': '12000', // number only
+      'vehicleNumber': 'UP 32 MN 5678',
+      'driverName': 'Amit Yadav',
     },
   ];
-  void _pickDate() async {
-  final DateTime? picked = await pickDate(
-    context: context,
-    initialDate: selectedDate,
-  );
+  final dynamic qcData = [
 
-  if (picked != null && picked != selectedDate) {
-    setState(() {
-      selectedDate = picked;
-    });
+  ];
+
+  void _pickDate() async {
+    final DateTime? picked = await pickDate(
+      context: context,
+      initialDate: selectedDate,
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
-}
-  
 
   @override
   Widget build(BuildContext context) {
@@ -62,39 +66,38 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
-        title:  widget.isQCPage ? 'Final Quality Check' : 'Deliveries',
+        title: widget.isQCPage ? 'Final Quality Check' : 'Deliveries',
         preferredHeight: height * 0.12,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+      body: Padding(
+        padding:
+        EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
         child: Column(
           children: [
-            // Custom search field
+            // 🔍 Search field
             ReusableSearchField(
               controller: searchController,
-              hintText: 'Search by Farmer Name/City/Town',
-              onChanged: (value) {
-                // handle search logic
-              },
+              hintText: widget.isQCPage
+                  ? 'Search Sample No./Farmer/Broker'
+                  : 'Search by Truck No./Farmer/Broker',
+              onChanged: (value) {},
             ),
-              AppDimensions.h20(context),
+            AppDimensions.h20(context),
 
-            // Date picker and Add New Leads button
+            // 📅 Date picker & Filter
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Date button
                 CustomRoundedButton(
                   onTap: _pickDate,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        selectedDate != null
-                            ? DateFormat('dd-MM-yy').format(selectedDate!)
-                            : 'Date',
+                        formatDate(selectedDate),
                         style: AppTextStyles.dateText,
                       ),
                       const SizedBox(width: 8),
@@ -102,12 +105,8 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                     ],
                   ),
                 ),
-
-                
                 CustomRoundedButton(
-                  onTap: () {
-                    // TODO: Implement filter logic or open filter bottom sheet
-                  },
+                  onTap: () {},
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -122,49 +121,52 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                 ),
               ],
             ),
-
             AppDimensions.h20(context),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(homeCardsData.length, (index) {
-                final data = homeCardsData[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: HomeInfoCard(
-                    cardType: widget.isQCPage ? CardType.qc : CardType.delivery,
-                    farmerName: data!['name'],
-                    date: data['date']!,
-                    vehicleNumber: data['vehicleNumber'],
-                    brokerName: data['driverName'],
-                    height: height,
-                    width: width,
-                    isPending: true,
-                    onPressed: () {
-                      widget.isQCPage ?
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.deliveryDetailPage,
-                        arguments: {
-                          'data': data,
-                          'isPendingQC': true,
-                        },
-                      )
-                          : Navigator.pushNamed(
-                        context,
-                        AppRoutes.deliveryDetailPage,
-                        arguments: {
-                          'data': data,
-                          'isAfterQC': false,
-                        },
-                      );
-                    },
-                                    ),
-                );
-              }),
-            )
-
-
+            // 📋 List of Cards (scrollable)
+            Expanded(
+              child: ListView.builder(
+                itemCount: deliveryData.length,
+                itemBuilder: (context, index) {
+                  final data = deliveryData[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: HomeInfoCard(
+                      cardType:
+                      widget.isQCPage ? CardType.qc : CardType.delivery,
+                      farmerName: data['name'] ?? '',
+                      date: data['date'] ?? '',
+                      vehicleNumber: data['vehicleNumber'] ?? '',
+                      brokerName: data['driverName'] ?? '',
+                      height: height,
+                      width: width,
+                      isPending: true,
+                      onPressed: () {
+                        if (widget.isQCPage) {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.deliveryDetailPage,
+                            arguments: {
+                              'data': data,
+                              'isPendingQC': true,
+                            },
+                          );
+                        } else {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.deliveryDetailPage,
+                            arguments: {
+                              'data': data,
+                              'isAfterQC': false,
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

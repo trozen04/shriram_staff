@@ -19,6 +19,7 @@ class _InitialQcApprovalScreenState extends State<InitialQcApprovalScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: ReusableAppBar(title: 'DL 12 AB 2198'),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),

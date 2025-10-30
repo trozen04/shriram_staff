@@ -21,7 +21,7 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? toDate;
   DateTime? _fromDate;
   DateTime? _toDate;
-  DateTime? selectedDate;
+  DateTime? selectedDate  = DateTime.now();
   Future<void> _pickFromDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -53,7 +53,12 @@ class _ReportScreenState extends State<ReportScreen> {
     {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
     {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
     {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
+    {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
+    {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
+    {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
+    {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
   ];
+
   void _pickDateRange() async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -91,6 +96,7 @@ class _ReportScreenState extends State<ReportScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Report', preferredHeight: height * 0.12),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
@@ -189,7 +195,7 @@ class _ReportScreenState extends State<ReportScreen> {
             ],
 
             AppDimensions.h20(context),
-            ReportTable(data: reportData),
+            Expanded(child: SingleChildScrollView(child: ReportTable(data: reportData))),
           ],
         ),
       ),

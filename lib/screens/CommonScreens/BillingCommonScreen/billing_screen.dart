@@ -51,6 +51,47 @@ class _BillingScreenState extends State<BillingScreen> {
       'vehicleNumber': 'DL 12 AB 2198',
       'driverName': 'Sunil Pal',
     },
+        {
+      'name': 'Suresh Kumar',
+      'date': '21-09-25',
+      'location': 'Lucknow, UP',
+      'quantity': '30 Qntl',
+      'item': 'Wheat',
+      'price': '15,000',
+      'vehicleNumber': 'DL 12 AB 2198',
+      'driverName': 'Sunil Pal',
+    },
+    {
+      'name': 'Suresh Kumar',
+      'date': '21-09-25',
+      'location': 'Lucknow, UP',
+      'quantity': '30 Qntl',
+      'item': 'Wheat',
+      'price': '15,000',
+      'vehicleNumber': 'DL 12 AB 2198',
+      'driverName': 'Sunil Pal',
+    },
+        {
+      'name': 'Suresh Kumar',
+      'date': '21-09-25',
+      'location': 'Lucknow, UP',
+      'quantity': '30 Qntl',
+      'item': 'Wheat',
+      'price': '15,000',
+      'vehicleNumber': 'DL 12 AB 2198',
+      'driverName': 'Sunil Pal',
+    },
+    {
+      'name': 'Suresh Kumar',
+      'date': '21-09-25',
+      'location': 'Lucknow, UP',
+      'quantity': '30 Qntl',
+      'item': 'Wheat',
+      'price': '15,000',
+      'vehicleNumber': 'DL 12 AB 2198',
+      'driverName': 'Sunil Pal',
+    },
+
   ];
   void _pickDate() async {
   final DateTime? picked = await pickDate(
@@ -72,21 +113,22 @@ class _BillingScreenState extends State<BillingScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Billing',
         preferredHeight: height * 0.12,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
         child: Column(
           children: [
             // Custom search field
             ReusableSearchField(
               controller: searchController,
-              hintText: 'Search by Farmer Name/City/Town',
+              hintText: 'Search Sample No./Farmer/Broker',
               onChanged: (value) {
-                // handle search logic
+
               },
             ),
 
@@ -108,9 +150,7 @@ class _BillingScreenState extends State<BillingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            selectedDate != null
-                                ? DateFormat('dd-MM-yy').format(selectedDate!)
-                                : 'Date',
+                            formatDate(selectedDate),
                             style: AppTextStyles.dateText,
                           ),
                           const SizedBox(width: 8),
@@ -151,31 +191,52 @@ class _BillingScreenState extends State<BillingScreen> {
 
             AppDimensions.h20(context),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(homeCardsData.length, (index) {
-                final data = homeCardsData[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: HomeInfoCard(
-                    cardType: CardType.billing,
-                    farmerName: data!['name'],
-                    date: data['date']!,
-                    vehicleNumber: data['vehicleNumber'],
-                    brokerName: data['driverName'],
-                    height: height,
-                    width: width,
-                    onPressed: (){
-                      widget.isSuperUser! ?
-                        Navigator.pushNamed(context, AppRoutes.billingFillDetailsSuperUser)
-                      : Navigator.pushNamed(context, AppRoutes.billingFillDetailsScreen, arguments: null);
-
-                    },
-                    isPending: true,
-                    isSuperUser: widget.isSuperUser ?? false,
-                  ),
-                );
-              }),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 10),
+                itemCount: homeCardsData.length,
+                itemBuilder: (context, index) {
+                  final data = homeCardsData[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: HomeInfoCard(
+                      cardType: CardType.billing,
+                      farmerName: data!['name'],
+                      date: data['date']!,
+                      vehicleNumber: data['vehicleNumber'],
+                      brokerName: data['driverName'],
+                      height: height,
+                      width: width,
+                      onPressed: () {
+                        widget.isSuperUser!
+                            ?
+                            //if pending then fill details else another (maybe)
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.billingFillDetailsSuperUser,
+                        )
+                        // Navigator.pushNamed(
+                        //   context,
+                        //   AppRoutes.billingDetailScreenSuperUser,
+                        // )
+                            : Navigator.pushNamed(
+                          context,
+                          AppRoutes.billingFillDetailsScreen,
+                          arguments: null,
+                        );
+                        //if pending is false
+                        // Navigator.pushNamed(
+                        //   context,
+                        //   AppRoutes.billingDetailsScreen,
+                        //   arguments: null,
+                        // );
+                      },
+                      isPending: true,
+                      isSuperUser: widget.isSuperUser ?? false,
+                    ),
+                  );
+                },
+              ),
             )
 
 

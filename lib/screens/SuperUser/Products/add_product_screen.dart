@@ -17,6 +17,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Product Master', preferredHeight: height * 0.12),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),

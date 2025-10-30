@@ -15,6 +15,7 @@ class MarkAttendanceScreen extends StatefulWidget {
 }
 
 class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
+  DateTime selectedDate = DateTime.now();
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -25,23 +26,32 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   final List<String> statusList = ['Present', 'Absent', 'Half Day'];
   String? _selectedStatus;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  @override
+  void initState() {
+    super.initState();
+
+    // 🗓️ Set today's date initially
+    final todayIST = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
+    final formattedToday = DateFormat('d MMMM, yyyy').format(todayIST);
+    _dateController.text = formattedToday;
+  }
+
+  void _pickDate() async {
+    final DateTime? picked = await pickDate(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      initialDate: selectedDate,
     );
 
-    if (picked != null) {
-      // Convert to Indian Standard Time (UTC+5:30)
+    if (picked != null && picked != selectedDate) {
+      // ✅ Convert to Indian Standard Time (UTC+5:30)
       final istDate = picked.toUtc().add(const Duration(hours: 5, minutes: 30));
 
-      // Format as "23 September, 2025"
+      // ✅ Format: "23 September, 2025"
       final formattedDate = DateFormat('d MMMM, yyyy').format(istDate);
 
-      // ✅ Update text controller so it shows inside the field
+      // ✅ Update state and text controller
       setState(() {
+        selectedDate = picked;
         _dateController.text = formattedDate;
       });
     }
@@ -62,6 +72,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Attendance', preferredHeight: height * 0.12),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
@@ -84,7 +95,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 hint: 'select date',
                 controller: _dateController,
                 readOnly: true,
-                onTap: () => _selectDate(context),
+                onTap: () => _pickDate(),
                 validator: (value) => value == null || value.isEmpty ? 'Date is required' : null,
               ),
 

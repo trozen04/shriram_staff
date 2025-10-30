@@ -18,6 +18,7 @@ import '../screens/SubUser/QualityCheck/quality_check_submit_page.dart';
 import '../screens/SubUser/WeightConfirmationPage/weight_confirmation_page.dart';
 import '../screens/SuperUser/Attendance/attendance_screen.dart';
 import '../screens/SuperUser/Attendance/mark_attendance_screen.dart';
+import '../screens/SuperUser/BillingSuperUser/billing_details.dart';
 import '../screens/SuperUser/BillingSuperUser/billing_fill_details_super_user.dart';
 import '../screens/SuperUser/Broker/broker_detail_screen.dart';
 import '../screens/SuperUser/Broker/broker_screen.dart';
@@ -67,6 +68,7 @@ class AppRoutes {
   static const String createSalesLeadScreen = '/createSalesLeadScreen';
   static const String salesDetailScreen = '/salesDetailScreen';
   static const String billingFillDetailsSuperUser = '/billingFillDetailsSuperUser';
+  static const String billingDetailScreenSuperUser = '/billingDetailScreenSuperUser';
   static const String expenseScreen = '/expenseScreen';
   static const String salaryScreen = '/salaryScreen';
   static const String salaryRolloutScreen = '/salaryRolloutScreen';
@@ -176,6 +178,9 @@ class AppRoutes {
         return _buildPageRoute(SalesDetailScreen(salesData: data), settings);
       case billingFillDetailsSuperUser:
         return _buildPageRoute(BillingFillDetailsSuperUser(), settings);
+      case billingDetailScreenSuperUser:
+        return _buildPageRoute(BillingDetailScreen(), settings);
+
       case expenseScreen:
         return _buildPageRoute(ExpenseScreen(), settings);
       case salaryScreen:
@@ -226,4 +231,5 @@ class AppRoutes {
       },
     );
   }
+
 }

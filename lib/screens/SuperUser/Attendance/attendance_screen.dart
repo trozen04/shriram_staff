@@ -16,7 +16,7 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate = DateTime.now();
+  DateTime? selectedDate  = DateTime.now();
 
   final dynamic attendanceData = [
     {"name": "Suresh Kumar", "present": 20, "absent": 2},
@@ -25,12 +25,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     {"name": "Vijay Kumar", "present": 19, "absent": 3},
   ];
 
+
   void _pickDate() async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await pickDate(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      initialDate: selectedDate,
     );
 
     if (picked != null && picked != selectedDate) {
@@ -46,6 +45,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Attendance', preferredHeight: height * 0.12),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
@@ -79,10 +79,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildIconContainer(Icons.filter_list, width, height, (){}),
+                  _buildIconContainer(Icons.filter_list, width, height, (){
+                    print('filter list');
+                  }),
                   SizedBox(width: width * 0.045),
 
-                  _buildIconContainer(Icons.calendar_month_outlined, width, height, () => _pickDate),
+                  _buildIconContainer(Icons.calendar_month_outlined, width, height, _pickDate),
 
                   SizedBox(width: width * 0.045),
 
@@ -115,7 +117,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             AppDimensions.h10(context),
 
             /// 📋 Attendance Table
-            StaffTable(data: attendanceData)
+            Expanded(
+              child: SingleChildScrollView(
+                child: StaffTable(data: attendanceData),
+              ),
+            ),
+
           ],
         ),
       ),
@@ -123,65 +130,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Widget _buildIconContainer(IconData icon, double width, double height, final VoidCallback onTap) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.16),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Icon(icon, color: AppColors.primaryColor),
-    );
-  }
-}
-
-class StaffTable extends StatelessWidget {
-  final data;
-
-  const StaffTable({
-    super.key,
-    required this.data,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final headerTextStyle = AppTextStyles.profileDataText;
-    final cellTextStyle = AppTextStyles.bodyText;
-
-    return Table(
-      border: TableBorder.all(
-        color: Colors.transparent, // ✅ ensures no horizontal or vertical lines
-        width: 0,
-      ),
-      columnWidths: const {
-        0: FlexColumnWidth(1.5),
-        1: FlexColumnWidth(1),
-        2: FlexColumnWidth(1),
-      },
-      children: [
-        TableRow(
-          children: [
-            TableHeaderCell(text: 'Staff Name', textStyle: headerTextStyle),
-            TableHeaderCell(text: 'Total Present', textStyle: headerTextStyle),
-            TableHeaderCell(text: 'Total Absent', textStyle: headerTextStyle),
-          ],
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(0.16),
+          borderRadius: BorderRadius.circular(30),
         ),
-        ...data.map((row) => TableRow(
-          children: [
-            TableCellWidget(
-              text: row['name'].toString(),
-              textStyle: AppTextStyles.profileDataText,
-            ),
-            TableCellWidget(
-              text: row['present'].toString(),
-              textStyle: cellTextStyle,
-            ),
-            TableCellWidget(
-              text: row['absent'].toString(),
-              textStyle: cellTextStyle,
-            ),
-          ],
-        )),
-      ],
+        child: Icon(icon, color: AppColors.primaryColor),
+      ),
     );
   }
 }
+

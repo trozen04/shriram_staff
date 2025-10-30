@@ -66,6 +66,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: '#22311'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -218,8 +219,10 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                 onTap: _pickImage,
                 child: Container(
                   width: double.infinity,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.035,
+                    vertical: height * 0.015,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black26),
                     borderRadius: BorderRadius.circular(10),
@@ -237,7 +240,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                       Image.asset(
                         ImageAssets.uploadIcon,
                         color: AppColors.primaryColor,
-                        height: 30,
+                        height: 25,
                       ),
                     ],
                   ),

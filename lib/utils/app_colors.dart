@@ -15,6 +15,8 @@ class AppColors {
   static const Color readOnlyFillColor = Color(0xFFE5E5E5);
   static const Color bottomBorder = Color(0xFFEBEBEB);
   static const Color successColor = Color(0xFF07D000);
+  static const Color opacityColorBlack = Color(0xFF939393);
+  static const Color dividerColor = Color(0xFFDDDDDD);
 
   static const Color textColor = Colors.black87;
   static const Color hintColor = Colors.grey;

@@ -38,6 +38,16 @@ class _SubUsersListState extends State<SubUsersList> {
       'vehicleNumber': 'DL 12 AB 2198',
       'driverName': 'Sunil Pal',
     },
+    {
+      'name': 'Suresh Kumar',
+      'date': '21-09-25',
+      'location': 'Lucknow, UP',
+      'quantity': '30 Qntl',
+      'item': 'Wheat',
+      'price': '15,000',
+      'vehicleNumber': 'DL 12 AB 2198',
+      'driverName': 'Sunil Pal',
+    },
   ];
 
   @override
@@ -46,6 +56,7 @@ class _SubUsersListState extends State<SubUsersList> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Sub User',
@@ -89,34 +100,39 @@ class _SubUsersListState extends State<SubUsersList> {
                   ],
                 ),
                 AppDimensions.h20(context),
-            
-            
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(homeCardsData.length, (index) {
-                    final data = homeCardsData[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.staffDetails, arguments: null);
-                        },
-                        child: SubUserCard(
-                          name: data!['name'],
-                          date: data['date']!,
-                          position: 'Manager',
-                          phone: '+91 9829891143',
-                          qcType: 'initialQC',
-                          height: height,
-                          width: width,
+
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: homeCardsData.length,
+                    itemBuilder: (context, index) {
+                      final data = homeCardsData[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.staffDetails,
+                              arguments: null,
+                            );
+                          },
+                          child: SubUserCard(
+                            name: data!['name'],
+                            date: data['date']!,
+                            position: 'Manager',
+                            phone: '+91 9829891143',
+                            qcType: 'initialQC',
+                            height: height,
+                            width: width,
+                          ),
                         ),
-            
-                      ),
-                    );
-                  }),
-                )
-            
-            
+                      );
+                    },
+                  ),
+                ),
+
+
               ],
             ),
             CustomFAB(

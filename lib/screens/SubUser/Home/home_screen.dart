@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime? selectedDate;
+  DateTime? selectedDate  = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: true,
         title: 'Home',
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: 'Sales',
                   imagePath: ImageAssets.sales,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: null);
+                    Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: false);
                   },
                 ),
                 ActionButton(

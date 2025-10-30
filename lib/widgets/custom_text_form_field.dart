@@ -87,8 +87,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             suffixIcon: widget.suffix,
             filled: true,
             fillColor: widget.isReadOnly! ? AppColors.readOnlyFillColor : Colors.white,
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:

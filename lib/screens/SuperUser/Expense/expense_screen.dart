@@ -19,16 +19,14 @@ class ExpenseScreen extends StatefulWidget {
 class _ExpenseScreenState extends State<ExpenseScreen> {
   DateTime? _fromDate;
   DateTime? _toDate;
-  DateTime? selectedDate;
+  DateTime? selectedDate  = DateTime.now();
 
   // ✅ Example dynamic expense data list
   final dynamic expenses = [
     {'reason': 'Money Lend', 'amount': 2200},
-
     {'reason': 'Money Lend', 'amount': 2200},
     {'reason': 'Office Supplies', 'amount': 1500},
     {'reason': 'Fuel Expense', 'amount': 800},
-
   ];
 
   void _pickDateRange() async {
@@ -71,6 +69,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Expense', preferredHeight: height * 0.12),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
@@ -122,10 +121,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 AppDimensions.h20(context),
 
                 // 🔹 Date Heading
+                if(_fromDate != null && _toDate != null)
                 Text(
-                  _fromDate != null && _toDate != null
-                      ? '${DateFormat('dd MMM yyyy').format(_fromDate!)}  →  ${DateFormat('dd MMM yyyy').format(_toDate!)}'
-                      : 'No date range selected',
+                  '${DateFormat('dd MMM yyyy').format(_fromDate!)}  →  ${DateFormat('dd MMM yyyy').format(_toDate!)}',
                   style: AppTextStyles.appbarTitle,
                 ),
 

@@ -36,6 +36,7 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: 'Delivery & Initial QC'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -93,7 +94,7 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
 
               ReusableTextField(
                 label: 'Discolor %',
-                hint: 'Enter Discolor Percentage',
+                hint: 'Enter Discolor %',
                 onChanged: (val) => setState(() => discolorPercent = val),
                 validator: (val) => val!.isEmpty ? 'Please enter the discolor percentage' : null,
               ),

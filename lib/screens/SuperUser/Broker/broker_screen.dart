@@ -20,7 +20,7 @@ class BrokerScreen extends StatefulWidget {
 
 class _BrokerScreenState extends State<BrokerScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate;
+  DateTime? selectedDate  = DateTime.now();
 
   @override
   void initState() {
@@ -72,6 +72,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Broker',
@@ -119,6 +120,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
                         ],
                       ),
                     ),
+                    SizedBox(width: width * 0.045),
                     CustomRoundedButton(
                       onTap: () {},
                       child: Row(
@@ -129,7 +131,7 @@ class _BrokerScreenState extends State<BrokerScreen> {
                         ],
                       ),
                     ),
-
+                    SizedBox(width: width * 0.045),
                     CustomRoundedButton(
                       onTap: () {},
                       child: Row(

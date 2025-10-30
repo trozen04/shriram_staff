@@ -19,6 +19,11 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.backgroundColor,
   );
+  static final TextStyle appbarWork = GoogleFonts.poppins(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.backgroundColor,
+  );
 
   static final TextStyle buttonText = GoogleFonts.poppins(
     fontSize: 18,

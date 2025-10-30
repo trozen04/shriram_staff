@@ -29,12 +29,37 @@ class _SalaryScreenState extends State<SalaryScreen> {
       });
     }
   }
-  final dynamic expenses = [
-    {'reason': 'Money Lend', 'amount': 2200},
-    {'reason': 'Money Lend', 'amount': 2200},
-    {'reason': 'Office Supplies', 'amount': 1500},
-    {'reason': 'Fuel Expense', 'amount': 800},
+  final salaryDetails = [
+    {
+      'Staff Name': 'Mohan',
+      'Present': '26 Days',
+      'Total Salary': 20000,
+      'Salary Paid': 15000,
+      'Salary Left': 5000,
+    },
+    {
+      'Staff Name': 'Ramesh',
+      'Present': '24 Days',
+      'Total Salary': 18000,
+      'Salary Paid': 10000,
+      'Salary Left': 8000,
+    },
+    {
+      'Staff Name': 'Suresh',
+      'Present': '28 Days',
+      'Total Salary': 22000,
+      'Salary Paid': 20000,
+      'Salary Left': 2000,
+    },
+    {
+      'Staff Name': 'Rajesh',
+      'Present': '20 Days',
+      'Total Salary': 16000,
+      'Salary Paid': 12000,
+      'Salary Left': 4000,
+    },
   ];
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -74,7 +99,7 @@ class _SalaryScreenState extends State<SalaryScreen> {
                   _buildIconContainer(Icons.filter_list, width, height, (){}),
                   SizedBox(width: width * 0.045),
 
-                  _buildIconContainer(Icons.calendar_month_outlined, width, height, () => _pickDate),
+                  _buildIconContainer(Icons.calendar_month_outlined, width, height, _pickDate),
 
                   SizedBox(width: width * 0.045),
 
@@ -102,41 +127,79 @@ class _SalaryScreenState extends State<SalaryScreen> {
             ),
             AppDimensions.h30(context),
             Text(formatReadableDate(selectedDate), style: AppTextStyles.appbarTitle),
-// 🔹 Header Row
-            ProfileRow(label: 'Reason', value: 'Amount'),
 
-            // 🔹 Dynamic Expense List
-            Expanded(
-              child: ListView.builder(
-                itemCount: expenses.length,
-                itemBuilder: (context, index) {
-                  final item = expenses[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: width * 1.1), // ensures proper width
+                child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(1.8),
+                    1: FlexColumnWidth(1.2),
+                    2: FlexColumnWidth(1.6),
+                    3: FlexColumnWidth(1.6),
+                    4: FlexColumnWidth(1.6),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    // ✅ Header Row
+                    TableRow(
                       children: [
-                        Text(item['reason'], style: AppTextStyles.profileDataText),
-                        Text(formatAmount(item['amount']), style: AppTextStyles.profileDataText),
+                        _headerCell('Staff Name'),
+                        _headerCell('Present'),
+                        _headerCell('Total Salary'),
+                        _headerCell('Salary Paid'),
+                        _headerCell('Salary Left'),
                       ],
                     ),
-                  );
-                },
+
+                    // ✅ Data Rows
+                    ...salaryDetails.map((row) => TableRow(
+                      children: [
+                        _cell(row['Staff Name'].toString()),
+                        _cell(row['Present'].toString()),
+                        _cell(row['Total Salary'].toString()),
+                        _cell(row['Salary Paid'].toString()),
+                        _cell(row['Salary Left'].toString()),
+                      ],
+                    )),
+                  ],
+                ),
               ),
             ),
+
           ],
         ),
       ),
     );
   }
   Widget _buildIconContainer(IconData icon, double width, double height, final VoidCallback onTap) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
-      decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.16),
-        borderRadius: BorderRadius.circular(30),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.withOpacity(0.16),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Icon(icon, color: AppColors.primaryColor),
       ),
-      child: Icon(icon, color: AppColors.primaryColor),
     );
   }
+
+
+  Widget _headerCell(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+    child: Text(text, style: AppTextStyles.bodyText),
+  );
+
+  Widget _cell(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+    child: Text(
+      text,
+      style: AppTextStyles.bodyText.copyWith(color: AppColors.opacityColorBlack),
+      overflow: TextOverflow.ellipsis,
+    ),
+  );
+
 }
