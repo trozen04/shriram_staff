@@ -5,6 +5,7 @@ import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart';
 import '../Constants/app_dimensions.dart';
 import '../utils/app_colors.dart';
 import '../utils/flutter_font_styles.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 
 String formatAmount(dynamic amount) {
   if (amount == null) return '';
@@ -622,6 +623,59 @@ class ReusableSearchField extends StatelessWidget {
 
 /// A reusable function to pick a date and return it as [DateTime].
 
+// Future<DateTime?> pickDate({
+//   required BuildContext context,
+//   DateTime? initialDate,
+//   DateTime? firstDate,
+//   DateTime? lastDate,
+// }) async {
+//   final DateTime now = DateTime.now();
+//   final bool isDark = Theme.of(context).brightness == Brightness.dark;
+//
+//   final DateTime? picked = await showDatePicker(
+//     context: context,
+//     initialDate: initialDate ?? now,
+//     firstDate: firstDate ?? DateTime(2000),
+//     lastDate: lastDate ?? DateTime(2100),
+//     builder: (BuildContext context, Widget? child) {
+//       return Theme(
+//         data: Theme.of(context).copyWith(
+//           dialogTheme: const DialogThemeData(
+//             elevation: 12,
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.all(Radius.circular(20)),
+//             ),
+//           ),
+//           colorScheme: ColorScheme.light(
+//             primary: Colors.teal, // header color
+//             onPrimary: Colors.white, // header text
+//             surface: Colors.white, // background color
+//             onSurface: Colors.black87, // text color
+//           ).copyWith(
+//             surface: isDark ? Colors.grey[900] : Colors.grey[50],
+//             onSurface: isDark ? Colors.white70 : Colors.black87,
+//             primary: isDark ? Colors.tealAccent.shade400 : Colors.teal.shade600,
+//           ),
+//           textButtonTheme: TextButtonThemeData(
+//             style: TextButton.styleFrom(
+//               foregroundColor:
+//               isDark ? Colors.tealAccent.shade200 : Colors.teal.shade700,
+//               textStyle: const TextStyle(
+//                 fontWeight: FontWeight.w600,
+//                 fontSize: 16,
+//               ),
+//             ),
+//           ),
+//         ),
+//         child: child!,
+//       );
+//     },
+//   );
+//
+//   return picked;
+// }
+
+
 Future<DateTime?> pickDate({
   required BuildContext context,
   DateTime? initialDate,
@@ -630,27 +684,37 @@ Future<DateTime?> pickDate({
 }) async {
   final DateTime now = DateTime.now();
 
-  final DateTime? picked = await showDatePicker(
+  final results = await showCalendarDatePicker2Dialog(
     context: context,
-    initialDate: initialDate ?? now,
-    firstDate: firstDate ?? DateTime(2000),
-    lastDate: lastDate ?? DateTime(2100),
-    builder: (BuildContext context, Widget? child) {
-      // Optional: Customize theme for date picker
-      return Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Colors.teal, // header color
-            onPrimary: Colors.white, // header text color
-            onSurface: Colors.black, // body text color
-          ),
-        ),
-        child: child!,
-      );
-    },
+    config: CalendarDatePicker2WithActionButtonsConfig(
+      dayBorderRadius: BorderRadius.circular(8),
+      selectedDayHighlightColor: Colors.teal,
+      yearTextStyle: const TextStyle(fontWeight: FontWeight.w600),
+      selectedYearTextStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+      weekdayLabels: const ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      controlsTextStyle: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+      ),
+      okButtonTextStyle: const TextStyle(
+        color: Colors.teal,
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+      ),
+      cancelButtonTextStyle: const TextStyle(
+        color: Colors.grey,
+        fontSize: 15,
+      ),
+    ),
+    dialogSize: const Size(320, 400),
+    borderRadius: BorderRadius.circular(16),
+    value: [initialDate ?? now],
   );
 
-  return picked;
+  return results?.first;
 }
 
 /// Optional helper to format the date as string (e.g., 'dd-MM-yy')
@@ -707,3 +771,5 @@ class CustomFAB extends StatelessWidget {
     );
   }
 }
+
+

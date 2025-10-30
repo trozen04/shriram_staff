@@ -147,6 +147,7 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Products',
                   imagePath: ImageAssets.broker,
                   ontap: () {
+                    Navigator.pushNamed(context, AppRoutes.productMasterScreen);
                   },
                 ),
 

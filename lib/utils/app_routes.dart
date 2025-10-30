@@ -27,6 +27,8 @@ import '../screens/SuperUser/InitialQC/initial_qc_approval_screen.dart';
 import '../screens/SuperUser/InitialQC/initial_qc_screen.dart';
 import '../screens/SuperUser/Labour/add_labour_charges_screen.dart';
 import '../screens/SuperUser/Labour/labour_screen.dart';
+import '../screens/SuperUser/Products/add_product_screen.dart';
+import '../screens/SuperUser/Products/product_master_screen.dart';
 import '../screens/SuperUser/Purchase/purchase_request_detail.dart';
 import '../screens/SuperUser/Purchase/purchase_request_screen.dart';
 import '../screens/SuperUser/Salary/salary_rollout_screen.dart';
@@ -74,6 +76,8 @@ class AppRoutes {
   static const String brokerDetailScreen = '/brokerDetailScreen';
   static const String labourScreen = '/labourScreen';
   static const String addLabourChargesScreen = '/addLabourChargesScreen';
+  static const String productMasterScreen = '/productMasterScreen';
+  static const String addProductScreen = '/addProductScreen';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -190,6 +194,10 @@ class AppRoutes {
         return _buildPageRoute(LabourScreen(), settings);
       case addLabourChargesScreen:
         return _buildPageRoute(AddLabourChargesScreen(), settings);
+      case productMasterScreen:
+        return _buildPageRoute(ProductMasterScreen(), settings);
+      case addProductScreen:
+        return _buildPageRoute(AddProductScreen(), settings);
 
       default:
         return _buildPageRoute(const RegistrationScreen(), settings); // Changed to DashboardScreen
