@@ -27,7 +27,9 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isLogout ? AppColors.logoutColor : AppColors.primaryColor,
+          backgroundColor: isLogout
+              ? AppColors.logoutColor
+              : AppColors.primaryColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
@@ -35,24 +37,26 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: isLoading
             ? const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-        )
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              )
             : Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if(isLogout && !isLogoutText!) ...[
-                  Image.asset(ImageAssets.logoutImage,
-                      height: MediaQuery.of(context).size.height * 0.035),
-                  SizedBox(width: 4),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isLogout && !isLogoutText!) ...[
+                    Image.asset(
+                      ImageAssets.logoutImage,
+                      height: MediaQuery.of(context).size.height * 0.035,
+                    ),
+                    SizedBox(width: 4),
+                  ],
+                  Text(
+                    text,
+                    style: AppTextStyles.buttonText,
+                    overflow: TextOverflow.ellipsis, // optional
+                    textAlign: TextAlign.center,
+                  ),
                 ],
-                Text(
-                  text,
-                  style: AppTextStyles.buttonText,
-                  overflow: TextOverflow.ellipsis, // optional
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+              ),
       ),
     );
   }
@@ -81,26 +85,26 @@ class ReusableOutlinedButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(50),
-          border: Border.all(
-            color: AppColors.primaryColor
-          )
+          border: Border.all(color: AppColors.primaryColor),
         ),
         alignment: Alignment.center,
         child: isLoading
             ? const SizedBox(
-          height: 24,
-          width: 24,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.5,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
-          ),
-        )
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryColor,
+                  ),
+                ),
+              )
             : Text(
-          text,
-          style: AppTextStyles.outlinedButtonText,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-        ),
+                text,
+                style: AppTextStyles.outlinedButtonText,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
       ),
     );
   }

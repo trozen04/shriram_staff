@@ -1,15 +1,10 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:shree_ram_staff/widgets/CustomCards/SuperUser/purchase_request_card.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/CustomCards/SuperUser/broker_card.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/reusable_functions.dart';
-import '../../../utils/flutter_font_styles.dart';
 
 class BrokerScreen extends StatefulWidget {
   const BrokerScreen({super.key});
@@ -20,7 +15,8 @@ class BrokerScreen extends StatefulWidget {
 
 class _BrokerScreenState extends State<BrokerScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate  = DateTime.now();
+  DateTimeRange? selectedDateRange;
+
 
   @override
   void initState() {
@@ -52,15 +48,16 @@ class _BrokerScreenState extends State<BrokerScreen> {
       'vehicleNumber': 'DL 12 AB 2198',
     },
   ];
+
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -72,14 +69,16 @@ class _BrokerScreenState extends State<BrokerScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Broker',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             // Custom search field
@@ -98,55 +97,44 @@ class _BrokerScreenState extends State<BrokerScreen> {
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width - (width * 0.07), // subtract total horizontal padding
+                  minWidth:
+                      MediaQuery.of(context).size.width -
+                      (width * 0.07), // subtract total horizontal padding
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CustomRoundedButton(
-                      onTap: _pickDate,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            selectedDate != null
-                                ? DateFormat('dd-MM-yy').format(selectedDate!)
-                                : 'Date',
-                            style: AppTextStyles.dateText,
-                          ),
-                          const SizedBox(width: 8),
-                          Image.asset(ImageAssets.calender, height: height * 0.025),
-                        ],
-                      ),
+                    CustomIconButton(
+                      text: formatDateRange(selectedDateRange),
+                      imagePath: ImageAssets.calender,
+                      width: width,
+                      height: height,
+                      onTap: () => _pickDate(),
                     ),
                     SizedBox(width: width * 0.045),
-                    CustomRoundedButton(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Text('Factory', style: AppTextStyles.dateText),
-                          const SizedBox(width: 8),
-                          Image.asset(ImageAssets.factoryPNG, height: 20),
-                        ],
-                      ),
+                    CustomIconButton(
+                      text: 'Factory',
+                      imagePath: ImageAssets.factoryPNG,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.factoryScreen,
+                          arguments: null,
+                        );
+                      },
+                      showIconOnRight: true,
                     ),
                     SizedBox(width: width * 0.045),
-                    CustomRoundedButton(
+                    CustomIconButton(
+                      text: 'Filter',
+                      iconData: Icons.tune,
                       onTap: () {},
-                      child: Row(
-                        children: [
-                          Text('Filter', style: AppTextStyles.dateText),
-                          AppDimensions.w10(context),
-                          Icon(Icons.tune, color: AppColors.primaryColor),
-                        ],
-                      ),
+                      showIconOnRight: true,
                     ),
                   ],
                 ),
               ),
             ),
-
 
             AppDimensions.h20(context),
 
@@ -167,17 +155,17 @@ class _BrokerScreenState extends State<BrokerScreen> {
                         width: width,
                         isPending: true,
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.brokerDetailScreen);
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.brokerDetailScreen,
+                          );
                         },
                       ),
                     );
-
                   }),
                 ),
               ),
-            )
-
-
+            ),
           ],
         ),
       ),

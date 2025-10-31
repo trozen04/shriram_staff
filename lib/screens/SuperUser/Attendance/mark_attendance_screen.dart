@@ -31,7 +31,9 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     super.initState();
 
     // 🗓️ Set today's date initially
-    final todayIST = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
+    final todayIST = DateTime.now().toUtc().add(
+      const Duration(hours: 5, minutes: 30),
+    );
     final formattedToday = DateFormat('d MMMM, yyyy').format(todayIST);
     _dateController.text = formattedToday;
   }
@@ -72,10 +74,12 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Attendance', preferredHeight: height * 0.12),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -86,7 +90,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 hint: 'Enter Name',
                 controller: _nameController,
                 keyboardType: TextInputType.phone,
-                validator: (value) => value == null || value.isEmpty ? 'Name is required' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Name is required' : null,
               ),
               AppDimensions.h10(context),
 
@@ -96,9 +101,9 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 controller: _dateController,
                 readOnly: true,
                 onTap: () => _pickDate(),
-                validator: (value) => value == null || value.isEmpty ? 'Date is required' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Date is required' : null,
               ),
-
 
               AppDimensions.h10(context),
               Text('Status', style: AppTextStyles.label),
@@ -111,12 +116,14 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 validator: (val) => val == null ? 'Select Status' : null,
               ),
               AppDimensions.h10(context),
-             ReusableTextField(
+              ReusableTextField(
                 label: 'No. of labours',
                 hint: 'Enter no. of labours',
                 controller: _labourController,
                 keyboardType: TextInputType.phone,
-                validator: (value) => value == null || value.isEmpty ? 'A value is required' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'A value is required'
+                    : null,
               ),
               AppDimensions.h10(context),
               ReusableTextField(
@@ -124,12 +131,13 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 hint: 'Enter Salary',
                 controller: _salaryController,
                 keyboardType: TextInputType.phone,
-                validator: (value) => value == null || value.isEmpty ? 'Salary is required' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Salary is required'
+                    : null,
               ),
               AppDimensions.h30(context),
 
-              PrimaryButton(text: 'Submit', onPressed: _submitForm)
-
+              PrimaryButton(text: 'Submit', onPressed: _submitForm),
             ],
           ),
         ),

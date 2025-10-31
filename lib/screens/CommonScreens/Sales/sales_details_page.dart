@@ -13,7 +13,6 @@ class SalesDetailScreen extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: 'Ramesh Yadav'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -47,4 +46,3 @@ class SalesDetailScreen extends StatelessWidget {
     );
   }
 }
-

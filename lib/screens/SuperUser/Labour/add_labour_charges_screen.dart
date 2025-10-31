@@ -69,8 +69,10 @@ class _AddLabourChargesScreenState extends State<AddLabourChargesScreen> {
           preferredHeight: height * 0.12,
         ),
         body: Padding(
-          padding:
-          EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.035,
+            vertical: height * 0.015,
+          ),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -126,17 +128,11 @@ class _AddLabourChargesScreenState extends State<AddLabourChargesScreen> {
                 AppDimensions.h30(context),
 
                 // Save Button
-                ReusableOutlinedButton(
-                  text: 'Save',
-                  onPressed: () {},
-                ),
+                ReusableOutlinedButton(text: 'Save', onPressed: () {}),
                 AppDimensions.h50(context),
 
                 // Submit Button
-                PrimaryButton(
-                  text: 'Submit',
-                  onPressed: _submit,
-                ),
+                PrimaryButton(text: 'Submit', onPressed: _submit),
               ],
             ),
           ),

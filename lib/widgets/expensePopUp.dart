@@ -33,11 +33,16 @@ class _ExpensePopupState extends State<ExpensePopup> {
     double height = MediaQuery.of(context).size.height;
 
     return Dialog(
-      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      insetPadding: EdgeInsets.symmetric(horizontal: width * 0.06, vertical: height * 0.03),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: width * 0.06,
+        vertical: height * 0.03,
+      ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.06, vertical: height * 0.03),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.06,
+          vertical: height * 0.03,
+        ),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -49,8 +54,11 @@ class _ExpensePopupState extends State<ExpensePopup> {
                 AppDimensions.h20(context),
                 Align(
                   alignment: AlignmentGeometry.centerLeft,
-                  child: Text('Enter Expense',
-                      style: AppTextStyles.appbarTitle, textAlign: TextAlign.left,),
+                  child: Text(
+                    'Enter Expense',
+                    style: AppTextStyles.appbarTitle,
+                    textAlign: TextAlign.left,
+                  ),
                 ),
                 AppDimensions.h20(context),
 
@@ -58,7 +66,8 @@ class _ExpensePopupState extends State<ExpensePopup> {
                   label: 'Amount',
                   hint: 'Enter Amount',
                   controller: _amountController,
-                  validator: (val) => val == null || val.isEmpty ? 'Please enter amount' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Please enter amount' : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -66,24 +75,25 @@ class _ExpensePopupState extends State<ExpensePopup> {
                   label: 'Reason',
                   hint: 'Enter Reason',
                   controller: _reasonController,
-                  validator: (val) => val == null || val.isEmpty ? 'Please enter reason' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Please enter reason' : null,
                 ),
 
                 AppDimensions.h20(context),
 
                 // Submit Button
                 PrimaryButton(
-                    text: 'Submit',
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        widget.onSubmit?.call(
-                          _amountController.text,
-                          _reasonController.text,
-                        );
-                        Navigator.pop(context);
-                      }
-                    },
-                )
+                  text: 'Submit',
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      widget.onSubmit?.call(
+                        _amountController.text,
+                        _reasonController.text,
+                      );
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
               ],
             ),
           ),

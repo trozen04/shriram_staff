@@ -54,7 +54,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                   hint: 'Enter Name',
                   controller: _nameController,
                   validator: (val) =>
-                  val == null || val.isEmpty ? 'Enter Name' : null,
+                      val == null || val.isEmpty ? 'Enter Name' : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -77,7 +77,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                   controller: _salaryController,
                   keyboardType: TextInputType.number,
                   validator: (val) =>
-                  val == null || val.isEmpty ? 'Enter Salary' : null,
+                      val == null || val.isEmpty ? 'Enter Salary' : null,
                 ),
                 AppDimensions.h10(context),
                 Text('Factory', style: AppTextStyles.label),
@@ -87,8 +87,9 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                   value: _selectedFactory ?? factories.first,
                   onChanged: (val) => setState(() => _selectedFactory = val),
                   hintText: 'Select Factory',
-                  validator: (val) =>
-                  val == null || val == factories.first ? 'Select Factory' : null,
+                  validator: (val) => val == null || val == factories.first
+                      ? 'Select Factory'
+                      : null,
                 ),
                 AppDimensions.h10(context),
                 Text('Role', style: AppTextStyles.label),
@@ -99,7 +100,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                   onChanged: (val) => setState(() => _selectedRole = val),
                   hintText: 'Select Role',
                   validator: (val) =>
-                  val == null || val == roles.first ? 'Select Role' : null,
+                      val == null || val == roles.first ? 'Select Role' : null,
                 ),
                 AppDimensions.h10(context),
                 Text('Authority', style: AppTextStyles.label),
@@ -120,7 +121,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                   hint: 'Enter Password',
                   controller: _passwordController,
                   validator: (val) =>
-                  val == null || val.isEmpty ? 'Enter Password' : null,
+                      val == null || val.isEmpty ? 'Enter Password' : null,
                 ),
                 AppDimensions.h10(context),
 

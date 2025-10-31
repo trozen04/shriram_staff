@@ -16,19 +16,21 @@ class SalaryScreen extends StatefulWidget {
 }
 
 class _SalaryScreenState extends State<SalaryScreen> {
-  DateTime? selectedDate = DateTime.now();
+  DateTimeRange? selectedDateRange;
+
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
+
   final salaryDetails = [
     {
       'Staff Name': 'Mohan',
@@ -70,68 +72,99 @@ class _SalaryScreenState extends State<SalaryScreen> {
         title: 'Salary',
         preferredHeight: height * 0.12,
       ),
-      backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+              padding: EdgeInsets.symmetric(
+                horizontal: width * 0.035,
+                vertical: height * 0.015,
+              ),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.16),
-                borderRadius: BorderRadius.circular(60)
+                color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                borderRadius: BorderRadius.circular(60),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('Select Factory', style: AppTextStyles.dateText),
-                  Image.asset(ImageAssets.factoryPNG, height: height * 0.025)
+                  Image.asset(ImageAssets.factoryPNG, height: height * 0.025),
                 ],
               ),
             ),
             AppDimensions.h10(context),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildIconContainer(Icons.filter_list, width, height, (){}),
-                  SizedBox(width: width * 0.045),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width -
+                      (width * 0.07),
+                ),
+                child: Row(
+                  children: [
+                    _buildIconContainer(width: width, height: height, onTap: (){}, iconData: Icons.filter_list),
 
-                  _buildIconContainer(Icons.calendar_month_outlined, width, height, _pickDate),
+                    SizedBox(width: width * 0.08),
 
-                  SizedBox(width: width * 0.045),
+                    _buildIconContainer(width: width, height: height, onTap: _pickDate, imagePath: ImageAssets.calender),
 
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.salaryRolloutScreen);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.16),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Row(
-                        children: [
-                          Text('Rollout Salary', style: AppTextStyles.dateText),
-                          AppDimensions.w10(context),
-                          Image.asset(ImageAssets.salaryPng, height: height * 0.02),
-                        ],
+                    SizedBox(width: width * 0.08),
+
+                    InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.salaryRolloutScreen,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: width * 0.065,
+                          vertical: height * 0.015,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            Text('Rollout Salary', style: AppTextStyles.dateText),
+                            AppDimensions.w10(context),
+                            Image.asset(
+                              ImageAssets.salaryPng,
+                              height: height * 0.02,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            AppDimensions.h30(context),
-            Text(formatReadableDate(selectedDate), style: AppTextStyles.appbarTitle),
 
+            if(selectedDateRange != null )...[
+              AppDimensions.h30(context),
+              Text(
+                formatDateRange(selectedDateRange),
+                style: AppTextStyles.appbarTitle,
+              ),
+
+            ],
+
+            AppDimensions.h10(context),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: width * 1.1), // ensures proper width
+                constraints: BoxConstraints(
+                  minWidth: width * 1.1,
+                ), // ensures proper width
                 child: Table(
                   columnWidths: const {
                     0: FlexColumnWidth(1.8),
@@ -154,39 +187,59 @@ class _SalaryScreenState extends State<SalaryScreen> {
                     ),
 
                     // ✅ Data Rows
-                    ...salaryDetails.map((row) => TableRow(
-                      children: [
-                        _cell(row['Staff Name'].toString()),
-                        _cell(row['Present'].toString()),
-                        _cell(row['Total Salary'].toString()),
-                        _cell(row['Salary Paid'].toString()),
-                        _cell(row['Salary Left'].toString()),
-                      ],
-                    )),
+                    ...salaryDetails.map(
+                      (row) => TableRow(
+                        children: [
+                          _cell(row['Staff Name'].toString()),
+                          _cell(row['Present'].toString()),
+                          _cell(row['Total Salary'].toString()),
+                          _cell(row['Salary Paid'].toString()),
+                          _cell(row['Salary Left'].toString()),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
-  Widget _buildIconContainer(IconData icon, double width, double height, final VoidCallback onTap) {
+
+  Widget _buildIconContainer({ String? imagePath,
+    IconData? iconData,
+    required double width,
+    required double height,
+    required final VoidCallback onTap,}
+  ) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.065,
+          vertical: height * 0.015,
+        ),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.16),
+          color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Icon(icon, color: AppColors.primaryColor),
+        child: Row(
+    children: [
+    if (imagePath != null)
+      Image.asset(imagePath, height: height * 0.02)
+    else if (iconData != null)
+      Icon(
+        iconData,
+        size: height * 0.022,
+        color: AppColors.primaryColor,
       ),
+    ],
+      ),
+    )
     );
   }
-
 
   Widget _headerCell(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
@@ -197,9 +250,10 @@ class _SalaryScreenState extends State<SalaryScreen> {
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
     child: Text(
       text,
-      style: AppTextStyles.bodyText.copyWith(color: AppColors.opacityColorBlack),
+      style: AppTextStyles.bodyText.copyWith(
+        color: AppColors.opacityColorBlack,
+      ),
       overflow: TextOverflow.ellipsis,
     ),
   );
-
 }

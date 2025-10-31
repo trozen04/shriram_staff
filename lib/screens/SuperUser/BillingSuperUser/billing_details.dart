@@ -42,7 +42,10 @@ class BillingDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: ReusableAppBar(title: '#22311'),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -62,7 +65,9 @@ class BillingDetailScreen extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: width * 1.1), // ensures proper width
+                constraints: BoxConstraints(
+                  minWidth: width * 1.1,
+                ), // ensures proper width
                 child: Table(
                   columnWidths: const {
                     0: FlexColumnWidth(1.6),
@@ -85,20 +90,21 @@ class BillingDetailScreen extends StatelessWidget {
                     ),
 
                     // ✅ Data Rows
-                    ...billingDetails.map((row) => TableRow(
-                      children: [
-                        _cell(row['paddyType']!),
-                        _cell(row['weight']!),
-                        _cell(row['bags']!),
-                        _cell(row['price']!),
-                        _cell(row['amount']!),
-                      ],
-                    )),
+                    ...billingDetails.map(
+                      (row) => TableRow(
+                        children: [
+                          _cell(row['paddyType']!),
+                          _cell(row['weight']!),
+                          _cell(row['bags']!),
+                          _cell(row['price']!),
+                          _cell(row['amount']!),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-
 
             AppDimensions.h20(context),
             Text('Deductions', style: AppTextStyles.appbarTitle),
@@ -119,7 +125,6 @@ class BillingDetailScreen extends StatelessWidget {
                 onTap: () async {
                   await generateBillingPdfToDevice(billingDetails);
                 },
-
               ),
             ),
             AppDimensions.h20(context),
@@ -138,7 +143,9 @@ class BillingDetailScreen extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
     child: Text(
       text,
-      style: AppTextStyles.bodyText.copyWith(color: AppColors.opacityColorBlack),
+      style: AppTextStyles.bodyText.copyWith(
+        color: AppColors.opacityColorBlack,
+      ),
       overflow: TextOverflow.ellipsis,
     ),
   );

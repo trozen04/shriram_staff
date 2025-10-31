@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/Utils/image_assets.dart';
 import '../../../Constants/app_dimensions.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/CustomCards/SuperUser/sub_user_card.dart';
 import '../../../widgets/custom_app_bar.dart';
-import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/reusable_functions.dart';
 
 class SubUsersList extends StatefulWidget {
@@ -56,14 +54,16 @@ class _SubUsersListState extends State<SubUsersList> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Sub User',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Stack(
           children: [
             Column(
@@ -81,26 +81,21 @@ class _SubUsersListState extends State<SubUsersList> {
                       ),
                     ),
                     AppDimensions.w10(context),
-                    Container(
-                      height: height * 0.05,
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.055),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.16),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          Text('Factory', style: AppTextStyles.dateText),
-                          AppDimensions.w10(context),
-                          Image.asset(ImageAssets.factoryPNG, height: height * 0.02,)
-                        ],
-                      ),
+                    CustomIconButton(
+                      text: 'Factory',
+                      imagePath: ImageAssets.factoryPNG,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.factoryScreen,
+                          arguments: null,
+                        );
+                      },
+                      showIconOnRight: true,
                     ),
                   ],
                 ),
                 AppDimensions.h20(context),
-
 
                 Expanded(
                   child: ListView.builder(
@@ -131,16 +126,17 @@ class _SubUsersListState extends State<SubUsersList> {
                     },
                   ),
                 ),
-
-
               ],
             ),
             CustomFAB(
               onTap: () {
-                Navigator.pushNamed(context, AppRoutes.createSubUserPage, arguments: null);
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.createSubUserPage,
+                  arguments: null,
+                );
               },
             ),
-
           ],
         ),
       ),

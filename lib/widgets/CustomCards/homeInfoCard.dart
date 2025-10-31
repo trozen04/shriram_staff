@@ -38,7 +38,10 @@ class HomeInfoCard extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.05,
+          vertical: height * 0.015,
+        ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.cardBorder),
           borderRadius: BorderRadius.circular(14),
@@ -59,7 +62,7 @@ class HomeInfoCard extends StatelessWidget {
                       Text(
                         cardType == CardType.qc || cardType == CardType.billing
                             ? '#22311'
-                        : vehicleNumber!,
+                            : vehicleNumber!,
                         style: AppTextStyles.cardHeading,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -71,9 +74,7 @@ class HomeInfoCard extends StatelessWidget {
                       // ✅ Call _buildStatusTag with a boolean
                       _buildStatusTag(cardType, isPending),
 
-
                       const SizedBox(width: 4),
-
                     ],
                   ),
                 ),
@@ -88,7 +89,7 @@ class HomeInfoCard extends StatelessWidget {
               ],
             ),
 
-              AppDimensions.h10(context),
+            AppDimensions.h10(context),
 
             // Main content
             Column(
@@ -98,11 +99,15 @@ class HomeInfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildInfoRow(text: 'Farmer', value: farmerName ?? ''),
+                    _buildInfoRow(text: 'Farmer', value: farmerName),
                     AppDimensions.w20(context),
 
                     if (staffName == null || staffName!.isEmpty) ...[
-                      Icon(Icons.shopping_cart, color: AppColors.bodyTextColor, size: 16),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: AppColors.bodyTextColor,
+                        size: 16,
+                      ),
                       AppDimensions.w10(context),
                       Text(
                         '50',
@@ -111,12 +116,10 @@ class HomeInfoCard extends StatelessWidget {
                       ),
                     ] else ...[
                       _buildInfoRow(text: 'Staff', value: staffName!),
-                    ]
-
-
+                    ],
                   ],
                 ),
-                  AppDimensions.h10(context),
+                AppDimensions.h10(context),
                 Row(
                   children: [
                     _buildInfoRow(text: 'Broker', value: brokerName!),
@@ -124,7 +127,11 @@ class HomeInfoCard extends StatelessWidget {
                       if (staffName != null && staffName!.isNotEmpty) ...[
                         AppDimensions.w40(context),
                         AppDimensions.w20(context),
-                        Icon(Icons.shopping_cart, color: AppColors.bodyTextColor, size: 16),
+                        Icon(
+                          Icons.shopping_cart,
+                          color: AppColors.bodyTextColor,
+                          size: 16,
+                        ),
                         AppDimensions.w10(context),
                         Text(
                           '50',
@@ -132,13 +139,11 @@ class HomeInfoCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ]
-
+                    ],
                   ],
                 ),
               ],
             ),
-
           ],
         ),
       ),
@@ -197,9 +202,7 @@ Widget _buildStatusTag(CardType cardType, bool isPending) {
     child: Text(
       text,
       style: AppTextStyles.statusFont.copyWith(
-        color: isPending
-            ? AppColors.pendingColor
-            : AppColors.successColor,
+        color: isPending ? AppColors.pendingColor : AppColors.successColor,
       ),
       maxLines: 1,
     ),

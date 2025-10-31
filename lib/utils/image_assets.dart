@@ -3,10 +3,13 @@ class ImageAssets {
   static const String passwordImage = "assets/images/passwordImage.png";
 
   //Appbar
-  static const String homeScreenIcon = "assets/images/appbar/homeScreenIcon.png";
-  static const String homeScreenNotificationIcon = "assets/images/appbar/homeScreenNotificationIcon.png";
+  static const String homeScreenIcon =
+      "assets/images/appbar/homeScreenIcon.png";
+  static const String homeScreenNotificationIcon =
+      "assets/images/appbar/homeScreenNotificationIcon.png";
   static const String backButton = "assets/images/appbar/backButton.png";
   static const String profileImage = "assets/images/appbar/profileImage.png";
+  static const String appbarBG = "assets/images/appbar/appbarBG.png";
 
   //HomeCards
   static const String logoutImage = "assets/images/logoutImage.png";
@@ -20,7 +23,8 @@ class ImageAssets {
 
   //SuperUser
   static const String subUsers = "assets/SuperUserImages/subUsers.png";
-  static const String purchaseRequest = "assets/SuperUserImages/purchaseRequest.png";
+  static const String purchaseRequest =
+      "assets/SuperUserImages/purchaseRequest.png";
   static const String attendance = "assets/SuperUserImages/attendance.png";
   static const String expense = "assets/SuperUserImages/expense.png";
   static const String salary = "assets/SuperUserImages/salary.png";
@@ -34,6 +38,4 @@ class ImageAssets {
   static const String editImage = "assets/SuperUserImages/editImage.png";
   static const String calender = "assets/SuperUserImages/Calender.png";
   static const String salaryPng = "assets/SuperUserImages/salaryPng.png";
-
-
 }

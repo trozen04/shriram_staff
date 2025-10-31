@@ -7,7 +7,6 @@ import '../../../utils/flutter_font_styles.dart';
 import '../../../utils/image_assets.dart';
 import '../../../widgets/custom_text_form_field.dart';
 import '../../../widgets/primary_and_outlined_button.dart';
-import '../../SubUser/Home/home_screen.dart';
 import '../../SuperUser/Home/super_user_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -71,7 +70,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await PrefUtils.setLoggedIn(true);
       //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SuperUserHomeScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SuperUserHomeScreen()),
+      );
     }
   }
 
@@ -85,7 +87,10 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.035,
+            vertical: height * 0.0,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -105,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 AppDimensions.h50(context),
 
                 // Phone Number
-                Text('Phone Number', style: AppTextStyles.label ),
+                Text('Phone Number', style: AppTextStyles.label),
                 AppDimensions.h5(context),
                 CustomTextFormField(
                   controller: _phoneController,
@@ -113,10 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixImagePath: ImageAssets.callImage,
                   prefix: Padding(
                     padding: const EdgeInsets.only(right: 6),
-                    child: Text(
-                      '+91',
-                      style: AppTextStyles.hintText
-                    ),
+                    child: Text('+91', style: AppTextStyles.hintText),
                   ),
                   keyboardType: TextInputType.phone,
                   suffix: TextButton(
@@ -127,8 +129,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Phone number is required';
-                    if (value.length != 10) return 'Enter a valid 10-digit number';
+                    if (value == null || value.isEmpty)
+                      return 'Phone number is required';
+                    if (value.length != 10)
+                      return 'Enter a valid 10-digit number';
                     return null;
                   },
                 ),
@@ -145,7 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (!_isOtpSent) return 'Please request OTP first';
-                    if (value == null || value.isEmpty) return 'OTP is required';
+                    if (value == null || value.isEmpty)
+                      return 'OTP is required';
                     if (value.length < 4) return 'Enter valid OTP';
                     return null;
                   },
@@ -164,11 +169,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account? ", style: AppTextStyles.bodyText),
+                    Text(
+                      "Don't have an account? ",
+                      style: AppTextStyles.bodyText,
+                    ),
                     GestureDetector(
                       onTap: () {
                         // TODO: Navigate to Register Screen
-                         Navigator.of(context).pushNamed('/register');
+                        Navigator.of(context).pushNamed('/register');
                       },
                       child: Text("Signup", style: AppTextStyles.linkText),
                     ),

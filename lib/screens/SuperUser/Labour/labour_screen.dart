@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_app_bar.dart';
@@ -17,17 +16,18 @@ class LabourScreen extends StatefulWidget {
 
 class _LabourScreenState extends State<LabourScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate = DateTime.now();
+  DateTimeRange? selectedDateRange;
+
 
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -36,7 +36,9 @@ class _LabourScreenState extends State<LabourScreen> {
   String formatAmount(dynamic amount) {
     if (amount == null) return '';
     try {
-      final number = amount is String ? double.parse(amount) : amount.toDouble();
+      final number = amount is String
+          ? double.parse(amount)
+          : amount.toDouble();
       final formatter = NumberFormat('#,##0', 'en_IN');
       return '₹ ${formatter.format(number)}';
     } catch (e) {
@@ -50,7 +52,6 @@ class _LabourScreenState extends State<LabourScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Labour',
@@ -78,71 +79,101 @@ class _LabourScreenState extends State<LabourScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      CustomRoundedButton(
-                        onTap: _pickDate,
-                        child: Row(
-                          children: [
-                            Text(
-                              selectedDate != null
-                                  ? DateFormat('dd-MM-yy').format(selectedDate!)
-                                  : 'Date',
-                              style: AppTextStyles.dateText,
-                            ),
-                            const SizedBox(width: 8),
-                            Image.asset(ImageAssets.calender, height: height * 0.025),
-                          ],
-                        ),
+                      CustomIconButton(
+                        text: formatDateRange(selectedDateRange),
+                        imagePath: ImageAssets.calender,
+                        width: width,
+                        height: height,
+                        onTap: () => _pickDate(),
                       ),
-                      const SizedBox(width: 10),
-                      CustomRoundedButton(
-                        onTap: () {},
-                        child: Row(
-                          children: [
-                            Text('Factory', style: AppTextStyles.dateText),
-                            const SizedBox(width: 8),
-                            Image.asset(ImageAssets.factoryPNG, height: 20),
-                          ],
-                        ),
+                      AppDimensions.w10(context),
+                      CustomIconButton(
+                        text: 'Factory',
+                        imagePath: ImageAssets.factoryPNG,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.factoryScreen,
+                            arguments: null,
+                          );
+                        },
+                        showIconOnRight: true,
                       ),
-                      const SizedBox(width: 10),
-                      CustomRoundedButton(
+                      AppDimensions.w10(context),
+                      CustomIconButton(
+                        text: 'Filter',
+                        iconData: Icons.tune,
                         onTap: () {},
-                        child: Row(
-                          children: [
-                            Text('Filter', style: AppTextStyles.dateText),
-                            AppDimensions.w10(context),
-                            Icon(Icons.tune, color: AppColors.primaryColor),
-                          ],
-                        ),
+                        showIconOnRight: true,
                       ),
                     ],
                   ),
                 ),
+
+                if(selectedDateRange != null) ...[
+                  AppDimensions.h20(context),
+                    Text(
+                      formatDateRange(selectedDateRange),
+                      style: AppTextStyles.appbarTitle,
+                    ),
+                ],
+
                 AppDimensions.h20(context),
 
-                Text(
-                  formatReadableDate(selectedDate),
-                  style: AppTextStyles.appbarTitle,
-                ),
-                AppDimensions.h20(context),
-                
-                Expanded( 
+                Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: SizedBox(
-                      width: width * 1.2, // allows horizontal overflow for columns
+                      width:
+                          width * 1.2, // allows horizontal overflow for columns
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Header Row
                           Row(
                             children: [
-                              Expanded(flex: 3, child: Text('Item Name', style: AppTextStyles.bodyText)),
-                              Expanded(flex: 2, child: Text('Unit', style: AppTextStyles.bodyText)),
-                              Expanded(flex: 2, child: Text('Price/U', style: AppTextStyles.bodyText)),
-                              Expanded(flex: 3, child: Text('Amount', style: AppTextStyles.bodyText)),
-                              Expanded(flex: 2, child: Text('Extra', style: AppTextStyles.bodyText)),
-                              Expanded(flex: 3, child: Text('Total', style: AppTextStyles.bodyText)),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  'Item Name',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  'Unit',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  'Price/U',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  'Amount',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  'Extra',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  'Total',
+                                  style: AppTextStyles.bodyText,
+                                ),
+                              ),
                             ],
                           ),
 
@@ -157,15 +188,35 @@ class _LabourScreenState extends State<LabourScreen> {
                                   // List of items
                                   ...List.generate(5, (index) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
                                       child: Row(
                                         children: [
-                                          const Expanded(flex: 3, child: Text('Rice')),
-                                          const Expanded(flex: 2, child: Text('21')),
-                                          Expanded(flex: 2, child: Text(formatAmount(2.5))),
-                                          Expanded(flex: 3, child: Text(formatAmount(7500))),
-                                          Expanded(flex: 2, child: Text(formatAmount(175))),
-                                          Expanded(flex: 3, child: Text(formatAmount(7675))),
+                                          const Expanded(
+                                            flex: 3,
+                                            child: Text('Rice'),
+                                          ),
+                                          const Expanded(
+                                            flex: 2,
+                                            child: Text('21'),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(formatAmount(2.5)),
+                                          ),
+                                          Expanded(
+                                            flex: 3,
+                                            child: Text(formatAmount(7500)),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(formatAmount(175)),
+                                          ),
+                                          Expanded(
+                                            flex: 3,
+                                            child: Text(formatAmount(7675)),
+                                          ),
                                         ],
                                       ),
                                     );
@@ -174,14 +225,25 @@ class _LabourScreenState extends State<LabourScreen> {
 
                                   ConstrainedBox(
                                     constraints: BoxConstraints(
-                                      maxWidth: MediaQuery.of(context).size.width - (width * 0.07), // subtract total horizontal padding
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width -
+                                          (width *
+                                              0.07), // subtract total horizontal padding
                                     ),
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text('Grand Total', style: AppTextStyles.grandTotalText),
-                                        Text(formatAmount(17500), style: AppTextStyles.bodyText),
+                                        Text(
+                                          'Grand Total',
+                                          style: AppTextStyles.grandTotalText,
+                                        ),
+                                        Text(
+                                          formatAmount(17500),
+                                          style: AppTextStyles.bodyText,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -189,7 +251,6 @@ class _LabourScreenState extends State<LabourScreen> {
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     ),

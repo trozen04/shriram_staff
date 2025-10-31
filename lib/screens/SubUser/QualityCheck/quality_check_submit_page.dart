@@ -34,7 +34,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
       'paddyRiceQty': null,
       'paddyHuskQty': null,
       'paddyDiscolor': null,
-    }
+    },
   ];
 
   List<Map<String, String?>> riceGroups = [
@@ -44,20 +44,20 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
       'riceDiscolor': null,
       'riceBroken': null,
       'finalWeight': null,
-    }
+    },
   ];
 
   final List<String> paddyTypes = [
     'Select Paddy Type',
     'Type 1',
     'Type 2',
-    'Type 3'
+    'Type 3',
   ];
   final List<String> riceTypes = [
     'Select Rice Type',
     'Type A',
     'Type B',
-    'Type C'
+    'Type C',
   ];
 
   @override
@@ -66,11 +66,12 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: '#22311'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
-            horizontal: width * 0.035, vertical: height * 0.015),
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -267,10 +268,8 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) => Text(
-    title,
-    style: AppTextStyles.appbarTitle,
-  );
+  Widget _buildSectionTitle(String title) =>
+      Text(title, style: AppTextStyles.appbarTitle);
 
   Widget _buildDropdownWithAddButton({
     required String label,
@@ -291,22 +290,24 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: AppTextStyles.label),
-              Row(
-                children: [
-                  if (index == totalCount - 1)
-                    InkWell(
+            Row(
+              children: [
+                if (index == totalCount - 1)
+                  InkWell(
                     onTap: onAddPressed,
                     child: Text(addText, style: AppTextStyles.underlineText),
                   ),
-                  AppDimensions.w10(context),
-                  if(index != 0)
+                AppDimensions.w10(context),
+                if (index != 0)
                   InkWell(
                     onTap: onRemovePressed,
-                    child: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                    child: const Icon(
+                      Icons.remove_circle,
+                      color: Colors.redAccent,
+                    ),
                   ),
-                ],
-              ),
-
+              ],
+            ),
           ],
         ),
         AppDimensions.h5(context),
@@ -326,8 +327,11 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
   Future<void> _pickImage() async {
     final permission = await Permission.camera.request();
     if (!permission.isGranted) {
-      CustomSnackBar.show(context,
-          message: "Camera permission denied.", isError: true);
+      CustomSnackBar.show(
+        context,
+        message: "Camera permission denied.",
+        isError: true,
+      );
       return;
     }
 
@@ -342,8 +346,11 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
               onTap: () async {
                 Navigator.of(context).pop();
                 final file = await _picker.pickImage(
-                    source: ImageSource.camera, imageQuality: 80);
-                if (file != null) setState(() => uploadedProof = File(file.path));
+                  source: ImageSource.camera,
+                  imageQuality: 80,
+                );
+                if (file != null)
+                  setState(() => uploadedProof = File(file.path));
               },
             ),
             ListTile(
@@ -352,8 +359,11 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
               onTap: () async {
                 Navigator.of(context).pop();
                 final file = await _picker.pickImage(
-                    source: ImageSource.gallery, imageQuality: 80);
-                if (file != null) setState(() => uploadedProof = File(file.path));
+                  source: ImageSource.gallery,
+                  imageQuality: 80,
+                );
+                if (file != null)
+                  setState(() => uploadedProof = File(file.path));
               },
             ),
           ],

@@ -36,7 +36,6 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: 'Delivery & Initial QC'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -61,7 +60,8 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
                 label: 'Initial Weight',
                 hint: 'Enter Initial Weight',
                 onChanged: (val) => setState(() => initialWeight = val),
-                validator: (val) => val!.isEmpty ? 'Please enter the initial weight' : null,
+                validator: (val) =>
+                    val!.isEmpty ? 'Please enter the initial weight' : null,
               ),
               AppDimensions.h10(context),
 
@@ -69,7 +69,9 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
                 label: 'Moisture %',
                 hint: 'Enter Moisture %',
                 onChanged: (val) => setState(() => moisturePercent = val),
-                validator: (val) => val!.isEmpty ? 'Please enter the moisture percentage' : null,
+                validator: (val) => val!.isEmpty
+                    ? 'Please enter the moisture percentage'
+                    : null,
               ),
               AppDimensions.h10(context),
 
@@ -79,7 +81,8 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
                 items: ['1', '2', '3'],
                 value: riceWeight,
                 onChanged: (val) => setState(() => riceWeight = val),
-                validator: (val) => val == null ? 'Please select the rice weight' : null,
+                validator: (val) =>
+                    val == null ? 'Please select the rice weight' : null,
                 hintText: 'Select Rice Weight',
               ),
               AppDimensions.h10(context),
@@ -88,7 +91,8 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
                 label: 'Husk in (g)',
                 hint: 'Enter Husk in (g)',
                 onChanged: (val) => setState(() => huskWeight = val),
-                validator: (val) => val!.isEmpty ? 'Please enter the husk weight' : null,
+                validator: (val) =>
+                    val!.isEmpty ? 'Please enter the husk weight' : null,
               ),
               AppDimensions.h10(context),
 
@@ -96,9 +100,10 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
                 label: 'Discolor %',
                 hint: 'Enter Discolor %',
                 onChanged: (val) => setState(() => discolorPercent = val),
-                validator: (val) => val!.isEmpty ? 'Please enter the discolor percentage' : null,
+                validator: (val) => val!.isEmpty
+                    ? 'Please enter the discolor percentage'
+                    : null,
               ),
-
 
               AppDimensions.h50(context),
               PrimaryButton(
@@ -120,72 +125,27 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
     );
   }
 
-  Future<void> _pickImage() async {
-    final cameraStatus = await Permission.camera.request();
-
-    if (!cameraStatus.isGranted) {
-      CustomSnackBar.show(
-        context,
-        message: "Camera permission denied.",
-        isError: true,
-      );
-      return;
-    }
-
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
-              onTap: () async {
-                Navigator.of(context).pop();
-                final XFile? pickedFile = await _picker.pickImage(
-                    source: ImageSource.camera, imageQuality: 80);
-                if (pickedFile != null) {
-                  setState(() => uploadedPhoto = File(pickedFile.path));
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
-              onTap: () async {
-                Navigator.of(context).pop();
-                final XFile? pickedFile = await _picker.pickImage(
-                    source: ImageSource.gallery, imageQuality: 80);
-                if (pickedFile != null) {
-                  setState(() => uploadedPhoto = File(pickedFile.path));
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) => Text(
-    title,
-    style: AppTextStyles.appbarTitle,
-  );
+  Widget _buildSectionTitle(String title) =>
+      Text(title, style: AppTextStyles.appbarTitle);
 
   Widget _buildReadOnlyField(String label, String value) => Padding(
-    padding:
-    EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.012),
+    padding: EdgeInsets.only(
+      bottom: MediaQuery.of(context).size.height * 0.012,
+    ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: AppTextStyles.bodyText,
-            overflow: TextOverflow.ellipsis),
-        Text(value,
-            style: AppTextStyles.profileDataText,
-            overflow: TextOverflow.ellipsis),
+        Text(
+          label,
+          style: AppTextStyles.bodyText,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(
+          value,
+          style: AppTextStyles.profileDataText,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     ),
   );
-
 }

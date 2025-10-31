@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/Constants/app_dimensions.dart';
-import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart' hide OutlinedButton;
+import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart';
 import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
 
 import '../../../widgets/reusable_functions.dart';
@@ -10,7 +10,8 @@ class InitialQcApprovalScreen extends StatefulWidget {
   const InitialQcApprovalScreen({super.key, required this.qcData});
 
   @override
-  State<InitialQcApprovalScreen> createState() => _InitialQcApprovalScreenState();
+  State<InitialQcApprovalScreen> createState() =>
+      _InitialQcApprovalScreenState();
 }
 
 class _InitialQcApprovalScreenState extends State<InitialQcApprovalScreen> {
@@ -19,10 +20,12 @@ class _InitialQcApprovalScreenState extends State<InitialQcApprovalScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: ReusableAppBar(title: 'DL 12 AB 2198'),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             ProfileRow(label: 'Unit ID', value: '#221212'),
@@ -39,13 +42,9 @@ class _InitialQcApprovalScreenState extends State<InitialQcApprovalScreen> {
 
             AppDimensions.h30(context),
 
-            PrimaryButton(text: 'Approve', onPressed: (){}),
+            PrimaryButton(text: 'Approve', onPressed: () {}),
             AppDimensions.h10(context),
-            ReusableOutlinedButton(
-              text: 'Reject',
-              onPressed: (){},
-            ),
-
+            ReusableOutlinedButton(text: 'Reject', onPressed: () {}),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/CommonScreens/Factory/factory_screen.dart';
 import '../screens/CommonScreens/Notification/notification_screen.dart';
 import '../screens/CommonScreens/Profile/profile_screen.dart';
 import '../screens/CommonScreens/Report/report_screen.dart';
@@ -12,7 +13,6 @@ import '../screens/SubUser/Billing/billing_fill_details_screen.dart';
 import '../screens/CommonScreens/BillingCommonScreen/billing_screen.dart';
 import '../screens/SubUser/DetailsPage/delivery_qc_detail_page.dart';
 import '../screens/SubUser/Delivery/delivery_qc_page.dart';
-import '../screens/SubUser/Factory/factory_screen.dart';
 import '../screens/SubUser/LoadingProducts/loading_product_screen.dart';
 import '../screens/SubUser/QualityCheck/quality_check_submit_page.dart';
 import '../screens/SubUser/WeightConfirmationPage/weight_confirmation_page.dart';
@@ -67,8 +67,10 @@ class AppRoutes {
   static const String initialQcApprovalScreen = '/initialQcApprovalScreen';
   static const String createSalesLeadScreen = '/createSalesLeadScreen';
   static const String salesDetailScreen = '/salesDetailScreen';
-  static const String billingFillDetailsSuperUser = '/billingFillDetailsSuperUser';
-  static const String billingDetailScreenSuperUser = '/billingDetailScreenSuperUser';
+  static const String billingFillDetailsSuperUser =
+      '/billingFillDetailsSuperUser';
+  static const String billingDetailScreenSuperUser =
+      '/billingDetailScreenSuperUser';
   static const String expenseScreen = '/expenseScreen';
   static const String salaryScreen = '/salaryScreen';
   static const String salaryRolloutScreen = '/salaryRolloutScreen';
@@ -84,13 +86,12 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
-         return _buildPageRoute(const LoginScreen(), settings);
+        return _buildPageRoute(const LoginScreen(), settings);
       case register:
         return _buildPageRoute(const RegistrationScreen(), settings);
       case deliveryPage:
         final isQC = settings.arguments as bool? ?? false;
         return _buildPageRoute(DeliveryQcPage(isQCPage: isQC), settings);
-
 
       case AppRoutes.deliveryDetailPage:
         final args = settings.arguments as Map<String, dynamic>;
@@ -98,37 +99,41 @@ class AppRoutes {
         final isAfterQC = args['isAfterQC'] as bool? ?? false;
         final isPendingQC = args['isPendingQC'] as bool? ?? false;
         return _buildPageRoute(
-            DeliveryQcDetailPage(userData: data, isAfterQC: isAfterQC, isPendingQC: isPendingQC,),
-            settings
+          DeliveryQcDetailPage(
+            userData: data,
+            isAfterQC: isAfterQC,
+            isPendingQC: isPendingQC,
+          ),
+          settings,
         );
 
       case AppRoutes.weightConfirmationPage:
         final data = settings.arguments;
         return _buildPageRoute(
-            WeightConfirmationPage(userData: data,),
-            settings
+          WeightConfirmationPage(userData: data),
+          settings,
         );
       case AppRoutes.qualityCheckSubmitPage:
         final data = settings.arguments;
         return _buildPageRoute(
-            QualityCheckSubmitPage(userData: data),
-            settings
-        );
-      case AppRoutes.factoryScreen:
-        return _buildPageRoute(FactoryScreen(),settings);
-      case AppRoutes.salesScreen:
-        final bool isSuperUser = settings.arguments as bool? ?? false;
-        return _buildPageRoute(
-          SalesScreen(isSuperUser: isSuperUser),
+          QualityCheckSubmitPage(userData: data),
           settings,
         );
+      case AppRoutes.factoryScreen:
+        return _buildPageRoute(FactoryScreen(), settings);
+      case AppRoutes.salesScreen:
+        final bool isSuperUser = settings.arguments as bool? ?? false;
+        return _buildPageRoute(SalesScreen(isSuperUser: isSuperUser), settings);
 
       case AppRoutes.profileScreen:
         final bool isSuperUser = settings.arguments as bool? ?? false;
-        return _buildPageRoute(ProfileScreen(isSuperUser: isSuperUser),settings);
+        return _buildPageRoute(
+          ProfileScreen(isSuperUser: isSuperUser),
+          settings,
+        );
       case AppRoutes.loadingProductScreen:
         final data = settings.arguments;
-        return _buildPageRoute(LoadingProductScreen(userData: data),settings);
+        return _buildPageRoute(LoadingProductScreen(userData: data), settings);
       case AppRoutes.reportScreen:
         final args = settings.arguments as Map?;
         return _buildPageRoute(
@@ -141,27 +146,33 @@ class AppRoutes {
 
       case AppRoutes.billingScreen:
         final bool isSuperUser = settings.arguments as bool? ?? false;
-        return _buildPageRoute(BillingScreen(isSuperUser: isSuperUser),settings);
+        return _buildPageRoute(
+          BillingScreen(isSuperUser: isSuperUser),
+          settings,
+        );
       case AppRoutes.billingFillDetailsScreen:
         final data = settings.arguments;
-        return _buildPageRoute(BillingFillDetailsScreen(billingData: data),settings);
+        return _buildPageRoute(
+          BillingFillDetailsScreen(billingData: data),
+          settings,
+        );
       case AppRoutes.billingDetailsScreen:
         final data = settings.arguments;
-        return _buildPageRoute(BillingDetails(billingData: data),settings);
+        return _buildPageRoute(BillingDetails(billingData: data), settings);
       case notificationScreen:
         return _buildPageRoute(const NotificationScreen(), settings);
 
-        /// Super User Screens
+      /// Super User Screens
       case superUserHomeScreen:
         return _buildPageRoute(const SuperUserHomeScreen(), settings);
       case subUsersList:
         return _buildPageRoute(const SubUsersList(), settings);
       case createSubUserPage:
         final data = settings.arguments;
-        return _buildPageRoute(CreateSubUserPage(subUserData: data,), settings);
+        return _buildPageRoute(CreateSubUserPage(subUserData: data), settings);
       case staffDetails:
         final data = settings.arguments;
-        return _buildPageRoute(StaffDetails(subUserData: data,), settings);
+        return _buildPageRoute(StaffDetails(subUserData: data), settings);
       case attendanceScreen:
         return _buildPageRoute(AttendanceScreen(), settings);
       case markAttendanceScreen:
@@ -205,7 +216,10 @@ class AppRoutes {
         return _buildPageRoute(AddProductScreen(), settings);
 
       default:
-        return _buildPageRoute(const RegistrationScreen(), settings); // Changed to DashboardScreen
+        return _buildPageRoute(
+          const RegistrationScreen(),
+          settings,
+        ); // Changed to DashboardScreen
     }
   }
 
@@ -218,8 +232,10 @@ class AppRoutes {
       transitionsBuilder: (_, animation, secondaryAnimation, child) {
         const beginOffset = Offset(1.0, 0.0);
         const endOffset = Offset.zero;
-        final tween = Tween(begin: beginOffset, end: endOffset)
-            .chain(CurveTween(curve: Curves.easeOutCubic));
+        final tween = Tween(
+          begin: beginOffset,
+          end: endOffset,
+        ).chain(CurveTween(curve: Curves.easeOutCubic));
 
         return FadeTransition(
           opacity: animation,
@@ -231,5 +247,4 @@ class AppRoutes {
       },
     );
   }
-
 }

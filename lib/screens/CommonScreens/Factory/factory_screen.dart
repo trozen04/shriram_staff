@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/widgets/custom_app_bar.dart';
 import 'package:intl/intl.dart';
 import '../../../Constants/app_dimensions.dart';
+import '../../../Utils/image_assets.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/reusable_functions.dart';
@@ -14,22 +15,22 @@ class FactoryScreen extends StatefulWidget {
 }
 
 class _FactoryScreenState extends State<FactoryScreen> {
-  DateTime? selectedDate = DateTime.now();
+  DateTimeRange? selectedDateRange;
 
   // List to store all added items
   List<Map<String, dynamic>> items = [
-    {'item': null, 'quantity': '', 'bags': '', 'quintal': ''}
+    {'item': null, 'quantity': '', 'bags': '', 'quintal': ''},
   ];
 
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -52,7 +53,6 @@ class _FactoryScreenState extends State<FactoryScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Factory', preferredHeight: height * 0.12),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -66,30 +66,18 @@ class _FactoryScreenState extends State<FactoryScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomRoundedButton(
-                  onTap: _pickDate,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        selectedDate != null
-                            ? DateFormat('dd-MM-yy').format(selectedDate!)
-                            : 'Date',
-                        style: AppTextStyles.dateText,
-                      ),
-                      AppDimensions.w10(context),
-                      Icon(
-                        Icons.calendar_month_outlined,
-                        color: AppColors.primaryColor,
-                      ),
-                    ],
-                  ),
+                CustomIconButton(
+                  text: formatDateRange(selectedDateRange),
+                  imagePath: ImageAssets.calender,
+                  width: width,
+                  height: height,
+                  onTap: () => _pickDate(),
                 ),
                 Container(
                   height: height * 0.05,
                   padding: EdgeInsets.symmetric(horizontal: width * 0.055),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.16),
+                    color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.center,
@@ -99,8 +87,6 @@ class _FactoryScreenState extends State<FactoryScreen> {
             ),
 
             AppDimensions.h20(context),
-
-
 
             // Scrollable list of added items
             Expanded(
@@ -117,17 +103,22 @@ class _FactoryScreenState extends State<FactoryScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Add Item', style: AppTextStyles.label),
-                            if(index == items.length-1)
-                            InkWell(
-                              onTap: _addItem,
-                              child: Text(
-                                'Add Item',
-                                style: AppTextStyles.underlineText,
+                            if (index == items.length - 1)
+                              InkWell(
+                                onTap: _addItem,
+                                child: Text(
+                                  'Add Item',
+                                  style: AppTextStyles.underlineText,
+                                ),
                               ),
-                            ),
-                            if(index != items.length - 1) InkWell(
+                            if (index != items.length - 1)
+                              InkWell(
                                 onTap: () => _removeItem(index),
-                                child: Icon(Icons.remove_circle, color: Colors.red,))
+                                child: Icon(
+                                  Icons.remove_circle,
+                                  color: Colors.red,
+                                ),
+                              ),
                           ],
                         ),
 
@@ -141,7 +132,7 @@ class _FactoryScreenState extends State<FactoryScreen> {
                             });
                           },
                           validator: (val) =>
-                          val == null ? 'Please select an item' : null,
+                              val == null ? 'Please select an item' : null,
                           hintText: 'Select Item',
                         ),
                         AppDimensions.h10(context),
@@ -151,9 +142,8 @@ class _FactoryScreenState extends State<FactoryScreen> {
                           onChanged: (val) {
                             item['quantity'] = val;
                           },
-                          validator: (val) => val!.isEmpty
-                              ? 'Please enter quantity'
-                              : null,
+                          validator: (val) =>
+                              val!.isEmpty ? 'Please enter quantity' : null,
                         ),
                         AppDimensions.h10(context),
                         ReusableTextField(
@@ -163,7 +153,7 @@ class _FactoryScreenState extends State<FactoryScreen> {
                             item['bags'] = val;
                           },
                           validator: (val) =>
-                          val!.isEmpty ? 'Please enter bags' : null,
+                              val!.isEmpty ? 'Please enter bags' : null,
                         ),
                         AppDimensions.h10(context),
                         ReusableTextField(
@@ -173,7 +163,7 @@ class _FactoryScreenState extends State<FactoryScreen> {
                             item['quintal'] = val;
                           },
                           validator: (val) =>
-                          val!.isEmpty ? 'Please enter quintal' : null,
+                              val!.isEmpty ? 'Please enter quintal' : null,
                         ),
                       ],
                     ),

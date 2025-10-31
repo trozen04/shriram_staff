@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shree_ram_staff/utils/image_assets.dart';
 import 'package:shree_ram_staff/widgets/CustomCards/sales_card.dart';
 import '../../../Constants/app_dimensions.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
-import '../../../widgets/CustomCards/homeInfoCard.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/reusable_functions.dart';
-import '../../../utils/flutter_font_styles.dart';
 
 class SalesScreen extends StatefulWidget {
   final bool? isSuperUser;
@@ -20,7 +16,7 @@ class SalesScreen extends StatefulWidget {
 
 class _SalesScreenState extends State<SalesScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
   dynamic salesData = [
     {
       'name': 'Suresh Kumar',
@@ -43,18 +39,19 @@ class _SalesScreenState extends State<SalesScreen> {
       'driverName': 'Sunil Pal',
     },
   ];
-  void _pickDate() async {
-  final DateTime? picked = await pickDate(
-    context: context,
-    initialDate: selectedDate,
-  );
 
-  if (picked != null && picked != selectedDate) {
-    setState(() {
-      selectedDate = picked;
-    });
+  void _pickDate() async {
+    final DateTimeRange? picked = await pickDateRange(
+      context: context,
+      initialRange: selectedDateRange,
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDateRange = picked;
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +59,6 @@ class _SalesScreenState extends State<SalesScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Sales',
@@ -71,7 +67,10 @@ class _SalesScreenState extends State<SalesScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+            padding: EdgeInsets.symmetric(
+              horizontal: width * 0.035,
+              vertical: height * 0.015,
+            ),
             child: Column(
               children: [
                 // Custom search field
@@ -89,57 +88,44 @@ class _SalesScreenState extends State<SalesScreen> {
                   scrollDirection: Axis.horizontal,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minWidth: MediaQuery.of(context).size.width - (width * 0.07), // subtract total horizontal padding
+                      minWidth:
+                          MediaQuery.of(context).size.width -
+                          (width * 0.07), // subtract total horizontal padding
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Date Button
-                        CustomRoundedButton(
-                          onTap: _pickDate,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                formatDate(selectedDate),
-                                style: AppTextStyles.dateText,
-                              ),
-                              const SizedBox(width: 8),
-                              Image.asset(ImageAssets.calender, height: height * 0.025),                            ],
-                          ),
+                        CustomIconButton(
+                          text: formatDateRange(selectedDateRange),
+                          imagePath: ImageAssets.calender,
+                          width: width,
+                          height: height,
+                          onTap: () => _pickDate(),
                         ),
 
                         if (widget.isSuperUser!) ...[
                           SizedBox(width: width * 0.045),
-
-                          CustomRoundedButton(
-                            onTap: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('Factory', style: AppTextStyles.dateText),
-                                const SizedBox(width: 8),
-                                Image.asset(ImageAssets.factoryPNG, height: 20),
-                              ],
-                            ),
+                          CustomIconButton(
+                            text: 'Factory',
+                            imagePath: ImageAssets.factoryPNG,
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.factoryScreen,
+                                arguments: null,
+                              );
+                            },
+                            showIconOnRight: true,
                           ),
                           SizedBox(width: width * 0.045),
-
                         ],
 
-                        CustomRoundedButton(
+                        CustomIconButton(
+                          text: 'Filter',
+                          iconData: Icons.tune,
                           onTap: () {},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text('Filter', style: AppTextStyles.dateText),
-                              AppDimensions.w10(context),
-                              Icon(Icons.tune, color: AppColors.primaryColor),
-                            ],
-                          ),
+                          showIconOnRight: true,
                         ),
                       ],
                     ),
@@ -159,19 +145,19 @@ class _SalesScreenState extends State<SalesScreen> {
                         child: GestureDetector(
                           onTap: widget.isSuperUser!
                               ? () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.salesDetailScreen,
-                              arguments: null,
-                            );
-                          }
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.salesDetailScreen,
+                                    arguments: null,
+                                  );
+                                }
                               : () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.loadingProductScreen,
-                              arguments: null,
-                            );
-                          },
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.loadingProductScreen,
+                                    arguments: null,
+                                  );
+                                },
                           child: SalesCard(
                             name: data!['name'],
                             date: data['date']!,
@@ -186,14 +172,11 @@ class _SalesScreenState extends State<SalesScreen> {
                       );
                     },
                   ),
-                )
-
-
-
+                ),
               ],
             ),
           ),
-          if(widget.isSuperUser!)
+          if (widget.isSuperUser!)
             CustomFAB(
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.createSalesLeadScreen);

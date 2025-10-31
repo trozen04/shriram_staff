@@ -48,27 +48,30 @@ class BrokerCard extends StatelessWidget {
                 // Broker
                 if (brokerName != null && brokerName!.isNotEmpty)
                   _buildInfoRow(
-                      text: 'Broker', value: brokerName!, context: context),
-                _buildStatusTag(isPending: isPending)
-
+                    text: 'Broker',
+                    value: brokerName!,
+                    context: context,
+                  ),
+                _buildStatusTag(isPending: isPending),
               ],
             ),
 
-
             AppDimensions.h10(context),
-
 
             // Broker
             if (contactNumber != null && contactNumber!.isNotEmpty)
               _buildInfoRow(
-                  text: 'Contact No', value: contactNumber!, context: context),
+                text: 'Contact No',
+                value: contactNumber!,
+                context: context,
+              ),
             AppDimensions.h10(context),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Broker
                 if (paddy != null && paddy!.isNotEmpty)
-                _buildInfoRow(text: 'Paddy', value: paddy!, context: context),
+                  _buildInfoRow(text: 'Paddy', value: paddy!, context: context),
 
                 Text(
                   date,
@@ -76,11 +79,9 @@ class BrokerCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
                 ),
-
               ],
             ),
             AppDimensions.h5(context),
-
 
             // Optional status tag
           ],
@@ -111,10 +112,9 @@ class BrokerCard extends StatelessWidget {
     );
   }
 
-
   Widget _buildStatusTag({required bool isPending, String? text}) {
-    final String statusText = text ??
-        (isPending ? 'Approval Pending' : 'Approved');
+    final String statusText =
+        text ?? (isPending ? 'Approval Pending' : 'Approved');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -127,13 +127,10 @@ class BrokerCard extends StatelessWidget {
       child: Text(
         statusText,
         style: AppTextStyles.statusFont.copyWith(
-          color: isPending
-              ? AppColors.pendingColor
-              : AppColors.successColor,
+          color: isPending ? AppColors.pendingColor : AppColors.successColor,
         ),
         maxLines: 1,
       ),
     );
   }
 }
-

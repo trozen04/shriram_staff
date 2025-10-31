@@ -26,7 +26,7 @@ class CustomTextFormField extends StatefulWidget {
     this.prefixIcon,
     this.prefix,
     this.suffix,
-    this.isReadOnly = false
+    this.isReadOnly = false,
   }) : super(key: key);
 
   @override
@@ -46,12 +46,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           keyboardType: widget.keyboardType,
           obscureText: widget.obscureText,
           readOnly: widget.isReadOnly ?? false,
-          inputFormatters: widget.keyboardType == TextInputType.phone ||
-        widget.keyboardType == TextInputType.number
+          inputFormatters:
+              widget.keyboardType == TextInputType.phone ||
+                  widget.keyboardType == TextInputType.number
               ? [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(10),
-          ]
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ]
               : null,
           validator: (value) {
             final result = widget.validator?.call(value);
@@ -81,30 +82,41 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 ],
               ),
             ),
-            prefixIconConstraints:
-            const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
 
             suffixIcon: widget.suffix,
             filled: true,
-            fillColor: widget.isReadOnly! ? AppColors.readOnlyFillColor : Colors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
+            fillColor: widget.isReadOnly!
+                ? AppColors.readOnlyFillColor
+                : Colors.white,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.035,
+              vertical: MediaQuery.of(context).size.height * 0.015,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              BorderSide(color: AppColors.cardBorder),
+              borderSide: BorderSide(color: AppColors.cardBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.borderColor.withOpacity(0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColors.primaryColor, width: 2),
+              borderSide: const BorderSide(
+                color: AppColors.primaryColor,
+                width: 2,
+              ),
             ),
-            errorStyle:
-            const TextStyle(height: 0, fontSize: 0), // hide default error
+            errorStyle: const TextStyle(
+              height: 0,
+              fontSize: 0,
+            ), // hide default error
           ),
         ),
         if (errorText != null)

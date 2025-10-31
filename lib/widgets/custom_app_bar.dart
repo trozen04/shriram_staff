@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../Constants/app_dimensions.dart';
 import '../Utils/image_assets.dart';
 import '../utils/app_colors.dart';
@@ -21,6 +22,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // transparent or your bg color
+        statusBarIconBrightness: Brightness.light, // makes icons white
+        statusBarBrightness: Brightness.dark, // for iOS (opposite logic)
+      ),
+    );
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -33,15 +41,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            gradient: AppGradients.purpleGradient,
+            image: DecorationImage(
+              image: AssetImage(ImageAssets.appbarBG),
+              fit: BoxFit.cover,
+            ),
           ),
           padding: EdgeInsets.only(
-            left: screenWidth * 0.04,
-            right: screenWidth * 0.04,
+            left: screenWidth * 0.035,
+            right: screenWidth * 0.035,
             bottom: screenHeight * 0.03,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end, // sticks content to bottom
+            mainAxisAlignment:
+                MainAxisAlignment.end, // sticks content to bottom
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (isHomePage)
@@ -60,14 +72,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Sunil Pal',
-                              style: AppTextStyles.appbarName
-                            ),
-                            Text(
-                              'Worker',
-                              style: AppTextStyles.appbarWork
-                            ),
+                            Text('Sunil Pal', style: AppTextStyles.appbarName),
+                            Text('Worker', style: AppTextStyles.appbarWork),
                           ],
                         ),
                       ],
@@ -77,7 +83,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       children: [
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.notificationScreen);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.notificationScreen,
+                            );
                           },
                           child: Image.asset(
                             ImageAssets.homeScreenNotificationIcon,
@@ -88,7 +97,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         AppDimensions.w10(context),
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.profileScreen, arguments: superUser);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.profileScreen,
+                              arguments: superUser,
+                            );
                           },
                           child: Image.asset(
                             ImageAssets.profileImage,
@@ -101,34 +114,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 )
               else
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      ImageAssets.backButton,
-                      color: Colors.white,
-                      width: screenWidth * 0.1,
-                    ),
-                  ),
-
-                  // Spacer to center the title
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        title,
-                        style: AppTextStyles.buttonText,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Image.asset(
+                        ImageAssets.backButton,
+                        color: Colors.white,
+                        width: screenWidth * 0.1,
                       ),
                     ),
-                  ),
 
-                  // Optional: if you want right side empty to keep title centered
-                  const SizedBox(width: 48), // same width as IconButton
-                ],
-              )
+                    // Spacer to center the title
+                    Expanded(
+                      child: Center(
+                        child: Text(title, style: AppTextStyles.buttonText),
+                      ),
+                    ),
 
+                    // Optional: if you want right side empty to keep title centered
+                    const SizedBox(width: 48), // same width as IconButton
+                  ],
+                ),
             ],
           ),
         ),

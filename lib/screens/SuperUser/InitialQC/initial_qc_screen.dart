@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/widgets/custom_app_bar.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
-import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/CustomCards/homeInfoCard.dart';
 import '../../../widgets/reusable_functions.dart';
 
@@ -17,7 +15,7 @@ class InitialQcScreen extends StatefulWidget {
 
 class _InitialQcScreenState extends State<InitialQcScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
 
 
   dynamic homeCardsData = [
@@ -44,27 +42,30 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
   ];
 
   void _pickDate() async {
-  final DateTime? picked = await pickDate(
-    context: context,
-    initialDate: selectedDate,
-  );
+    final DateTimeRange? picked = await pickDateRange(
+      context: context,
+      initialRange: selectedDateRange,
+    );
 
-  if (picked != null && picked != selectedDate) {
-    setState(() {
-      selectedDate = picked;
-    });
+    if (picked != null) {
+      setState(() {
+        selectedDateRange = picked;
+      });
+    }
   }
-}
+
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Initial QC', preferredHeight: height * 0.12),
       body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             ReusableSearchField(
@@ -80,8 +81,8 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildIconContainer(
-                    text: formatDate(selectedDate),
+                  CustomIconButton(
+                    text: formatDateRange(selectedDateRange),
                     imagePath: ImageAssets.calender,
                     width: width,
                     height: height,
@@ -90,28 +91,30 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
 
                   SizedBox(width: width * 0.045),
 
-                  _buildIconContainer(
+                  CustomIconButton(
                     text: 'Factory',
                     imagePath: ImageAssets.factoryPNG,
-                    width: width,
-                    height: height,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.factoryScreen,
+                        arguments: null,
+                      );
+                    },
+                    showIconOnRight: true,
                   ),
 
                   SizedBox(width: width * 0.045),
 
-                  _buildIconContainer(
+                  CustomIconButton(
                     text: 'Filter',
                     iconData: Icons.tune,
-                    width: width,
-                    height: height,
                     onTap: () {},
+                    showIconOnRight: true,
                   ),
-
 
                 ],
               ),
-
             ),
             AppDimensions.h20(context),
             Expanded(
@@ -153,50 +156,11 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
                   );
                 },
               ),
-            )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          ],
-        ),
-      ),
-    );
-  }
-  Widget _buildIconContainer({
-    required String text,
-    String? imagePath,
-    IconData? iconData,
-    required double width,
-    required double height,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: width * 0.065,
-          vertical: height * 0.015,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.16),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Text(text, style: AppTextStyles.dateText),
-            AppDimensions.w10(context),
-            if (imagePath != null)
-              Image.asset(
-                imagePath,
-                height: height * 0.02,
-              )
-            else if (iconData != null)
-              Icon(
-                iconData,
-                size: height * 0.022,
-                color: AppColors.primaryColor,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -27,7 +27,10 @@ class SubUserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.05,
+        vertical: height * 0.015,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(14),
@@ -59,20 +62,19 @@ class SubUserCard extends StatelessWidget {
             ],
           ),
 
-            AppDimensions.h10(context),
+          AppDimensions.h10(context),
 
           // Main content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildInfoRow(imagePath: ImageAssets.work, value: position!),
-                AppDimensions.h10(context),
+              AppDimensions.h10(context),
               _buildInfoRow(imagePath: ImageAssets.call, value: phone!),
               AppDimensions.h10(context),
               _buildInfoRow(imagePath: ImageAssets.qcPng, value: qcType!),
             ],
           ),
-
         ],
       ),
     );
@@ -92,8 +94,7 @@ class SubUserCard extends StatelessWidget {
         else if (imagePath != null)
           Image.asset(imagePath, height: 18, width: 18, fit: BoxFit.contain),
 
-        if (icon != null || imagePath != null)
-          const SizedBox(width: 6),
+        if (icon != null || imagePath != null) const SizedBox(width: 6),
 
         Expanded(
           child: Text(

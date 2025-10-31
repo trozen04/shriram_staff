@@ -12,17 +12,19 @@ class BillingFillDetailsSuperUser extends StatefulWidget {
   const BillingFillDetailsSuperUser({super.key});
 
   @override
-  State<BillingFillDetailsSuperUser> createState() => _BillingFillDetailsSuperUserState();
+  State<BillingFillDetailsSuperUser> createState() =>
+      _BillingFillDetailsSuperUserState();
 }
 
-class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUser> {
+class _BillingFillDetailsSuperUserState
+    extends State<BillingFillDetailsSuperUser> {
   List<Map<String, dynamic>> billingItems = [
-    {'item': '', 'weight': '', 'bags': '', 'price': '', 'amount': ''}
+    {'item': '', 'weight': '', 'bags': '', 'price': '', 'amount': ''},
   ];
 
   List<Map<String, dynamic>> deductions = [
     {'label': 'Labor Charge', 'value': ''},
-    {'label': 'Brokerage', 'value': ''}
+    {'label': 'Brokerage', 'value': ''},
   ];
 
   final TextEditingController totalAmountController = TextEditingController();
@@ -38,7 +40,9 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
         appBar: ReusableAppBar(title: '#22311'),
         body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-              horizontal: width * 0.035, vertical: height * 0.015),
+            horizontal: width * 0.035,
+            vertical: height * 0.015,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,30 +53,33 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
               const ProfileRow(label: 'Net Weight', value: '112 Qntl'),
               AppDimensions.h10(context),
 
-              Text('Enter Billing Details',
-                  style: AppTextStyles.appbarTitle),
+              Text('Enter Billing Details', style: AppTextStyles.appbarTitle),
               AppDimensions.h10(context),
 
               ..._buildBillingItems(),
 
               AppDimensions.h20(context),
-              ReusableOutlinedButton(text: 'Save', onPressed: (){}),
+              ReusableOutlinedButton(text: 'Save', onPressed: () {}),
 
               AppDimensions.h20(context),
 
               _buildSummaryCard(height, width),
 
               AppDimensions.h20(context),
-              Text('Extra Charges to be deduct',
-                  style: AppTextStyles.appbarTitle),
+              Text(
+                'Extra Charges to be deduct',
+                style: AppTextStyles.appbarTitle,
+              ),
               AppDimensions.h10(context),
 
               ..._buildDeductionFields(),
 
               GestureDetector(
                 onTap: _addDeduction,
-                child: Text('+ Add another deductions',
-                    style: AppTextStyles.underlineText),
+                child: Text(
+                  '+ Add another deductions',
+                  style: AppTextStyles.underlineText,
+                ),
               ),
 
               AppDimensions.h20(context),
@@ -84,7 +91,7 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
               ),
 
               AppDimensions.h30(context),
-              PrimaryButton(text: 'Submit', onPressed: (){}),
+              PrimaryButton(text: 'Submit', onPressed: () {}),
               AppDimensions.h20(context),
             ],
           ),
@@ -115,7 +122,11 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
           AppDimensions.h10(context),
           ReusableTextField(label: 'Price', hint: 'Enter Price'),
           AppDimensions.h10(context),
-          ReusableTextField(label: 'Amount', hint: 'Amount (auto calculate)', readOnly: true),
+          ReusableTextField(
+            label: 'Amount',
+            hint: 'Amount (auto calculate)',
+            readOnly: true,
+          ),
           if (index != billingItems.length - 1) AppDimensions.h20(context),
         ],
       );
@@ -124,7 +135,13 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
 
   void _addBillingItem() {
     setState(() {
-      billingItems.add({'item': '', 'weight': '', 'bags': '', 'price': '', 'amount': ''});
+      billingItems.add({
+        'item': '',
+        'weight': '',
+        'bags': '',
+        'price': '',
+        'amount': '',
+      });
     });
   }
 
@@ -136,30 +153,34 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
 
   Widget _buildSummaryCard(double height, double width) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.035,
+        vertical: height * 0.015,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Paddy Type: A', style: AppTextStyles.bodyText),
-                Text('₹ 20,000', style: AppTextStyles.bodyText),
-              ],
-            ),
-            AppDimensions.h10(context),
-            Text('Weight: 22 Qntl', style: AppTextStyles.bodyText),
-            AppDimensions.h10(context),
-            Text('Bags: 2', style: AppTextStyles.bodyText),
-            AppDimensions.h10(context),
-            Text('Price: ₹ 200', style: AppTextStyles.bodyText),
-            AppDimensions.h10(context),
-          ]),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Paddy Type: A', style: AppTextStyles.bodyText),
+              Text('₹ 20,000', style: AppTextStyles.bodyText),
+            ],
+          ),
+          AppDimensions.h10(context),
+          Text('Weight: 22 Qntl', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+          Text('Bags: 2', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+          Text('Price: ₹ 200', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+        ],
+      ),
     );
   }
 
@@ -191,11 +212,9 @@ class _BillingFillDetailsSuperUserState extends State<BillingFillDetailsSuperUse
     });
   }
 
-
   void _removeDeduction(int index) {
     setState(() {
       deductions.removeAt(index);
     });
   }
-
 }

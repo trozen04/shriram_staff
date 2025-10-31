@@ -14,7 +14,8 @@ class BillingFillDetailsScreen extends StatefulWidget {
   const BillingFillDetailsScreen({super.key, this.billingData});
 
   @override
-  State<BillingFillDetailsScreen> createState() => _BillingFillDetailsScreenState();
+  State<BillingFillDetailsScreen> createState() =>
+      _BillingFillDetailsScreenState();
 }
 
 class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
@@ -48,7 +49,10 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
       child: Scaffold(
         appBar: const ReusableAppBar(title: '#22311'),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.035,
+            vertical: height * 0.015,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -64,7 +68,9 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               CustomTextFormField(
                 controller: finalWeightController,
                 hintText: 'Enter Final weight',
-                validator: (value) => value == null || value.isEmpty ? 'Final weight is required' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Final weight is required'
+                    : null,
               ),
 
               AppDimensions.h10(context),
@@ -76,8 +82,6 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
 
               // === Dynamic Paddy Entries ===
               ..._buildPaddyEntries(),
-
-
 
               AppDimensions.h20(context),
               _buildSectionTitle('Extra Charges to be deduct'),
@@ -125,7 +129,11 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               PrimaryButton(
                 text: 'Submit',
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.billingDetailsScreen, arguments: null);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.billingDetailsScreen,
+                    arguments: null,
+                  );
                 },
               ),
               AppDimensions.h20(context),
@@ -174,22 +182,27 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               children: [
                 Text('Paddy Type ${index + 1}', style: AppTextStyles.label),
                 AppDimensions.h5(context),
-                if (index == paddyEntries.length-1)
+                if (index == paddyEntries.length - 1)
                   Row(
                     children: [
                       InkWell(
                         onTap: _addPaddyEntry,
-                        child: Text('Add another type', style: AppTextStyles.underlineText),
+                        child: Text(
+                          'Add another type',
+                          style: AppTextStyles.underlineText,
+                        ),
                       ),
                       AppDimensions.w10(context),
                       if (paddyEntries.length > 1)
                         IconButton(
                           onPressed: () => _removePaddyEntry(index),
-                          icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                          icon: const Icon(
+                            Icons.remove_circle,
+                            color: Colors.redAccent,
+                          ),
                         ),
                     ],
                   ),
-
               ],
             ),
             _buildDropdown(
@@ -220,7 +233,10 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
   }
 
   // --- REUSABLE DROPDOWN ---
-  Widget _buildDropdown({String? selectedValue, required ValueChanged<String?> onChanged}) {
+  Widget _buildDropdown({
+    String? selectedValue,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       width: double.infinity,
@@ -234,10 +250,12 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
           value: selectedValue,
           hint: Text('Select Paddy Type', style: AppTextStyles.hintText),
           items: paddyTypes
-              .map((type) => DropdownMenuItem<String>(
-            value: type,
-            child: Text(type, style: AppTextStyles.hintText),
-          ))
+              .map(
+                (type) => DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(type, style: AppTextStyles.hintText),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),

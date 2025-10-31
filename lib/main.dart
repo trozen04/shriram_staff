@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shree_ram_staff/screens/CommonScreens/auth/login_screen.dart';
 import 'package:shree_ram_staff/screens/SubUser/Home/home_screen.dart';
-import 'package:shree_ram_staff/screens/SuperUser/Home/super_user_home_screen.dart';
 import 'package:shree_ram_staff/utils/app_routes.dart';
 import 'package:shree_ram_staff/utils/pref_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // 🔒 Lock orientation to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await PrefUtils.isLoggedIn();
   runApp(const MyApp());
 }
@@ -26,8 +31,9 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         // Override system font scaling for the entire app
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-          child: child!,
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),          child: child!,
         );
       },
       home: const SplashScreen(),
@@ -57,8 +63,8 @@ class SplashScreen extends StatelessWidget {
           // If logged in, show MainScreen, else LoginScreen
           bool isLoggedIn = snapshot.data ?? false;
           return isLoggedIn
-              //? const HomeScreen()
-              ? const SuperUserHomeScreen()
+              ? const HomeScreen()
+              //? const SuperUserHomeScreen()
               : const LoginScreen();
         }
       },

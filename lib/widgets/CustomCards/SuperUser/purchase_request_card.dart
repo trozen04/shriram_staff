@@ -53,18 +53,19 @@ class PurchaseRequestCard extends StatelessWidget {
                       context: context,
                     ),
                   ),
-                _buildStatusTag(isPending: isPending)
-
+                _buildStatusTag(isPending: isPending),
               ],
             ),
-
 
             AppDimensions.h10(context),
 
             // Broker
             if (brokerName != null && brokerName!.isNotEmpty)
               _buildInfoRow(
-                  text: 'Broker', value: brokerName!, context: context),
+                text: 'Broker',
+                value: brokerName!,
+                context: context,
+              ),
 
             // Optional Paddy
             if (paddy != null && paddy!.isNotEmpty) ...[
@@ -78,7 +79,11 @@ class PurchaseRequestCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.shopping_cart, color: AppColors.bodyTextColor, size: 16),
+                    Icon(
+                      Icons.shopping_cart,
+                      color: AppColors.bodyTextColor,
+                      size: 16,
+                    ),
                     AppDimensions.w10(context),
                     Text(
                       '50',
@@ -94,7 +99,7 @@ class PurchaseRequestCard extends StatelessWidget {
                   textAlign: TextAlign.right,
                 ),
               ],
-            )
+            ),
 
             // Optional status tag
           ],
@@ -125,10 +130,9 @@ class PurchaseRequestCard extends StatelessWidget {
     );
   }
 
-
   Widget _buildStatusTag({required bool isPending, String? text}) {
-    final String statusText = text ??
-        (isPending ? 'Approval Pending' : 'Approved');
+    final String statusText =
+        text ?? (isPending ? 'Approval Pending' : 'Approved');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -141,13 +145,10 @@ class PurchaseRequestCard extends StatelessWidget {
       child: Text(
         statusText,
         style: AppTextStyles.statusFont.copyWith(
-          color: isPending
-              ? AppColors.pendingColor
-              : AppColors.successColor,
+          color: isPending ? AppColors.pendingColor : AppColors.successColor,
         ),
         maxLines: 1,
       ),
     );
   }
 }
-

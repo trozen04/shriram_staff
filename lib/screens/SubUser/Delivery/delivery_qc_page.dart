@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/CustomCards/homeInfoCard.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/reusable_functions.dart';
-import '../../../utils/flutter_font_styles.dart';
 
 class DeliveryQcPage extends StatefulWidget {
   final bool isQCPage;
@@ -19,7 +16,7 @@ class DeliveryQcPage extends StatefulWidget {
 
 class _DeliveryQcPageState extends State<DeliveryQcPage> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
 
   final dynamic deliveryData = [
     {
@@ -43,19 +40,17 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
       'driverName': 'Amit Yadav',
     },
   ];
-  final dynamic qcData = [
-
-  ];
+  final dynamic qcData = [];
 
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -66,15 +61,16 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: widget.isQCPage ? 'Final Quality Check' : 'Deliveries',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
-        padding:
-        EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             // 🔍 Search field
@@ -91,33 +87,18 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CustomRoundedButton(
-                  onTap: _pickDate,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        formatDate(selectedDate),
-                        style: AppTextStyles.dateText,
-                      ),
-                      const SizedBox(width: 8),
-                      Image.asset(ImageAssets.calender, height: height * 0.025),
-                    ],
-                  ),
+                CustomIconButton(
+                  text: formatDateRange(selectedDateRange),
+                  imagePath: ImageAssets.calender,
+                  width: width,
+                  height: height,
+                  onTap: () => _pickDate(),
                 ),
-                CustomRoundedButton(
+                CustomIconButton(
+                  text: 'Filter',
+                  iconData: Icons.tune,
                   onTap: () {},
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Filter',
-                        style: AppTextStyles.dateText,
-                      ),
-                      AppDimensions.w10(context),
-                      Icon(Icons.tune, color: AppColors.primaryColor),
-                    ],
-                  ),
+                  showIconOnRight: true,
                 ),
               ],
             ),
@@ -132,8 +113,9 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: HomeInfoCard(
-                      cardType:
-                      widget.isQCPage ? CardType.qc : CardType.delivery,
+                      cardType: widget.isQCPage
+                          ? CardType.qc
+                          : CardType.delivery,
                       farmerName: data['name'] ?? '',
                       date: data['date'] ?? '',
                       vehicleNumber: data['vehicleNumber'] ?? '',
@@ -146,19 +128,13 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                           Navigator.pushNamed(
                             context,
                             AppRoutes.deliveryDetailPage,
-                            arguments: {
-                              'data': data,
-                              'isPendingQC': true,
-                            },
+                            arguments: {'data': data, 'isPendingQC': true},
                           );
                         } else {
                           Navigator.pushNamed(
                             context,
                             AppRoutes.deliveryDetailPage,
-                            arguments: {
-                              'data': data,
-                              'isAfterQC': false,
-                            },
+                            arguments: {'data': data, 'isAfterQC': false},
                           );
                         }
                       },

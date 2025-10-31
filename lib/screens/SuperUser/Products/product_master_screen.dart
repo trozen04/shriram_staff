@@ -15,10 +15,10 @@ class ProductMasterScreen extends StatefulWidget {
 class _ProductMasterScreenState extends State<ProductMasterScreen> {
   TextEditingController searchController = TextEditingController();
   dynamic productData = [
-    {'paddyName' : 'Paddy A'},
-    {'paddyName' : 'Paddy B'},
-    {'paddyName' : 'Paddy C'},
-    {'paddyName' : 'Paddy D'},
+    {'paddyName': 'Paddy A'},
+    {'paddyName': 'Paddy B'},
+    {'paddyName': 'Paddy C'},
+    {'paddyName': 'Paddy D'},
   ];
 
   @override
@@ -26,10 +26,15 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: CustomAppBar(title: 'Product Master', preferredHeight: height * 0.12),
+      appBar: CustomAppBar(
+        title: 'Product Master',
+        preferredHeight: height * 0.12,
+      ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Stack(
           children: [
             Column(
@@ -45,20 +50,22 @@ class _ProductMasterScreenState extends State<ProductMasterScreen> {
                 Expanded(
                   child: ListView.builder(
                     itemCount: productData.length,
-                      itemBuilder: (context, index) {
-                          dynamic product = productData[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(product['paddyName']),
-                          );
-                      }
+                    itemBuilder: (context, index) {
+                      dynamic product = productData[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(product['paddyName']),
+                      );
+                    },
                   ),
-                )
+                ),
               ],
             ),
-            CustomFAB(onTap: (){
-              Navigator.pushNamed(context, AppRoutes.addProductScreen);
-            })
+            CustomFAB(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.addProductScreen);
+              },
+            ),
           ],
         ),
       ),

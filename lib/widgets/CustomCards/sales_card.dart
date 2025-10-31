@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/flutter_font_styles.dart';
 import '../../Constants/app_dimensions.dart';
-import '../reusable_functions.dart';
 
 class SalesCard extends StatelessWidget {
   final String name;
@@ -29,7 +28,10 @@ class SalesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.05,
+        vertical: height * 0.015,
+      ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(14),
@@ -54,7 +56,7 @@ class SalesCard extends StatelessWidget {
                       maxLines: 1,
                     ),
                     AppDimensions.w10(context),
-                    _buildStatusTag(isPending!)
+                    _buildStatusTag(isPending!),
                   ],
                 ),
               ),
@@ -69,23 +71,22 @@ class SalesCard extends StatelessWidget {
             ],
           ),
 
-            AppDimensions.h10(context),
+          AppDimensions.h10(context),
 
           // Main content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildInfoRow(text: 'Address', value: address!),
-                AppDimensions.h10(context),
+              AppDimensions.h10(context),
               _buildInfoRow(text: 'City/Town', value: city!),
-              if((staffName!.isNotEmpty || staffName != null) && !isPending!) ...[
+              if ((staffName!.isNotEmpty || staffName != null) &&
+                  !isPending!) ...[
                 AppDimensions.h10(context),
                 _buildInfoRow(text: 'Staff', value: staffName!),
-              ]
-
+              ],
             ],
           ),
-
         ],
       ),
     );
@@ -115,15 +116,15 @@ Widget _buildStatusTag(bool isPending) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: isPending ? AppColors.pendingColor.withOpacity(0.21)
-      : AppColors.successColor.withOpacity(0.21),
+      color: isPending
+          ? AppColors.pendingColor.withOpacity(0.21)
+          : AppColors.successColor.withOpacity(0.21),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(
       isPending ? 'Loading Pending' : 'Dispatched',
       style: AppTextStyles.statusFont.copyWith(
-        color: isPending ? AppColors.pendingColor
-            : AppColors.successColor
+        color: isPending ? AppColors.pendingColor : AppColors.successColor,
       ),
       maxLines: 1,
     ),

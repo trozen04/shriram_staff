@@ -25,10 +25,7 @@ class AppColors {
 
 class AppGradients {
   static const LinearGradient purpleGradient = LinearGradient(
-    colors: [
-      AppColors.primaryColorLight,
-      AppColors.primaryColor,
-    ],
+    colors: [AppColors.primaryColorLight, AppColors.primaryColor],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );

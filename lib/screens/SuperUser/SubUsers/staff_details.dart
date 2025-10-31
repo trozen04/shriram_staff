@@ -4,7 +4,6 @@ import '../../../Utils/image_assets.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
-import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_appbar.dart';
 import '../../../widgets/reusable_functions.dart';
 
@@ -18,23 +17,29 @@ class StaffDetails extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: ReusableAppBar(title: 'Ram'),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             FittedBox(
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.createSubUserPage, arguments: null);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.createSubUserPage,
+                    arguments: null,
+                  );
                 },
                 child: Container(
                   height: height * 0.05,
                   padding: EdgeInsets.symmetric(horizontal: width * 0.055),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.16),
+                    color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.centerRight,
@@ -42,7 +47,7 @@ class StaffDetails extends StatelessWidget {
                     children: [
                       Text('Edit', style: AppTextStyles.dateText),
                       AppDimensions.w10(context),
-                      Image.asset(ImageAssets.editImage, height: height * 0.02,)
+                      Image.asset(ImageAssets.editImage, height: height * 0.02),
                     ],
                   ),
                 ),
@@ -60,10 +65,10 @@ class StaffDetails extends StatelessWidget {
       ),
     );
   }
-
 }
 
 // Extension to capitalize first letter
 extension StringCasingExtension on String {
-  String capitalize() => isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
+  String capitalize() =>
+      isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
 }

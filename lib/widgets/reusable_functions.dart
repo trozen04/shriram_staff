@@ -18,8 +18,6 @@ String formatAmount(dynamic amount) {
   }
 }
 
-
-
 class CustomRoundedButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -40,7 +38,8 @@ class CustomRoundedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double defaultHeight = height ?? MediaQuery.of(context).size.height * 0.055;
+    final double defaultHeight =
+        height ?? MediaQuery.of(context).size.height * 0.055;
     final double width = MediaQuery.of(context).size.width;
 
     return GestureDetector(
@@ -49,7 +48,7 @@ class CustomRoundedButton extends StatelessWidget {
         height: defaultHeight,
         padding: padding ?? EdgeInsets.symmetric(horizontal: width * 0.055),
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppColors.primaryColor.withOpacity(0.16),
+          color: backgroundColor ?? AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: borderRadius ?? BorderRadius.circular(30),
         ),
         alignment: Alignment.center,
@@ -68,7 +67,9 @@ class ProfileRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01),
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.01,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -111,9 +112,7 @@ class CustomConfirmationDialog {
             borderRadius: BorderRadius.circular(16),
           ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: maxDialogHeight,
-            ),
+            constraints: BoxConstraints(maxHeight: maxDialogHeight),
             child: SingleChildScrollView(
               padding: EdgeInsets.all(padding),
               child: Column(
@@ -147,7 +146,7 @@ class CustomConfirmationDialog {
                           ),
                         ),
                       ),
-                       SizedBox(width: padding),
+                      SizedBox(width: padding),
                       Expanded(
                         child: SizedBox(
                           height: buttonHeight,
@@ -195,26 +194,32 @@ class ReusableDropdown extends StatelessWidget {
       icon: const Icon(Icons.keyboard_arrow_down_outlined),
       decoration: InputDecoration(
         isDense: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.035,
+          vertical: MediaQuery.of(context).size.height * 0.015,
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
         errorStyle: const TextStyle(
           height: 1, // reduce vertical gap
           color: Colors.red,
         ),
         errorMaxLines: 2,
       ),
-      value: value,
+      initialValue: value,
       items: items
-          .map((item) => DropdownMenuItem<String>(
-        value: item,
-        child: Text(item, style: AppTextStyles.hintText),
-      ))
+          .map(
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(item, style: AppTextStyles.hintText),
+            ),
+          )
           .toList(),
       onChanged: onChanged,
       validator: validator,
-      hint: Text('${hintText!.isNotEmpty ? hintText :  'Select option'}', style: AppTextStyles.hintText),
+      hint: Text(
+        '${hintText!.isNotEmpty ? hintText : 'Select option'}',
+        style: AppTextStyles.hintText,
+      ),
     );
   }
 }
@@ -227,28 +232,29 @@ class ReusablePopup extends StatelessWidget {
   final double height;
   final double width;
 
-  ReusablePopup({
+  const ReusablePopup({
+    super.key,
     required this.title,
     required this.message,
     required this.buttonText,
-    required this.onButtonPressed, required this.height, required this.width,
+    required this.onButtonPressed,
+    required this.height,
+    required this.width,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.2, vertical: height * 0.035),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.2,
+          vertical: height * 0.035,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title,
-              style: AppTextStyles.popupTitle,
-            ),
+            Text(title, style: AppTextStyles.popupTitle),
             AppDimensions.h20(context),
             Text(
               message,
@@ -257,7 +263,7 @@ class ReusablePopup extends StatelessWidget {
               maxLines: 3,
             ),
             AppDimensions.h20(context),
-            PrimaryButton(text: 'okay', onPressed: onButtonPressed)
+            PrimaryButton(text: 'okay', onPressed: onButtonPressed),
           ],
         ),
       ),
@@ -277,8 +283,10 @@ class ActionButton extends StatelessWidget {
     this.icon,
     this.imagePath,
     required this.ontap,
-  }) : assert(icon != null || imagePath != null,
-  'Either icon or imagePath must be provided');
+  }) : assert(
+         icon != null || imagePath != null,
+         'Either icon or imagePath must be provided',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -287,9 +295,12 @@ class ActionButton extends StatelessWidget {
     return InkWell(
       onTap: ontap,
       child: Container(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.02),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.02,
+        ),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.16),
+          color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -303,11 +314,7 @@ class ActionButton extends StatelessWidget {
                 fit: BoxFit.contain,
               )
             else
-              Icon(
-                icon,
-                size: height * 0.07,
-                color: AppColors.primaryColor,
-              ),
+              Icon(icon, size: height * 0.07, color: AppColors.primaryColor),
             AppDimensions.h10(context),
             Text(
               title,
@@ -324,11 +331,7 @@ class ActionButton extends StatelessWidget {
 
 class ReportTable extends StatelessWidget {
   final data;
-
-  const ReportTable({
-    super.key,
-    required this.data,
-  });
+  const ReportTable({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -351,14 +354,19 @@ class ReportTable extends StatelessWidget {
             TableHeaderCell(text: 'Stock Left', textStyle: headerTextStyle),
           ],
         ),
-        ...data.map((row) => TableRow(
-          children: [
-            TableCellWidget(text: row['item']!, textStyle: cellTextStyle),
-            TableCellWidget(text: row['qtyIn']!, textStyle: cellTextStyle),
-            TableCellWidget(text: row['qtyOut']!, textStyle: cellTextStyle),
-            TableCellWidget(text: row['stockLeft']!, textStyle: cellTextStyle),
-          ],
-        )),
+        ...data.map(
+          (row) => TableRow(
+            children: [
+              TableCellWidget(text: row['item']!, textStyle: cellTextStyle),
+              TableCellWidget(text: row['qtyIn']!, textStyle: cellTextStyle),
+              TableCellWidget(text: row['qtyOut']!, textStyle: cellTextStyle),
+              TableCellWidget(
+                text: row['stockLeft']!,
+                textStyle: cellTextStyle,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -368,7 +376,11 @@ class TableHeaderCell extends StatelessWidget {
   final String text;
   final TextStyle textStyle;
 
-  const TableHeaderCell({super.key, required this.text, required this.textStyle});
+  const TableHeaderCell({
+    super.key,
+    required this.text,
+    required this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +395,11 @@ class TableCellWidget extends StatelessWidget {
   final String text;
   final TextStyle textStyle;
 
-  const TableCellWidget({super.key, required this.text, required this.textStyle});
+  const TableCellWidget({
+    super.key,
+    required this.text,
+    required this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -394,13 +410,11 @@ class TableCellWidget extends StatelessWidget {
         style: textStyle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        softWrap: false
+        softWrap: false,
       ),
     );
   }
 }
-
-
 
 class ReusableTextField extends StatelessWidget {
   final String label;
@@ -454,10 +468,7 @@ class ReusableTextField extends StatelessWidget {
                       Icon(actionIcon, size: 18, color: Colors.red),
                     if (actionLabel != null) ...[
                       const SizedBox(width: 4),
-                      Text(
-                        actionLabel!,
-                        style: AppTextStyles.underlineText,
-                      ),
+                      Text(actionLabel!, style: AppTextStyles.underlineText),
                     ],
                   ],
                 ),
@@ -481,8 +492,9 @@ class ReusableTextField extends StatelessWidget {
           readOnly: readOnly,
           maxLines: maxLines,
           onTap: onTap,
-          inputFormatters: keyboardType == TextInputType.number ||
-              keyboardType == TextInputType.phone
+          inputFormatters:
+              keyboardType == TextInputType.number ||
+                  keyboardType == TextInputType.phone
               ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
               : [],
           decoration: InputDecoration(
@@ -492,21 +504,26 @@ class ReusableTextField extends StatelessWidget {
             fillColor: readOnly
                 ? AppColors.readOnlyFillColor
                 : Colors.white, // same logic
-            contentPadding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.035, vertical: MediaQuery.of(context).size.height * 0.015),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.035,
+              vertical: MediaQuery.of(context).size.height * 0.015,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              BorderSide(color: AppColors.cardBorder),
+              borderSide: BorderSide(color: AppColors.cardBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              BorderSide(color: AppColors.borderColor.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.borderColor.withOpacity(0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                  color: AppColors.primaryColor, width: 2),
+                color: AppColors.primaryColor,
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -514,7 +531,6 @@ class ReusableTextField extends StatelessWidget {
     );
   }
 }
-
 
 class ReusableNotificationCard extends StatelessWidget {
   final String title;
@@ -527,19 +543,18 @@ class ReusableNotificationCard extends StatelessWidget {
     required this.title,
     required this.time,
     required this.height,
-    required this.width
+    required this.width,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.035,
+        vertical: height * 0.015,
+      ),
       decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-                  color: AppColors.bottomBorder
-              )
-          )
+        border: Border(bottom: BorderSide(color: AppColors.bottomBorder)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -550,9 +565,10 @@ class ReusableNotificationCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Notification 1', style: AppTextStyles.label),
-              if(true) Icon(Icons.circle, size: 10, color: AppColors.primaryColor,)
-              else Text(''),
-
+              if (true)
+                Icon(Icons.circle, size: 10, color: AppColors.primaryColor)
+              else
+                Text(''),
             ],
           ),
           AppDimensions.h10(context),
@@ -561,15 +577,14 @@ class ReusableNotificationCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('Monday, 4:41 pm', style: AppTextStyles.dateAndTime),
-              Text('3 Hours ago', style: AppTextStyles.timeLeft)
+              Text('3 Hours ago', style: AppTextStyles.timeLeft),
             ],
-          )
+          ),
         ],
       ),
     );
   }
 }
-
 
 ///Date Functions
 String formatReadableDate(DateTime? date) {
@@ -582,7 +597,7 @@ String formatReadableDate(DateTime? date) {
   return DateFormat('d MMMM, yyyy').format(istDate);
 }
 
-///
+///ReusableSearchField
 
 class ReusableSearchField extends StatelessWidget {
   final TextEditingController controller;
@@ -591,12 +606,12 @@ class ReusableSearchField extends StatelessWidget {
   final void Function(String)? onChanged;
 
   const ReusableSearchField({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = 'Search...',
     this.prefixIcon = Icons.search,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -611,7 +626,7 @@ class ReusableSearchField extends StatelessWidget {
         hintStyle: AppTextStyles.searchFieldFont,
         prefixIcon: Icon(prefixIcon, color: AppColors.primaryColor),
         filled: true,
-        fillColor: AppColors.primaryColor.withOpacity(0.16),
+        fillColor: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
         contentPadding: EdgeInsets.symmetric(
           horizontal: width * 0.035,
           vertical: height * 0.01,
@@ -626,59 +641,6 @@ class ReusableSearchField extends StatelessWidget {
 }
 
 /// A reusable function to pick a date and return it as [DateTime].
-
-// Future<DateTime?> pickDate({
-//   required BuildContext context,
-//   DateTime? initialDate,
-//   DateTime? firstDate,
-//   DateTime? lastDate,
-// }) async {
-//   final DateTime now = DateTime.now();
-//   final bool isDark = Theme.of(context).brightness == Brightness.dark;
-//
-//   final DateTime? picked = await showDatePicker(
-//     context: context,
-//     initialDate: initialDate ?? now,
-//     firstDate: firstDate ?? DateTime(2000),
-//     lastDate: lastDate ?? DateTime(2100),
-//     builder: (BuildContext context, Widget? child) {
-//       return Theme(
-//         data: Theme.of(context).copyWith(
-//           dialogTheme: const DialogThemeData(
-//             elevation: 12,
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.all(Radius.circular(20)),
-//             ),
-//           ),
-//           colorScheme: ColorScheme.light(
-//             primary: Colors.teal, // header color
-//             onPrimary: Colors.white, // header text
-//             surface: Colors.white, // background color
-//             onSurface: Colors.black87, // text color
-//           ).copyWith(
-//             surface: isDark ? Colors.grey[900] : Colors.grey[50],
-//             onSurface: isDark ? Colors.white70 : Colors.black87,
-//             primary: isDark ? Colors.tealAccent.shade400 : Colors.teal.shade600,
-//           ),
-//           textButtonTheme: TextButtonThemeData(
-//             style: TextButton.styleFrom(
-//               foregroundColor:
-//               isDark ? Colors.tealAccent.shade200 : Colors.teal.shade700,
-//               textStyle: const TextStyle(
-//                 fontWeight: FontWeight.w600,
-//                 fontSize: 16,
-//               ),
-//             ),
-//           ),
-//         ),
-//         child: child!,
-//       );
-//     },
-//   );
-//
-//   return picked;
-// }
-
 
 Future<DateTime?> pickDate({
   required BuildContext context,
@@ -708,10 +670,7 @@ Future<DateTime?> pickDate({
         fontWeight: FontWeight.bold,
         fontSize: 15,
       ),
-      cancelButtonTextStyle: const TextStyle(
-        color: Colors.grey,
-        fontSize: 15,
-      ),
+      cancelButtonTextStyle: const TextStyle(color: Colors.grey, fontSize: 15),
     ),
     dialogSize: const Size(320, 400),
     borderRadius: BorderRadius.circular(16),
@@ -721,11 +680,60 @@ Future<DateTime?> pickDate({
   return results?.first;
 }
 
+Future<DateTimeRange?> pickDateRange({
+  required BuildContext context,
+  DateTimeRange? initialRange,
+  DateTime? firstDate,
+  DateTime? lastDate,
+}) async {
+  final DateTime now = DateTime.now();
+
+  // Default range: today to today
+  final List<DateTime?> initialDates = [
+    initialRange?.start ?? now,
+    initialRange?.end ?? now,
+  ];
+
+  final results = await showCalendarDatePicker2Dialog(
+    context: context,
+    config: CalendarDatePicker2WithActionButtonsConfig(
+      calendarType: CalendarDatePicker2Type.range,
+      dayBorderRadius: BorderRadius.circular(8),
+      selectedDayHighlightColor: AppColors.primaryColor,
+      yearTextStyle: AppTextStyles.linkText,
+      selectedYearTextStyle: AppTextStyles.linkText.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.white
+      ),
+      weekdayLabels: const ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      controlsTextStyle: AppTextStyles.bodyText,
+      okButtonTextStyle: AppTextStyles.linkText,
+      cancelButtonTextStyle: AppTextStyles.cardText,
+    ),
+    dialogSize: const Size(320, 400),
+    borderRadius: BorderRadius.circular(16),
+    value: initialDates,
+  );
+
+  if (results == null || results.length < 2 || results[0] == null || results[1] == null) {
+    return null;
+  }
+
+  return DateTimeRange(start: results[0]!, end: results[1]!);
+}
+
+
 /// Optional helper to format the date as string (e.g., 'dd-MM-yy')
 String formatDate(DateTime? date) {
   return date != null ? DateFormat('dd-MM-yy').format(date) : 'Date';
 }
 
+String formatDateRange(DateTimeRange? range) {
+  if (range == null) return 'From ~ To';
+  final String from = DateFormat('dd-MM-yy').format(range.start);
+  final String to = DateFormat('dd-MM-yy').format(range.end);
+  return '$from ~ $to';
+}
 
 class CustomFAB extends StatelessWidget {
   final VoidCallback onTap;
@@ -736,14 +744,14 @@ class CustomFAB extends StatelessWidget {
   final Alignment alignment;
 
   const CustomFAB({
-    Key? key,
+    super.key,
     required this.onTap,
     this.icon = Icons.add,
     this.backgroundColor,
     this.iconColor,
     this.padding,
     this.alignment = Alignment.bottomRight,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -752,10 +760,7 @@ class CustomFAB extends StatelessWidget {
     return Align(
       alignment: alignment,
       child: Padding(
-        padding: EdgeInsets.only(
-          right: width * 0.05,
-          bottom: width * 0.05,
-        ),
+        padding: EdgeInsets.only(right: width * 0.05, bottom: width * 0.05),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(100),
@@ -765,10 +770,7 @@ class CustomFAB extends StatelessWidget {
               color: backgroundColor ?? AppColors.primaryColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              color: iconColor ?? Colors.white,
-            ),
+            child: Icon(icon, color: iconColor ?? Colors.white),
           ),
         ),
       ),
@@ -779,10 +781,7 @@ class CustomFAB extends StatelessWidget {
 class StaffTable extends StatelessWidget {
   final data;
 
-  const StaffTable({
-    super.key,
-    required this.data,
-  });
+  const StaffTable({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -807,24 +806,101 @@ class StaffTable extends StatelessWidget {
             TableHeaderCell(text: 'Total Absent', textStyle: headerTextStyle),
           ],
         ),
-        ...data.map((row) => TableRow(
-          children: [
-            TableCellWidget(
-              text: row['name'].toString(),
-              textStyle: AppTextStyles.profileDataText,
-            ),
-            TableCellWidget(
-              text: row['present'].toString(),
-              textStyle: cellTextStyle,
-            ),
-            TableCellWidget(
-              text: row['absent'].toString(),
-              textStyle: cellTextStyle,
-            ),
-          ],
-        )),
+        ...data.map(
+          (row) => TableRow(
+            children: [
+              TableCellWidget(
+                text: row['name'].toString(),
+                textStyle: AppTextStyles.profileDataText,
+              ),
+              TableCellWidget(
+                text: row['present'].toString(),
+                textStyle: cellTextStyle,
+              ),
+              TableCellWidget(
+                text: row['absent'].toString(),
+                textStyle: cellTextStyle,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 }
 
+class CustomIconButton extends StatelessWidget {
+  final String text;
+  final String? imagePath;
+  final IconData? iconData;
+  final VoidCallback onTap;
+  final double? width;
+  final double? height;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final TextStyle? textStyle;
+  final double borderRadius;
+  final bool showIconOnRight;
+
+  const CustomIconButton({
+    super.key,
+    required this.text,
+    this.imagePath,
+    this.iconData,
+    required this.onTap,
+    this.width,
+    this.height,
+    this.backgroundColor,
+    this.iconColor,
+    this.textStyle,
+    this.borderRadius = 30,
+    this.showIconOnRight = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final double w = width ?? MediaQuery.of(context).size.width;
+    final double h = height ?? MediaQuery.of(context).size.height;
+
+    final Widget? iconWidget = imagePath != null
+        ? Image.asset(imagePath!, height: h * 0.025)
+        : iconData != null
+        ? Icon(
+      iconData,
+      size: h * 0.022,
+      color: iconColor ?? AppColors.primaryColor,
+    )
+        : null;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: w * 0.06,
+          vertical: h * 0.015,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor ?? AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!showIconOnRight && iconWidget != null) ...[
+              iconWidget,
+              AppDimensions.w10(context),
+            ],
+            Text(
+              text,
+              style: textStyle ?? AppTextStyles.dateText,
+            ),
+            if (showIconOnRight && iconWidget != null) ...[
+              AppDimensions.w10(context),
+              iconWidget,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

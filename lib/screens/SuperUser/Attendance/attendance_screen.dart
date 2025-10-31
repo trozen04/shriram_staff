@@ -16,7 +16,8 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate  = DateTime.now();
+  DateTimeRange? selectedDateRange;
+
 
   final dynamic attendanceData = [
     {"name": "Suresh Kumar", "present": 20, "absent": 2},
@@ -25,16 +26,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     {"name": "Vijay Kumar", "present": 19, "absent": 3},
   ];
 
-
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -45,27 +45,37 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Attendance', preferredHeight: height * 0.12),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// 🔍 Search Field
-
             TextField(
               controller: searchController,
               decoration: InputDecoration(
                 hintText: 'Search Factory',
                 hintStyle: AppTextStyles.searchFieldFont,
                 suffixIcon: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
-                  child: Image.asset(ImageAssets.factoryPNG, height: height * 0.01),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.05,
+                    vertical: height * 0.015,
+                  ),
+                  child: Image.asset(
+                    ImageAssets.factoryPNG,
+                    height: height * 0.01,
+                  ),
                 ),
                 filled: true,
-                fillColor: AppColors.primaryColor.withOpacity(0.16),
-                contentPadding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.01),
+                fillColor: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: width * 0.035,
+                  vertical: height * 0.01,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(61),
                   borderSide: BorderSide.none,
@@ -79,30 +89,47 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildIconContainer(Icons.filter_list, width, height, (){
+                  _buildIconContainer(width, height, () {
                     print('filter list');
-                  }),
+                  }, icon: Icons.filter_list),
                   SizedBox(width: width * 0.045),
 
-                  _buildIconContainer(Icons.calendar_month_outlined, width, height, _pickDate),
+                  _buildIconContainer(
+                    width,
+                    height,
+                    _pickDate,
+                    imagePath: ImageAssets.calender
+                  ),
 
                   SizedBox(width: width * 0.045),
 
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.markAttendanceScreen);
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.markAttendanceScreen,
+                      );
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: width * 0.065,
+                        vertical: height * 0.015,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.16),
+                        color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
                         children: [
-                          Text('Mark Attendance', style: AppTextStyles.dateText),
+                          Text(
+                            'Mark Attendance',
+                            style: AppTextStyles.dateText,
+                          ),
                           AppDimensions.w10(context),
-                          Image.asset(ImageAssets.editImage, height: height * 0.02),
+                          Image.asset(
+                            ImageAssets.editImage,
+                            height: height * 0.02,
+                          ),
                         ],
                       ),
                     ),
@@ -113,7 +140,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             AppDimensions.h20(context),
 
             /// 📅 Date Header
-            Text(formatReadableDate(selectedDate), style: AppTextStyles.appbarTitle),
+            if(selectedDateRange != null)
+            Text(
+              formatDateRange(selectedDateRange),
+              style: AppTextStyles.appbarTitle,
+            ),
             AppDimensions.h10(context),
 
             /// 📋 Attendance Table
@@ -122,25 +153,43 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 child: StaffTable(data: attendanceData),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Widget _buildIconContainer(IconData icon, double width, double height, final VoidCallback onTap) {
+  Widget _buildIconContainer(
+      double width,
+      double height,
+      VoidCallback onTap, {
+        IconData? icon,
+        String? imagePath,
+      }) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.065,
+          vertical: height * 0.015,
+        ),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withOpacity(0.16),
+          color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Icon(icon, color: AppColors.primaryColor),
+        child: imagePath != null
+            ? Image.asset(
+          imagePath,
+          width: width * 0.06,
+          height: width * 0.06,
+          color: AppColors.primaryColor,
+        )
+            : Icon(
+          icon ?? Icons.help_outline,
+          color: AppColors.primaryColor,
+        ),
       ),
     );
   }
-}
 
+}

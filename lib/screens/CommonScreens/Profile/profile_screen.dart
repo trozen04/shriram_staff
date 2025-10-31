@@ -15,10 +15,12 @@ class ProfileScreen extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'Profile', preferredHeight: height * 0.12),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -26,8 +28,7 @@ class ProfileScreen extends StatelessWidget {
             ProfileRow(label: 'Address', value: '122/22, Tilak Nagar'),
             ProfileRow(label: 'City/Town', value: 'New Delhi'),
             ProfileRow(label: 'State', value: 'Delhi'),
-            if(isSuperUser)
-              ProfileRow(label: 'Factory', value: 'Factory1'),
+            if (isSuperUser) ProfileRow(label: 'Factory', value: 'Factory1'),
 
             AppDimensions.h30(context),
             PrimaryButton(
@@ -58,4 +59,3 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
-

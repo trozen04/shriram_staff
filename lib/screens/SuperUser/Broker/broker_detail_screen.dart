@@ -18,10 +18,15 @@ class _BrokerDetailScreenState extends State<BrokerDetailScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: CustomAppBar(title: 'Ramesh Yadav', preferredHeight: height * 0.12),
+      appBar: CustomAppBar(
+        title: 'Ramesh Yadav',
+        preferredHeight: height * 0.12,
+      ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             ProfileRow(label: 'Broker Name', value: 'Karan'),
@@ -31,9 +36,9 @@ class _BrokerDetailScreenState extends State<BrokerDetailScreen> {
             ProfileRow(label: 'Factory', value: 'Factory 1'),
             ProfileRow(label: 'Date', value: '20/09/2025'),
             AppDimensions.h30(context),
-            PrimaryButton(text: 'Approve', onPressed: (){}),
+            PrimaryButton(text: 'Approve', onPressed: () {}),
             AppDimensions.h10(context),
-            ReusableOutlinedButton(text: 'Reject', onPressed: (){}),
+            ReusableOutlinedButton(text: 'Reject', onPressed: () {}),
             AppDimensions.h30(context),
           ],
         ),

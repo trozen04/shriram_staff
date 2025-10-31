@@ -71,13 +71,13 @@ class AppTextStyles {
   );
 
   static TextStyle errorText = const TextStyle(
-    color: AppColors.errorColor,   // e.g., Colors.red
+    color: AppColors.errorColor, // e.g., Colors.red
     fontSize: 12,
     fontWeight: FontWeight.w400,
-    height: 1.3,                  // line height
+    height: 1.3, // line height
   );
   static TextStyle navbar = const TextStyle(
-    color: AppColors.navbarNotSelected,   // e.g., Colors.red
+    color: AppColors.navbarNotSelected, // e.g., Colors.red
     fontSize: 12,
     fontWeight: FontWeight.w500,
   );
@@ -155,6 +155,4 @@ class AppTextStyles {
     color: AppColors.labelColor,
     fontWeight: FontWeight.w400,
   );
-
-
 }

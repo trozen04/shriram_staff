@@ -23,11 +23,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: const ReusableAppBar(title: 'Notification'),
       body: ListView.builder(
         itemCount: notifications.length,
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         itemBuilder: (context, index) {
           return ReusableNotificationCard(
             title: 'Notification1',

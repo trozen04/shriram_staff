@@ -17,10 +17,12 @@ class _BillingDetailsState extends State<BillingDetails> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: ReusableAppBar(title: '#22311'),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             ProfileRow(label: 'Unit ID', value: '#22311'),

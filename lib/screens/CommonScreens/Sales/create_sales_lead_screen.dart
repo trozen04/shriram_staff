@@ -25,7 +25,9 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
   final List<String> factoryList = ['Factory A', 'Factory B', 'Factory C'];
 
   /// Dynamic item controllers
-  final List<TextEditingController> _itemControllers = [TextEditingController()];
+  final List<TextEditingController> _itemControllers = [
+    TextEditingController(),
+  ];
 
   final TextEditingController _bagsController = TextEditingController();
   final TextEditingController _qtyController = TextEditingController();
@@ -64,11 +66,14 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
     final width = MediaQuery.of(context).size.width;
 
     return GestureDetector(
-      onTap: ()=> FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: ReusableAppBar(title: 'Create Sales Lead'),
         body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.035,
+            vertical: height * 0.015,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -79,7 +84,9 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   label: 'Customer Name',
                   hint: 'Enter Name',
                   controller: _nameController,
-                  validator: (val) => val == null || val.isEmpty ? 'Customer name is required' : null,
+                  validator: (val) => val == null || val.isEmpty
+                      ? 'Customer name is required'
+                      : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -102,7 +109,8 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   label: 'Address',
                   hint: 'Enter Address',
                   controller: _addressController,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter address' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter address' : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -111,7 +119,8 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   label: 'City/Town',
                   hint: 'Enter City/Town',
                   controller: _cityController,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter city/town' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter city/town' : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -123,7 +132,8 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   value: _selectedFactory,
                   hintText: 'Select Factory',
                   onChanged: (val) => setState(() => _selectedFactory = val),
-                  validator: (val) => val == null || val.isEmpty ? 'Select factory' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Select factory' : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -138,13 +148,18 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                       label: index == 0 ? 'Item' : 'Item ${index + 1}',
                       hint: 'Enter Item',
                       controller: controller,
-                      validator: (val) => val == null || val.isEmpty ? 'Enter item' : null,
+                      validator: (val) =>
+                          val == null || val.isEmpty ? 'Enter item' : null,
                       // Show Add button on first only
                       actionLabel: index == 0 ? 'Add another item' : null,
                       onActionTap: index == 0 ? _addNewItemField : null,
                       // Show Remove button on all except first
-                      actionIcon: index != 0 ? Icons.remove_circle_outline : null,
-                      onIconTap: index != 0 ? () => _removeItemField(index) : null,
+                      actionIcon: index != 0
+                          ? Icons.remove_circle_outline
+                          : null,
+                      onIconTap: index != 0
+                          ? () => _removeItemField(index)
+                          : null,
                     ),
                   );
                 }),
@@ -160,7 +175,9 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   hint: 'Enter No. of bags',
                   controller: _bagsController,
                   keyboardType: TextInputType.number,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter number of bags' : null,
+                  validator: (val) => val == null || val.isEmpty
+                      ? 'Enter number of bags'
+                      : null,
                 ),
                 AppDimensions.h10(context),
 
@@ -170,7 +187,8 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   hint: 'Enter Quantity',
                   controller: _qtyController,
                   keyboardType: TextInputType.number,
-                  validator: (val) => val == null || val.isEmpty ? 'Enter quantity' : null,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter quantity' : null,
                 ),
                 AppDimensions.h30(context),
 

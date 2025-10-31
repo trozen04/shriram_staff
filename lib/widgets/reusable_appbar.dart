@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/utils/image_assets.dart';
-
-import '../utils/app_colors.dart';
 import '../utils/flutter_font_styles.dart';
 
 class ReusableAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -30,12 +28,12 @@ class ReusableAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       leading: showBackButton
           ? GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Image.asset(
-          ImageAssets.backButton,
-          width: screenWidth * 0.06,
-        ),
-      )
+              onTap: () => Navigator.pop(context),
+              child: Image.asset(
+                ImageAssets.backButton,
+                width: screenWidth * 0.06,
+              ),
+            )
           : null,
       title: Text(
         title,

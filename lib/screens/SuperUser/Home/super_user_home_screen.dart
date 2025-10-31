@@ -15,7 +15,7 @@ class SuperUserHomeScreen extends StatefulWidget {
 }
 
 class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
-  DateTime? selectedDate  = DateTime.now();
+  DateTimeRange? selectedDateRange;
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +23,52 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
     final width = MediaQuery.of(context).size.width;
 
     final reportData = [
-      {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
-      {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
-      {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
-      {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
-      {'item': 'Paddy', 'qtyIn': '33 Qntl', 'qtyOut': '13 Qntl', 'stockLeft': '20 Qntl'},
+      {
+        'item': 'Paddy',
+        'qtyIn': '33 Qntl',
+        'qtyOut': '13 Qntl',
+        'stockLeft': '20 Qntl',
+      },
+      {
+        'item': 'Paddy',
+        'qtyIn': '33 Qntl',
+        'qtyOut': '13 Qntl',
+        'stockLeft': '20 Qntl',
+      },
+      {
+        'item': 'Paddy',
+        'qtyIn': '33 Qntl',
+        'qtyOut': '13 Qntl',
+        'stockLeft': '20 Qntl',
+      },
+      {
+        'item': 'Paddy',
+        'qtyIn': '33 Qntl',
+        'qtyOut': '13 Qntl',
+        'stockLeft': '20 Qntl',
+      },
+      {
+        'item': 'Paddy',
+        'qtyIn': '33 Qntl',
+        'qtyOut': '13 Qntl',
+        'stockLeft': '20 Qntl',
+      },
     ];
 
+    void _pickDate() async {
+      final DateTimeRange? picked = await pickDateRange(
+        context: context,
+        initialRange: selectedDateRange,
+      );
+
+      if (picked != null) {
+        setState(() {
+          selectedDateRange = picked;
+        });
+      }
+    }
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: true,
         title: 'Home',
@@ -39,7 +76,10 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
         preferredHeight: height * 0.15,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.02),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.02,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -62,7 +102,10 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Purchase Request',
                   imagePath: ImageAssets.purchaseRequest,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.purchaseRequestScreen);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.purchaseRequestScreen,
+                    );
                   },
                 ),
                 ActionButton(
@@ -83,14 +126,22 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Sales',
                   imagePath: ImageAssets.sales,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: true);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.salesScreen,
+                      arguments: true,
+                    );
                   },
                 ),
                 ActionButton(
                   title: 'Factory',
                   imagePath: ImageAssets.factory,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.factoryScreen, arguments: null);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.factoryScreen,
+                      arguments: null,
+                    );
                   },
                 ),
                 ActionButton(
@@ -104,7 +155,11 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                   title: 'Billing',
                   imagePath: ImageAssets.billing,
                   ontap: () {
-                    Navigator.pushNamed(context, AppRoutes.billingScreen, arguments: true);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.billingScreen,
+                      arguments: true,
+                    );
                   },
                 ),
 
@@ -124,11 +179,12 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                       context,
                       AppRoutes.reportScreen,
                       arguments: {
-                        'reportData': null, // e.g. fetched data or empty list/map
+                        'reportData':
+                            null, // e.g. fetched data or empty list/map
                         'isSuperUser': true, // or false depending on user type
                       },
                     );
-                    },
+                  },
                 ),
                 ActionButton(
                   title: 'Broker',
@@ -151,66 +207,26 @@ class _SuperUserHomeScreenState extends State<SuperUserHomeScreen> {
                     Navigator.pushNamed(context, AppRoutes.productMasterScreen);
                   },
                 ),
-
               ],
             ),
             AppDimensions.h20(context),
-            Text(
-              'Report',
-              style: AppTextStyles.appbarTitle,
-            ),
+            Text('Report', style: AppTextStyles.appbarTitle),
             AppDimensions.h10(context),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                InkWell(
-                  onTap: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (pickedDate != null) setState(() => selectedDate = pickedDate);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          selectedDate == null
-                              ? 'Date'
-                              : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                          style: AppTextStyles.dateText,
-                        ),
-                        AppDimensions.w10(context),
-                        Icon(Icons.calendar_month_outlined, color: AppColors.primaryColor, size: 16),
-                      ],
-                    ),
-                  ),
+                CustomIconButton(
+                  text: formatDateRange(selectedDateRange),
+                  imagePath: ImageAssets.calender,
+                  width: width,
+                  height: height,
+                  onTap: () => _pickDate(),
                 ),
-                Container(
-                  height: height * 0.05,
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.055),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('Factory', style: AppTextStyles.dateText),
-                      AppDimensions.w10(context),
-                      Image.asset(ImageAssets.factoryPNG, height: height * 0.02)
-                    ],
-                  ),
+                CustomIconButton(
+                  text: 'Factory',
+                  imagePath: ImageAssets.factoryPNG,
+                  onTap: () {},
+                  showIconOnRight: true,
                 ),
               ],
             ),

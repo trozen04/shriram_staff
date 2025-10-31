@@ -1,14 +1,11 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shree_ram_staff/widgets/CustomCards/SuperUser/purchase_request_card.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
-import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/reusable_functions.dart';
-import '../../../utils/flutter_font_styles.dart';
 
 class PurchaseRequestScreen extends StatefulWidget {
   const PurchaseRequestScreen({super.key});
@@ -19,7 +16,8 @@ class PurchaseRequestScreen extends StatefulWidget {
 
 class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
   TextEditingController searchController = TextEditingController();
-  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
+
 
   @override
   void initState() {
@@ -51,15 +49,16 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
       'vehicleNumber': 'DL 12 AB 2198',
     },
   ];
+
   void _pickDate() async {
-    final DateTime? picked = await pickDate(
+    final DateTimeRange? picked = await pickDateRange(
       context: context,
-      initialDate: selectedDate,
+      initialRange: selectedDateRange,
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = picked;
+        selectedDateRange = picked;
       });
     }
   }
@@ -71,14 +70,16 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         isHomePage: false,
         title: 'Purchase Request',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.035,
+          vertical: height * 0.015,
+        ),
         child: Column(
           children: [
             // Search Field
@@ -98,41 +99,35 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CustomRoundedButton(
-                    onTap: _pickDate,
-                    child: Row(
-                      children: [
-                        Text(
-                          formatDate(selectedDate),
-                          style: AppTextStyles.dateText,
-                        ),
-                        const SizedBox(width: 8),
-                        Image.asset(ImageAssets.calender, height: height * 0.025),
-                      ],
-                    ),
+                  CustomIconButton(
+                    text: formatDateRange(selectedDateRange),
+                    imagePath: ImageAssets.calender,
+                    width: width,
+                    height: height,
+                    onTap: () => _pickDate(),
                   ),
                   SizedBox(width: width * 0.045),
-                  CustomRoundedButton(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Text('Factory', style: AppTextStyles.dateText),
-                        const SizedBox(width: 8),
-                        Image.asset(ImageAssets.factoryPNG, height: 20),
-                      ],
-                    ),
+                  CustomIconButton(
+                    text: 'Factory',
+                    imagePath: ImageAssets.factoryPNG,
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.factoryScreen,
+                        arguments: null,
+                      );
+                    },
+                    showIconOnRight: true,
                   ),
+
                   SizedBox(width: width * 0.045),
-                  CustomRoundedButton(
+                  CustomIconButton(
+                    text: 'Filter',
+                    iconData: Icons.tune,
                     onTap: () {},
-                    child: Row(
-                      children: [
-                        Text('Filter', style: AppTextStyles.dateText),
-                        const SizedBox(width: 8),
-                        Icon(Icons.tune, color: AppColors.primaryColor),
-                      ],
-                    ),
+                    showIconOnRight: true,
                   ),
+
                 ],
               ),
             ),
@@ -171,6 +166,5 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
         ),
       ),
     );
-
   }
 }

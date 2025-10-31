@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart';
 import '../../../Constants/app_dimensions.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/reusable_functions.dart';
 
@@ -35,7 +33,10 @@ class _SalaryRolloutScreenState extends State<SalaryRolloutScreen> {
           preferredHeight: height * 0.12,
         ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.015),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.05,
+            vertical: height * 0.015,
+          ),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +90,7 @@ class _SalaryRolloutScreenState extends State<SalaryRolloutScreen> {
                 AppDimensions.h30(context),
 
                 /// Submit Button
-                PrimaryButton(text: 'Submit', onPressed: (){})
+                PrimaryButton(text: 'Submit', onPressed: () {}),
               ],
             ),
           ),
