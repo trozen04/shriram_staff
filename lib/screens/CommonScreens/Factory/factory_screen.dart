@@ -88,92 +88,134 @@ class _FactoryScreenState extends State<FactoryScreen> {
 
             AppDimensions.h20(context),
 
-            // Scrollable list of added items
+            // Single Expanded with scrollable Column
             Expanded(
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Container(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: Column(
-                      children: [
-                        // Header row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Add Item', style: AppTextStyles.label),
-                            if (index == items.length - 1)
-                              InkWell(
-                                onTap: _addItem,
-                                child: Text(
-                                  'Add Item',
-                                  style: AppTextStyles.underlineText,
-                                ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // List of item cards
+                    ListView.builder(
+                      physics: NeverScrollableScrollPhysics(), // Disable inner scroll
+                      shrinkWrap: true,
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return Container(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Column(
+                            children: [
+                              // Header row
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Add Item', style: AppTextStyles.label),
+                                  if (index == items.length - 1)
+                                    InkWell(
+                                      onTap: _addItem,
+                                      child: Text(
+                                        'Add Item',
+                                        style: AppTextStyles.underlineText,
+                                      ),
+                                    ),
+                                  if (index != items.length - 1)
+                                    InkWell(
+                                      onTap: () => _removeItem(index),
+                                      child: Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                ],
                               ),
-                            if (index != items.length - 1)
-                              InkWell(
-                                onTap: () => _removeItem(index),
-                                child: Icon(
-                                  Icons.remove_circle,
-                                  color: Colors.red,
-                                ),
+                              AppDimensions.h10(context),
+                              ReusableDropdown(
+                                items: ['Wheat', 'Rice', 'Barley', 'Maize'],
+                                value: item['item'],
+                                onChanged: (val) {
+                                  setState(() {
+                                    item['item'] = val;
+                                  });
+                                },
+                                validator: (val) =>
+                                val == null ? 'Please select an item' : null,
+                                hintText: 'Select Item',
                               ),
-                          ],
-                        ),
-
-                        AppDimensions.h10(context),
-                        ReusableDropdown(
-                          items: ['Wheat', 'Rice', 'Barley', 'Maize'],
-                          value: item['item'],
-                          onChanged: (val) {
-                            setState(() {
-                              item['item'] = val;
-                            });
-                          },
-                          validator: (val) =>
-                              val == null ? 'Please select an item' : null,
-                          hintText: 'Select Item',
-                        ),
-                        AppDimensions.h10(context),
-                        ReusableTextField(
-                          label: 'Quantity',
-                          hint: 'Enter Quantity',
-                          onChanged: (val) {
-                            item['quantity'] = val;
-                          },
-                          validator: (val) =>
-                              val!.isEmpty ? 'Please enter quantity' : null,
-                        ),
-                        AppDimensions.h10(context),
-                        ReusableTextField(
-                          label: 'Bags',
-                          hint: 'Enter number of bags',
-                          onChanged: (val) {
-                            item['bags'] = val;
-                          },
-                          validator: (val) =>
-                              val!.isEmpty ? 'Please enter bags' : null,
-                        ),
-                        AppDimensions.h10(context),
-                        ReusableTextField(
-                          label: 'Quintal',
-                          hint: 'Enter Quintal',
-                          onChanged: (val) {
-                            item['quintal'] = val;
-                          },
-                          validator: (val) =>
-                              val!.isEmpty ? 'Please enter quintal' : null,
-                        ),
-                      ],
+                              AppDimensions.h10(context),
+                              ReusableTextField(
+                                label: 'Quantity',
+                                hint: 'Enter Quantity',
+                                onChanged: (val) {
+                                  item['quantity'] = val;
+                                },
+                                validator: (val) =>
+                                val!.isEmpty ? 'Please enter quantity' : null,
+                              ),
+                              AppDimensions.h10(context),
+                              ReusableTextField(
+                                label: 'Bags',
+                                hint: 'Enter number of bags',
+                                onChanged: (val) {
+                                  item['bags'] = val;
+                                },
+                                validator: (val) =>
+                                val!.isEmpty ? 'Please enter bags' : null,
+                              ),
+                              AppDimensions.h10(context),
+                              ReusableTextField(
+                                label: 'Quintal',
+                                hint: 'Enter Quintal',
+                                onChanged: (val) {
+                                  item['quintal'] = val;
+                                },
+                                validator: (val) =>
+                                val!.isEmpty ? 'Please enter quintal' : null,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+
+                    AppDimensions.h20(context),
+
+                    // Summary Card (scrollable if needed)
+                    _buildSummaryCard(height, width),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+
   }
+  Widget _buildSummaryCard(double height, double width) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.035,
+        vertical: height * 0.015,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text('Factory name: ', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+          Text('Weight: 22 Qntl', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+          Text('Bags: 2', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+          Text('Quantity: ', style: AppTextStyles.bodyText),
+          AppDimensions.h10(context),
+        ],
+      ),
+    );
+  }
+
 }

@@ -1,29 +1,69 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefUtils {
+  static late SharedPreferences _prefs;
+
+  // 🔑 Keys
   static const String _isLoggedInKey = 'isLoggedIn';
+  static const String _userRoleKey = 'userRole';
+  static const String _tokenKey = 'authToken';
+  static const String _userIdKey = 'userId';
+  static const String _userNameKey = 'userName';
+  static const String _userMobileKey = 'userMobile';
 
-  // Save login status
-  static Future<void> setLoggedIn(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isLoggedInKey, value);
+  /// 🏁 Must call once before runApp()
+  static Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
-  // Get login status
-  static Future<bool> isLoggedIn() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_isLoggedInKey) ?? false;
+  // ───────────────────────────────
+  // LOGIN STATUS
+  // ───────────────────────────────
+  static void setLoggedIn(bool value) {
+    _prefs.setBool(_isLoggedInKey, value);
   }
 
-  // Logout
-  static Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isLoggedInKey, false);
+  static bool isLoggedIn() {
+    return _prefs.getBool(_isLoggedInKey) ?? false;
   }
 
-  // Clear all SharedPreferences
-  static Future<void> clearPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+  // ───────────────────────────────
+  // USER DETAILS
+  // ───────────────────────────────
+  static void setUserDetails({
+    required String id,
+    required String name,
+    required String mobile,
+    required String role,
+    required String token,
+  }) {
+    _prefs.setBool(_isLoggedInKey, true);
+    _prefs.setString(_userIdKey, id);
+    _prefs.setString(_userNameKey, name);
+    _prefs.setString(_userMobileKey, mobile);
+    _prefs.setString(_userRoleKey, role);
+    _prefs.setString(_tokenKey, token);
+  }
+
+  static String getUserId() => _prefs.getString(_userIdKey) ?? '';
+  static String getUserName() => _prefs.getString(_userNameKey) ?? '';
+  static String getUserMobile() => _prefs.getString(_userMobileKey) ?? '';
+  static String getUserRole() => _prefs.getString(_userRoleKey) ?? '';
+  static String getToken() => _prefs.getString(_tokenKey) ?? '';
+
+  // ───────────────────────────────
+  // LOGOUT / CLEAR
+  // ───────────────────────────────
+  static void logout() {
+    _prefs.setBool(_isLoggedInKey, false);
+    _prefs.remove(_userIdKey);
+    _prefs.remove(_userNameKey);
+    _prefs.remove(_userMobileKey);
+    _prefs.remove(_userRoleKey);
+    _prefs.remove(_tokenKey);
+  }
+
+  static void clearPrefs() {
+    _prefs.clear();
   }
 }

@@ -39,7 +39,9 @@ class StaffDetails extends StatelessWidget {
                   height: height * 0.05,
                   padding: EdgeInsets.symmetric(horizontal: width * 0.055),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                    color: AppColors.primaryColor.withAlpha(
+                      (0.16 * 255).toInt(),
+                    ),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   alignment: Alignment.centerRight,

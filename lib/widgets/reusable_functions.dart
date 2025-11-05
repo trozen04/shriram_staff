@@ -6,6 +6,7 @@ import '../Constants/app_dimensions.dart';
 import '../utils/app_colors.dart';
 import '../utils/flutter_font_styles.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:intl/intl.dart';
 
 String formatAmount(dynamic amount) {
   if (amount == null) return '';
@@ -48,7 +49,9 @@ class CustomRoundedButton extends StatelessWidget {
         height: defaultHeight,
         padding: padding ?? EdgeInsets.symmetric(horizontal: width * 0.055),
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+          color:
+              backgroundColor ??
+              AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: borderRadius ?? BorderRadius.circular(30),
         ),
         alignment: Alignment.center,
@@ -60,12 +63,26 @@ class CustomRoundedButton extends StatelessWidget {
 
 class ProfileRow extends StatelessWidget {
   final String label;
-  final String value;
+  final dynamic value;
 
-  const ProfileRow({super.key, required this.label, required this.value});
+  const ProfileRow({
+    super.key,
+    required this.label,
+    this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Convert dynamic to displayable string and handle null/empty cases
+    String displayValue;
+    if (value == null ||
+        (value is String && value.trim().isEmpty) ||
+        (value.toString().trim().isEmpty)) {
+      displayValue = '~';
+    } else {
+      displayValue = value.toString();
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: MediaQuery.of(context).size.height * 0.01,
@@ -76,7 +93,7 @@ class ProfileRow extends StatelessWidget {
           Text(label, style: AppTextStyles.bodyText),
           Flexible(
             child: Text(
-              value,
+              displayValue,
               style: AppTextStyles.profileDataText,
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
@@ -423,6 +440,7 @@ class ReusableTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
+  final TextCapitalization textCapitalization;
   final bool readOnly;
   final int maxLines;
   final VoidCallback? onTap;
@@ -439,6 +457,7 @@ class ReusableTextField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.keyboardType = TextInputType.text,
+    this.textCapitalization = TextCapitalization.none,
     this.readOnly = false,
     this.maxLines = 1,
     this.onTap,
@@ -492,11 +511,14 @@ class ReusableTextField extends StatelessWidget {
           readOnly: readOnly,
           maxLines: maxLines,
           onTap: onTap,
-          inputFormatters:
-              keyboardType == TextInputType.number ||
-                  keyboardType == TextInputType.phone
-              ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))]
-              : [],
+          textCapitalization: textCapitalization,
+          inputFormatters: [
+            if (keyboardType == TextInputType.phone)
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+            if (keyboardType == TextInputType.number)
+              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+          ],
+
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.hintText,
@@ -703,7 +725,7 @@ Future<DateTimeRange?> pickDateRange({
       yearTextStyle: AppTextStyles.linkText,
       selectedYearTextStyle: AppTextStyles.linkText.copyWith(
         fontWeight: FontWeight.bold,
-        color: Colors.white
+        color: Colors.white,
       ),
       weekdayLabels: const ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       controlsTextStyle: AppTextStyles.bodyText,
@@ -715,13 +737,15 @@ Future<DateTimeRange?> pickDateRange({
     value: initialDates,
   );
 
-  if (results == null || results.length < 2 || results[0] == null || results[1] == null) {
+  if (results == null ||
+      results.length < 2 ||
+      results[0] == null ||
+      results[1] == null) {
     return null;
   }
 
   return DateTimeRange(start: results[0]!, end: results[1]!);
 }
-
 
 /// Optional helper to format the date as string (e.g., 'dd-MM-yy')
 String formatDate(DateTime? date) {
@@ -866,10 +890,10 @@ class CustomIconButton extends StatelessWidget {
         ? Image.asset(imagePath!, height: h * 0.025)
         : iconData != null
         ? Icon(
-      iconData,
-      size: h * 0.022,
-      color: iconColor ?? AppColors.primaryColor,
-    )
+            iconData,
+            size: h * 0.022,
+            color: iconColor ?? AppColors.primaryColor,
+          )
         : null;
 
     return GestureDetector(
@@ -880,7 +904,9 @@ class CustomIconButton extends StatelessWidget {
           vertical: h * 0.015,
         ),
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+          color:
+              backgroundColor ??
+              AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Row(
@@ -890,10 +916,7 @@ class CustomIconButton extends StatelessWidget {
               iconWidget,
               AppDimensions.w10(context),
             ],
-            Text(
-              text,
-              style: textStyle ?? AppTextStyles.dateText,
-            ),
+            Text(text, style: textStyle ?? AppTextStyles.dateText),
             if (showIconOnRight && iconWidget != null) ...[
               AppDimensions.w10(context),
               iconWidget,
@@ -904,3 +927,34 @@ class CustomIconButton extends StatelessWidget {
     );
   }
 }
+
+String formatToIST(String? utcDateString) {
+  if (utcDateString == null || utcDateString.isEmpty) return '';
+
+  try {
+    // Parse as UTC
+    final utcDate = DateTime.parse(utcDateString).toUtc();
+
+    // Convert to IST (UTC +5:30)
+    final istDate = utcDate.add(const Duration(hours: 5, minutes: 30));
+
+    // Format to dd-MM-yy
+    return DateFormat('dd-MM-yy').format(istDate);
+  } catch (e) {
+    // fallback if parsing fails
+    return '';
+  }
+}
+
+String formatToISTFull(String? utcDateString) {
+  if (utcDateString == null || utcDateString.isEmpty) return '~';
+
+  try {
+    final utcDate = DateTime.parse(utcDateString).toUtc();
+    final istDate = utcDate.add(const Duration(hours: 5, minutes: 30));
+    return DateFormat('dd/MM/yyyy').format(istDate);
+  } catch (e) {
+    return '~';
+  }
+}
+

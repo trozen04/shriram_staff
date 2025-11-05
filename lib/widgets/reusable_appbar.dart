@@ -8,6 +8,8 @@ class ReusableAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Color backgroundColor;
   final bool centerTitle;
+  final String? popUntilRoute;
+  final VoidCallback? onBackTap;
 
   const ReusableAppBar({
     super.key,
@@ -16,6 +18,8 @@ class ReusableAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.backgroundColor = Colors.white,
     this.centerTitle = true,
+    this.popUntilRoute,
+    this.onBackTap,
   });
 
   @override
@@ -28,7 +32,10 @@ class ReusableAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       leading: showBackButton
           ? GestureDetector(
-              onTap: () => Navigator.pop(context),
+        onTap: onBackTap ??
+                () {
+              Navigator.pop(context);
+            },
               child: Image.asset(
                 ImageAssets.backButton,
                 width: screenWidth * 0.06,

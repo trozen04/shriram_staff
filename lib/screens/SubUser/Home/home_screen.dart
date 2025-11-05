@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: height,
                   onTap: () => _pickDate(),
                 ),
-                SizedBox.shrink()
+                SizedBox.shrink(),
               ],
             ),
             AppDimensions.h20(context),

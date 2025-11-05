@@ -23,7 +23,6 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? fromDate;
   DateTime? toDate;
 
-
   void _pickDate() async {
     final DateTimeRange? picked = await pickDateRange(
       context: context,
@@ -88,7 +87,6 @@ class _ReportScreenState extends State<ReportScreen> {
     },
   ];
 
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -129,7 +127,6 @@ class _ReportScreenState extends State<ReportScreen> {
                     showIconOnRight: true,
                   ),
                 ],
-
               ],
             ),
 
@@ -144,5 +141,4 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
     );
   }
-
 }

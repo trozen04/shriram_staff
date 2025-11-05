@@ -18,7 +18,6 @@ class _LabourScreenState extends State<LabourScreen> {
   TextEditingController searchController = TextEditingController();
   DateTimeRange? selectedDateRange;
 
-
   void _pickDate() async {
     final DateTimeRange? picked = await pickDateRange(
       context: context,
@@ -110,12 +109,12 @@ class _LabourScreenState extends State<LabourScreen> {
                   ),
                 ),
 
-                if(selectedDateRange != null) ...[
+                if (selectedDateRange != null) ...[
                   AppDimensions.h20(context),
-                    Text(
-                      formatDateRange(selectedDateRange),
-                      style: AppTextStyles.appbarTitle,
-                    ),
+                  Text(
+                    formatDateRange(selectedDateRange),
+                    style: AppTextStyles.appbarTitle,
+                  ),
                 ],
 
                 AppDimensions.h20(context),

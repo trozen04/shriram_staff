@@ -17,7 +17,6 @@ class _BrokerScreenState extends State<BrokerScreen> {
   TextEditingController searchController = TextEditingController();
   DateTimeRange? selectedDateRange;
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -61,7 +60,6 @@ class _BrokerScreenState extends State<BrokerScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

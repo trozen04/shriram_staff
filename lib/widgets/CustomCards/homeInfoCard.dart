@@ -2,34 +2,39 @@ import 'package:flutter/material.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/flutter_font_styles.dart';
 import '../../Constants/app_dimensions.dart';
+import '../reusable_functions.dart';
 
 enum CardType { delivery, qc, billing, initialQC }
 
 class HomeInfoCard extends StatelessWidget {
   final CardType cardType;
   final String farmerName;
+  final String? id;
   final String date;
   final String? vehicleNumber;
   final String? brokerName;
   final String? staffName;
+  final String? weight;
   final double height;
   final double width;
   final VoidCallback onPressed;
-  final bool isPending;
+  final String status;
   final bool isSuperUser;
 
   const HomeInfoCard({
     super.key,
     required this.cardType,
+    this.id,
     required this.farmerName,
     required this.date,
     this.vehicleNumber,
     this.brokerName,
     this.staffName,
+    this.weight,
     required this.height,
     required this.width,
     required this.onPressed,
-    required this.isPending,
+    required this.status,
     this.isSuperUser = false,
   });
 
@@ -61,7 +66,7 @@ class HomeInfoCard extends StatelessWidget {
                       // Name
                       Text(
                         cardType == CardType.qc || cardType == CardType.billing
-                            ? '#22311'
+                            ? _formatId(id)
                             : vehicleNumber!,
                         style: AppTextStyles.cardHeading,
                         overflow: TextOverflow.ellipsis,
@@ -72,7 +77,7 @@ class HomeInfoCard extends StatelessWidget {
                       const SizedBox(width: 4),
 
                       // ✅ Call _buildStatusTag with a boolean
-                      _buildStatusTag(cardType, isPending),
+                      _buildStatusTag(cardType, status),
 
                       const SizedBox(width: 4),
                     ],
@@ -81,7 +86,7 @@ class HomeInfoCard extends StatelessWidget {
 
                 // Right: Date
                 Text(
-                  date,
+                  formatToISTFull(date),
                   style: AppTextStyles.priceTitle,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
@@ -110,7 +115,7 @@ class HomeInfoCard extends StatelessWidget {
                       ),
                       AppDimensions.w10(context),
                       Text(
-                        '50',
+                        weight ?? '~',
                         style: AppTextStyles.cardText,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -134,7 +139,7 @@ class HomeInfoCard extends StatelessWidget {
                         ),
                         AppDimensions.w10(context),
                         Text(
-                          '50',
+                          weight ?? '~',
                           style: AppTextStyles.cardText,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -170,41 +175,64 @@ class HomeInfoCard extends StatelessWidget {
   }
 }
 
-Widget _buildStatusTag(CardType cardType, bool isPending) {
+Widget _buildStatusTag(CardType cardType, String status) {
   late final String text;
+  late final Color color;
 
-  if (isPending) {
-    switch (cardType) {
-      case CardType.delivery:
-        text = 'Approval Pending';
-        break;
-      case CardType.qc:
-        text = 'Final QC Pending';
-        break;
-      case CardType.billing:
-        text = 'Billing Pending';
-        break;
-      default:
-        text = 'Pending';
-    }
-  } else {
-    text = 'Dispatched';
+  switch (status.toLowerCase()) {
+    case 'pending':
+      switch (cardType) {
+        case CardType.delivery:
+          text = 'Approval Pending';
+          break;
+        case CardType.qc:
+          text = 'Final QC Pending';
+          break;
+        case CardType.billing:
+          text = 'Billing Pending';
+          break;
+        default:
+          text = 'Pending';
+      }
+      color = AppColors.pendingColor;
+      break;
+
+    case 'dispatched':
+      text = 'Dispatched';
+      color = AppColors.successColor;
+      break;
+
+    case 'approve':
+      text = 'Approved';
+      color = AppColors.successColor;
+      break;
+
+    case 'rejected':
+      text = 'Rejected';
+      color = AppColors.errorColor;
+      break;
+
+    default:
+      text = status;
+      color = AppColors.successColor;
   }
 
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: isPending
-          ? AppColors.pendingColor.withOpacity(0.21)
-          : AppColors.successColor.withOpacity(0.21),
+      color: color.withOpacity(0.21),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(
       text,
-      style: AppTextStyles.statusFont.copyWith(
-        color: isPending ? AppColors.pendingColor : AppColors.successColor,
-      ),
+      style: AppTextStyles.statusFont.copyWith(color: color),
       maxLines: 1,
     ),
   );
+}
+
+String _formatId(String? id) {
+  if (id == null || id.isEmpty) return '#------'; // fallback if null
+  // show only last 6 characters, prefix with '#'
+  return '#${id.length > 6 ? id.substring(id.length - 6) : id}';
 }

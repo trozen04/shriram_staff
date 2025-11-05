@@ -17,7 +17,6 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
   TextEditingController searchController = TextEditingController();
   DateTimeRange? selectedDateRange;
 
-
   dynamic homeCardsData = [
     {
       'name': 'Suresh Kumar',
@@ -53,7 +52,6 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +110,6 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
                     onTap: () {},
                     showIconOnRight: true,
                   ),
-
                 ],
               ),
             ),
@@ -142,7 +139,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
                         staffName: 'Ram',
                         height: height,
                         width: width,
-                        isPending: false,
+                        status: '',
                         isSuperUser: true,
                         onPressed: () {
                           Navigator.pushNamed(
@@ -162,5 +159,4 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
       ),
     );
   }
-
 }

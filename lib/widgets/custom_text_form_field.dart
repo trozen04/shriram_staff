@@ -59,8 +59,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             setState(() {
               errorText = result;
             });
-            return null; // hide default error
+            return result;
           },
+
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: AppTextStyles.hintText,

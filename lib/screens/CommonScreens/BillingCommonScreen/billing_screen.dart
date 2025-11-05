@@ -191,6 +191,7 @@ class _BillingScreenState extends State<BillingScreen> {
                       date: data['date']!,
                       vehicleNumber: data['vehicleNumber'],
                       brokerName: data['driverName'],
+                      status: 'pending',
                       height: height,
                       width: width,
                       onPressed: () {
@@ -217,7 +218,6 @@ class _BillingScreenState extends State<BillingScreen> {
                         //   arguments: null,
                         // );
                       },
-                      isPending: true,
                       isSuperUser: widget.isSuperUser ?? false,
                     ),
                   );

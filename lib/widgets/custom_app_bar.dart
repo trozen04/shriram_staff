@@ -5,6 +5,7 @@ import '../Utils/image_assets.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_routes.dart';
 import '../utils/flutter_font_styles.dart';
+import '../utils/pref_utils.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -72,7 +73,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Sunil Pal', style: AppTextStyles.appbarName),
+                            Text(PrefUtils.getUserName(), style: AppTextStyles.appbarName),
                             Text('Worker', style: AppTextStyles.appbarWork),
                           ],
                         ),

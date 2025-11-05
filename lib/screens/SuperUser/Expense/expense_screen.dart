@@ -88,7 +88,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 AppDimensions.h20(context),
 
                 // 🔹 Date Heading
-                if(selectedDateRange != null)
+                if (selectedDateRange != null)
                   Text(
                     formatDateRange(selectedDateRange),
                     style: AppTextStyles.appbarTitle,

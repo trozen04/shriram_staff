@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../utils/app_routes.dart';
@@ -8,25 +9,56 @@ import '../../../widgets/reusable_functions.dart';
 
 class DeliveryQcDetailPage extends StatelessWidget {
   final dynamic userData;
-  final bool isAfterQC;
-  final bool isPendingQC;
+  final bool isQcPage;
   const DeliveryQcDetailPage({
     super.key,
     required this.userData,
-    this.isAfterQC = false,
-    this.isPendingQC = false,
+    this.isQcPage = false,
   });
+
+  /// ✅ Helper to safely extract nested keys
+  String getNestedValue(dynamic map, List<String> path) {
+    dynamic value = map;
+    for (var key in path) {
+      if (value is Map && value.containsKey(key)) {
+        value = value[key];
+      } else {
+        return '';
+      }
+    }
+    return value?.toString() ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    developer.log('userdata: $userData\n$isQcPage');
 
-    final data = userData;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
+    /// ✅ Extract common values safely
+    final String id = getNestedValue(userData, ['_id']);
+    final String transportId = getNestedValue(userData, ['transportId', '_id']);
+    final String vehicleno = getNestedValue(userData, ['transportId', 'vehicleno']);
+    final String brokerName = getNestedValue(userData, ['transportId', 'brokerId', 'name']);
+    final String farmerName = getNestedValue(userData, ['transportId', 'purchaseId', 'name']);
+    final String weight = getNestedValue(userData, ['transportId', 'weight']);
+    final String deliveryDate = getNestedValue(userData, ['transportId', 'deliverydate']);
+    final String initialWeight = getNestedValue(userData, ['initialweight']);
+    final String moisture = getNestedValue(userData, ['moisture']);
+    final String riceIn = getNestedValue(userData, ['ricein']);
+    final String huskIn = getNestedValue(userData, ['huskin']);
+    final String discolor = getNestedValue(userData, ['discolor']);
+    final String status = getNestedValue(userData, ['status']);
+
+    /// ✅ Format unit id with max 6 digits
+    String formattedId = '#${(transportId.isNotEmpty ? transportId.substring(transportId.length - 6) : id.substring(id.length - 6))}';
 
     return Scaffold(
       appBar: ReusableAppBar(
-        title: isPendingQC ? "#22311" : data['vehicleNumber'] ?? 'Details',
+        title: isQcPage
+            ? formattedId
+            : (vehicleno.isNotEmpty ? vehicleno : 'Details'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -36,55 +68,62 @@ class DeliveryQcDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Optional top row with name and call button
-            if (!isAfterQC &&
-                !isPendingQC &&
-                data['vehicleNumber'] != null &&
-                data['vehicleNumber'].toString().isNotEmpty)
-              Text(data['vehicleNumber'], style: AppTextStyles.cardHeading),
+            /// 🚚 Vehicle number (only for delivery)
+            if (!isQcPage && vehicleno.isNotEmpty)
+              Text(vehicleno, style: AppTextStyles.cardHeading),
             AppDimensions.h20(context),
 
-            //if (isAfterQC && data['_id'] != null && data['_id'].toString().isNotEmpty)
-            if (isAfterQC || isPendingQC)
-              ProfileRow(label: 'Unit ID', value: '#221212'),
-            ProfileRow(label: 'Name', value: 'Ramesh Yadav'),
-            ProfileRow(label: 'Broker', value: 'Rahul'),
-            ProfileRow(label: 'Quantity', value: '50 Qntl'),
-            ProfileRow(label: 'Date', value: '20/09/2025'),
-            if (isAfterQC || isPendingQC)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProfileRow(label: 'Initial Weight', value: '51 Qntl'),
-                  ProfileRow(label: 'Moisture %', value: '33%'),
-                  ProfileRow(label: 'Rice (g)', value: '1110'),
-                  ProfileRow(label: 'Husk (g)', value: '1120'),
-                  ProfileRow(label: 'Discolor %', value: '12'),
-                ],
-              ),
+            /// 🧾 Unit ID (for QC)
+            if (isQcPage && transportId.isNotEmpty)
+              ProfileRow(label: 'Unit ID', value: formattedId),
+
+            /// 👨 Farmer & Broker info
+            ProfileRow(label: 'Name', value: isQcPage ? farmerName : getNestedValue(userData, ['purchaseId', 'name'])),
+            ProfileRow(label: 'Broker', value: isQcPage ? brokerName : getNestedValue(userData, ['brokerId', 'name'])),
+            ProfileRow(label: 'Weight', value: isQcPage ? weight : getNestedValue(userData, ['weight'])),
             ProfileRow(
-              label: 'Status',
-              value:
-                  '${isPendingQC ? 'QC' : '${isAfterQC ? 'Approval' : 'Arrival'}'} Pending',
+              label: 'Date',
+              value: isQcPage
+                  ? formatToISTFull(deliveryDate)
+                  : formatToISTFull(getNestedValue(userData, ['deliverydate'])),
             ),
+
+            /// ⚗️ QC Specific Data
+            if (isQcPage) ...[
+              ProfileRow(label: 'Initial Weight', value: initialWeight),
+              ProfileRow(label: 'Moisture %', value: moisture),
+              ProfileRow(label: 'Rice (g)', value: riceIn),
+              ProfileRow(label: 'Husk (g)', value: huskIn),
+              ProfileRow(label: 'Discolor %', value: discolor),
+            ],
+
+            /// 📊 Status
+            ProfileRow(label: 'Status', value: status),
+
             AppDimensions.h30(context),
-            if (!isAfterQC)
+
+            /// ✅ Action Button
+            if (!isQcPage && status.toLowerCase().contains('approve'))
               PrimaryButton(
-                text: isPendingQC ? 'Start Final QC' : 'Ready to Unload',
+                text: 'Ready to Unload',
                 onPressed: () {
-                  if (isPendingQC) {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.qualityCheckSubmitPage,
-                      arguments: null,
-                    );
-                  } else {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.weightConfirmationPage,
-                      arguments: null,
-                    );
-                  }
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.weightConfirmationPage,
+                    arguments: userData,
+                  );
+                },
+                isLoading: false,
+              ),
+            if (isQcPage && status.toLowerCase().contains('approve'))
+              PrimaryButton(
+                text: 'Start Final QC',
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.qualityCheckSubmitPage,
+                    arguments: userData,
+                  );
                 },
                 isLoading: false,
               ),
@@ -95,8 +134,7 @@ class DeliveryQcDetailPage extends StatelessWidget {
   }
 }
 
-// Extension to capitalize first letter
+/// 🧩 Capitalize helper
 extension StringCasingExtension on String {
-  String capitalize() =>
-      isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
+  String capitalize() => isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
 }

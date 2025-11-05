@@ -7,10 +7,10 @@ import '../screens/CommonScreens/Sales/create_sales_lead_screen.dart';
 import '../screens/CommonScreens/Sales/sales_details_page.dart';
 import '../screens/CommonScreens/Sales/sales_screen.dart';
 import '../screens/CommonScreens/auth/login_screen.dart';
-import '../screens/CommonScreens/auth/registration_screen.dart';
 import '../screens/SubUser/Billing/billing_details.dart';
 import '../screens/SubUser/Billing/billing_fill_details_screen.dart';
 import '../screens/CommonScreens/BillingCommonScreen/billing_screen.dart';
+import '../screens/SubUser/DetailsPage/after_qc_detail_page.dart';
 import '../screens/SubUser/DetailsPage/delivery_qc_detail_page.dart';
 import '../screens/SubUser/Delivery/delivery_qc_page.dart';
 import '../screens/SubUser/LoadingProducts/loading_product_screen.dart';
@@ -40,10 +40,10 @@ import '../screens/SuperUser/SubUsers/sub_users_list.dart';
 
 class AppRoutes {
   static const String login = '/login';
-  static const String register = '/register';
   static const String home = '/home';
   static const String deliveryPage = '/deliveryPage';
   static const String deliveryDetailPage = '/deliveryDetailPage';
+  static const String afterQcDetailPage = '/afterQcDetailPage';
   static const String weightConfirmationPage = '/weightConfirmationPage';
   static const String qualityCheckSubmitPage = '/qualityCheckSubmitPage';
   static const String factoryScreen = '/factoryScreen';
@@ -87,22 +87,29 @@ class AppRoutes {
     switch (settings.name) {
       case login:
         return _buildPageRoute(const LoginScreen(), settings);
-      case register:
-        return _buildPageRoute(const RegistrationScreen(), settings);
       case deliveryPage:
         final isQC = settings.arguments as bool? ?? false;
         return _buildPageRoute(DeliveryQcPage(isQCPage: isQC), settings);
 
+
       case AppRoutes.deliveryDetailPage:
         final args = settings.arguments as Map<String, dynamic>;
         final data = args['data'];
-        final isAfterQC = args['isAfterQC'] as bool? ?? false;
-        final isPendingQC = args['isPendingQC'] as bool? ?? false;
+        final bool isQcPage = args['isQcPage'] ?? false;
+
         return _buildPageRoute(
           DeliveryQcDetailPage(
             userData: data,
-            isAfterQC: isAfterQC,
-            isPendingQC: isPendingQC,
+            isQcPage: isQcPage,
+          ),
+          settings,
+        );
+      case AppRoutes.afterQcDetailPage:
+        final args = settings.arguments as Map<String, dynamic>;
+        return _buildPageRoute(
+          AfterQcDetailPage(
+            qcData: args['qcData'],
+            userData: args['userData'],
           ),
           settings,
         );
@@ -217,7 +224,7 @@ class AppRoutes {
 
       default:
         return _buildPageRoute(
-          const RegistrationScreen(),
+          const LoginScreen(),
           settings,
         ); // Changed to DashboardScreen
     }

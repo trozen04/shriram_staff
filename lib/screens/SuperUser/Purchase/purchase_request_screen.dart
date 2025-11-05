@@ -18,7 +18,6 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
   TextEditingController searchController = TextEditingController();
   DateTimeRange? selectedDateRange;
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -62,7 +61,6 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +125,6 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
                     onTap: () {},
                     showIconOnRight: true,
                   ),
-
                 ],
               ),
             ),

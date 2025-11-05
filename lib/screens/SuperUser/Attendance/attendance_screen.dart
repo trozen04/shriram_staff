@@ -18,7 +18,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   TextEditingController searchController = TextEditingController();
   DateTimeRange? selectedDateRange;
 
-
   final dynamic attendanceData = [
     {"name": "Suresh Kumar", "present": 20, "absent": 2},
     {"name": "Ramesh Yadav", "present": 18, "absent": 4},
@@ -71,7 +70,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ),
                 ),
                 filled: true,
-                fillColor: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                fillColor: AppColors.primaryColor.withAlpha(
+                  (0.16 * 255).toInt(),
+                ),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: width * 0.035,
                   vertical: height * 0.01,
@@ -98,7 +99,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     width,
                     height,
                     _pickDate,
-                    imagePath: ImageAssets.calender
+                    imagePath: ImageAssets.calender,
                   ),
 
                   SizedBox(width: width * 0.045),
@@ -116,7 +117,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         vertical: height * 0.015,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                        color: AppColors.primaryColor.withAlpha(
+                          (0.16 * 255).toInt(),
+                        ),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
@@ -140,11 +143,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             AppDimensions.h20(context),
 
             /// 📅 Date Header
-            if(selectedDateRange != null)
-            Text(
-              formatDateRange(selectedDateRange),
-              style: AppTextStyles.appbarTitle,
-            ),
+            if (selectedDateRange != null)
+              Text(
+                formatDateRange(selectedDateRange),
+                style: AppTextStyles.appbarTitle,
+              ),
             AppDimensions.h10(context),
 
             /// 📋 Attendance Table
@@ -160,12 +163,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Widget _buildIconContainer(
-      double width,
-      double height,
-      VoidCallback onTap, {
-        IconData? icon,
-        String? imagePath,
-      }) {
+    double width,
+    double height,
+    VoidCallback onTap, {
+    IconData? icon,
+    String? imagePath,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -179,17 +182,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ),
         child: imagePath != null
             ? Image.asset(
-          imagePath,
-          width: width * 0.06,
-          height: width * 0.06,
-          color: AppColors.primaryColor,
-        )
-            : Icon(
-          icon ?? Icons.help_outline,
-          color: AppColors.primaryColor,
-        ),
+                imagePath,
+                width: width * 0.06,
+                height: width * 0.06,
+                color: AppColors.primaryColor,
+              )
+            : Icon(icon ?? Icons.help_outline, color: AppColors.primaryColor),
       ),
     );
   }
-
 }

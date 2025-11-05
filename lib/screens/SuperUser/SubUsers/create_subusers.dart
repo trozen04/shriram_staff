@@ -1,156 +1,264 @@
-import 'package:flutter/material.dart';
-import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
-import 'package:shree_ram_staff/Constants/app_dimensions.dart';
-import '../../../utils/flutter_font_styles.dart';
-import '../../../widgets/primary_and_outlined_button.dart';
-import '../../../widgets/reusable_functions.dart';
+  import 'dart:developer' as developer;
 
-class CreateSubUserPage extends StatefulWidget {
-  final subUserData;
-  const CreateSubUserPage({super.key, required this.subUserData});
+  import 'package:flutter/material.dart';
+  import 'package:flutter_bloc/flutter_bloc.dart';
+  import 'package:shree_ram_staff/Bloc/FactoryBloc/factory_bloc.dart';
+  import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
+  import 'package:shree_ram_staff/Constants/app_dimensions.dart';
+  import '../../../Bloc/SubUsers/subusers_bloc.dart';
+  import '../../../utils/flutter_font_styles.dart';
+  import '../../../widgets/custom_snackbar.dart';
+  import '../../../widgets/primary_and_outlined_button.dart';
+  import '../../../widgets/reusable_functions.dart';
 
-  @override
-  State<CreateSubUserPage> createState() => _CreateSubUserPageState();
-}
+  class CreateSubUserPage extends StatefulWidget {
+    final subUserData;
+    const CreateSubUserPage({super.key, required this.subUserData});
 
-class _CreateSubUserPageState extends State<CreateSubUserPage> {
-  final _formKey = GlobalKey<FormState>();
+    @override
+    State<CreateSubUserPage> createState() => _CreateSubUserPageState();
+  }
 
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _salaryController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  class _CreateSubUserPageState extends State<CreateSubUserPage> {
+    final _formKey = GlobalKey<FormState>();
 
-  String? _selectedFactory;
-  String? _selectedRole;
-  String? _selectedAuthority;
+    final _nameController = TextEditingController();
+    final _phoneController = TextEditingController();
+    final _salaryController = TextEditingController();
+    final _passwordController = TextEditingController();
+    final _confirmPasswordController = TextEditingController();
+    final _addressController = TextEditingController();
 
-  final List<String> factories = ['Select Factory', 'Factory A', 'Factory B'];
-  final List<String> roles = ['Select Role', 'Manager', 'Staff', 'Loader'];
-  final List<String> authorities = ['Select Authority', 'Full', 'Limited'];
+    String? _selectedFactory;
+    String? _selectedFactoryId;
+    String? _selectedAuthority;
 
-  @override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    bool isButtonLoading = false;
+    bool isLoading = false;
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: const ReusableAppBar(title: 'Create Sub user'),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: width * 0.035,
-            vertical: height * 0.015,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    List<Map<String, String>> factoryList = [];
+    final List<String> authorities = ['Select Authority', 'Full', 'Limited'];
+
+    @override
+    void initState() {
+      super.initState();
+      context.read<FactoryBloc>().add(FactoryEventHandler());
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      final height = MediaQuery.of(context).size.height;
+      final width = MediaQuery.of(context).size.width;
+
+      return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: MultiBlocListener(
+          listeners: [
+            // Subusers Bloc
+            BlocListener<SubusersBloc, SubusersState>(
+              listener: (context, state) {
+                if (state is SubusersLoadingState) {
+                  setState(() => isButtonLoading = true);
+                } else {
+                  setState(() => isButtonLoading = false);
+                }
+                if (state is SubusersCreateSuccessState) {
+                  CustomSnackBar.show(context, message: "Subuser Created Successfully!");
+                  Navigator.pop(context, true);
+                }
+                if (state is SubusersErrorState) {
+                  CustomSnackBar.show(context, message: state.message, isError: true);
+                }
+              },
+            ),
+            // Factory Bloc
+            BlocListener<FactoryBloc, FactoryState>(
+              listener: (context, state) {
+                if (state is FactoryLoadingState) {
+                  setState(() => isLoading = true);
+                } else {
+                  setState(() => isLoading = false);
+                }
+                if (state is FactorySuccessState) {
+                  factoryList = (state.factoryData['data'] as List)
+                      .map((e) => {
+                    '_id': e['_id'].toString(),
+                    'name': e['factoryname'].toString(),
+                  })
+                      .toList();
+
+                  if (factoryList.isNotEmpty) {
+                    _selectedFactory = factoryList.first['name'];
+                    _selectedFactoryId = factoryList.first['_id'];
+                  }
+                  setState(() {});
+                }
+                if (state is FactoryErrorState) {
+                  developer.log('FactoryErrorState: ${state.message}');
+                  CustomSnackBar.show(context, message: state.message, isError: true);
+                }
+              },
+            ),
+          ],
+          child: Scaffold(
+            appBar: const ReusableAppBar(title: 'Create Sub user'),
+            body: Stack(
               children: [
-                ReusableTextField(
-                  label: 'Name',
-                  hint: 'Enter Name',
-                  controller: _nameController,
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'Enter Name' : null,
-                ),
-                AppDimensions.h10(context),
+                SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.035,
+                    vertical: height * 0.015,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Name
+                        ReusableTextField(
+                          label: 'Name',
+                          hint: 'Enter Name',
+                          controller: _nameController,
+                          textCapitalization: TextCapitalization.words,
+                          validator: (val) => val == null || val.isEmpty ? 'Enter Name' : null,
+                        ),
+                        AppDimensions.h10(context),
 
-                ReusableTextField(
-                  label: 'Phone Number',
-                  hint: 'Enter Phone Number',
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) return 'Enter Phone Number';
-                    if (val.length < 10) return 'Enter valid number';
-                    return null;
-                  },
-                ),
-                AppDimensions.h10(context),
+                        // Phone
+                        ReusableTextField(
+                          label: 'Phone Number',
+                          hint: 'Enter Phone Number',
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) return 'Enter Phone Number';
+                            if (val.length < 10) return 'Enter valid number';
+                            return null;
+                          },
+                        ),
+                        AppDimensions.h10(context),
 
-                ReusableTextField(
-                  label: 'Salary',
-                  hint: 'Enter Salary',
-                  controller: _salaryController,
-                  keyboardType: TextInputType.number,
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'Enter Salary' : null,
-                ),
-                AppDimensions.h10(context),
-                Text('Factory', style: AppTextStyles.label),
-                AppDimensions.h5(context),
-                ReusableDropdown(
-                  items: factories,
-                  value: _selectedFactory ?? factories.first,
-                  onChanged: (val) => setState(() => _selectedFactory = val),
-                  hintText: 'Select Factory',
-                  validator: (val) => val == null || val == factories.first
-                      ? 'Select Factory'
-                      : null,
-                ),
-                AppDimensions.h10(context),
-                Text('Role', style: AppTextStyles.label),
-                AppDimensions.h5(context),
-                ReusableDropdown(
-                  items: roles,
-                  value: _selectedRole ?? roles.first,
-                  onChanged: (val) => setState(() => _selectedRole = val),
-                  hintText: 'Select Role',
-                  validator: (val) =>
-                      val == null || val == roles.first ? 'Select Role' : null,
-                ),
-                AppDimensions.h10(context),
-                Text('Authority', style: AppTextStyles.label),
-                AppDimensions.h5(context),
-                ReusableDropdown(
-                  items: authorities,
-                  value: _selectedAuthority ?? authorities.first,
-                  onChanged: (val) => setState(() => _selectedAuthority = val),
-                  hintText: 'Select Authority',
-                  validator: (val) => val == null || val == authorities.first
-                      ? 'Select Authority'
-                      : null,
-                ),
-                AppDimensions.h10(context),
+                        // Address
+                        ReusableTextField(
+                          label: 'Address',
+                          hint: 'Enter Address',
+                          controller: _addressController,
+                          validator: (val) => val == null || val.isEmpty ? 'Enter Address' : null,
+                        ),
+                        AppDimensions.h10(context),
 
-                ReusableTextField(
-                  label: 'Password',
-                  hint: 'Enter Password',
-                  controller: _passwordController,
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'Enter Password' : null,
-                ),
-                AppDimensions.h10(context),
+                        // Salary
+                        ReusableTextField(
+                          label: 'Salary',
+                          hint: 'Enter Salary',
+                          controller: _salaryController,
+                          keyboardType: TextInputType.number,
+                          validator: (val) => val == null || val.isEmpty ? 'Enter Salary' : null,
+                        ),
+                        AppDimensions.h10(context),
 
-                ReusableTextField(
-                  label: 'Confirm Password',
-                  hint: 'Enter Password',
-                  controller: _confirmPasswordController,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) return 'Confirm Password';
-                    if (val != _passwordController.text)
-                      return 'Passwords do not match';
-                    return null;
-                  },
-                ),
-                AppDimensions.h30(context),
+                        // Factory Dropdown
+                        Text('Factory', style: AppTextStyles.label),
+                        AppDimensions.h5(context),
+                        DropdownButtonFormField<String>(
+                          value: _selectedFactoryId, // use the unique ID here
+                          items: factoryList.map<DropdownMenuItem<String>>((e) {
+                            return DropdownMenuItem<String>(
+                              value: e['_id'],       // unique value
+                              child: Text(e['name']!, style: AppTextStyles.hintText,), // display name
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedFactoryId = val;
+                              _selectedFactory = factoryList
+                                  .firstWhere((e) => e['_id'] == val)['name'];
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintStyle: AppTextStyles.hintText,
+                            isDense: true,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.of(context).size.width * 0.035,
+                              vertical: MediaQuery.of(context).size.height * 0.015,
+                            ),
+                            errorStyle: const TextStyle(
+                              height: 1, // reduce vertical gap
+                              color: Colors.red,
+                            ),
+                            errorMaxLines: 2,
+                          ),
+                          validator: (val) => val == null ? 'Select Factory' : null,
+                        ),
 
-                PrimaryButton(
-                  text: 'Submit',
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // handle submit
-                    }
-                  },
+                        AppDimensions.h10(context),
+
+                        // Authority Dropdown
+                        Text('Authority', style: AppTextStyles.label),
+                        AppDimensions.h5(context),
+                        ReusableDropdown(
+                          items: authorities,
+                          value: _selectedAuthority ?? authorities.first,
+                          onChanged: (val) => setState(() => _selectedAuthority = val),
+                          hintText: 'Select Authority',
+                          validator: (val) => val == null || val == authorities.first
+                              ? 'Select Authority'
+                              : null,
+                        ),
+                        AppDimensions.h10(context),
+
+                        // Password
+                        ReusableTextField(
+                          label: 'Password',
+                          hint: 'Enter Password',
+                          controller: _passwordController,
+                          validator: (val) => val == null || val.isEmpty ? 'Enter Password' : null,
+                        ),
+                        AppDimensions.h10(context),
+
+                        // Confirm Password
+                        ReusableTextField(
+                          label: 'Confirm Password',
+                          hint: 'Enter Password',
+                          controller: _confirmPasswordController,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) return 'Confirm Password';
+                            if (val != _passwordController.text) return 'Passwords do not match';
+                            return null;
+                          },
+                        ),
+                        AppDimensions.h30(context),
+
+                        PrimaryButton(
+                          text: 'Submit',
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<SubusersBloc>().add(
+                                SubusersCreateEvent(
+                                  name: _nameController.text,
+                                  mobileNo: _phoneController.text,
+                                  role: 'subuser',
+                                  authority: _selectedAuthority ?? authorities.first,
+                                  salary: _salaryController.text.trim(),
+                                  factoryId: _selectedFactoryId ?? '',
+                                  address: _addressController.text,
+                                  password: _passwordController.text,
+                                  confirmPassword: _confirmPasswordController.text,
+                                ),
+                              );
+                            }
+                          },
+                          isLoading: isButtonLoading,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
-}

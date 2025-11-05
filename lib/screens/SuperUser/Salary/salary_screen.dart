@@ -103,16 +103,25 @@ class _SalaryScreenState extends State<SalaryScreen> {
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width -
-                      (width * 0.07),
+                  minWidth: MediaQuery.of(context).size.width - (width * 0.07),
                 ),
                 child: Row(
                   children: [
-                    _buildIconContainer(width: width, height: height, onTap: (){}, iconData: Icons.filter_list),
+                    _buildIconContainer(
+                      width: width,
+                      height: height,
+                      onTap: () {},
+                      iconData: Icons.filter_list,
+                    ),
 
                     SizedBox(width: width * 0.08),
 
-                    _buildIconContainer(width: width, height: height, onTap: _pickDate, imagePath: ImageAssets.calender),
+                    _buildIconContainer(
+                      width: width,
+                      height: height,
+                      onTap: _pickDate,
+                      imagePath: ImageAssets.calender,
+                    ),
 
                     SizedBox(width: width * 0.08),
 
@@ -129,12 +138,17 @@ class _SalaryScreenState extends State<SalaryScreen> {
                           vertical: height * 0.015,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                          color: AppColors.primaryColor.withAlpha(
+                            (0.16 * 255).toInt(),
+                          ),
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: Row(
                           children: [
-                            Text('Rollout Salary', style: AppTextStyles.dateText),
+                            Text(
+                              'Rollout Salary',
+                              style: AppTextStyles.dateText,
+                            ),
                             AppDimensions.w10(context),
                             Image.asset(
                               ImageAssets.salaryPng,
@@ -149,13 +163,12 @@ class _SalaryScreenState extends State<SalaryScreen> {
               ),
             ),
 
-            if(selectedDateRange != null )...[
+            if (selectedDateRange != null) ...[
               AppDimensions.h30(context),
               Text(
                 formatDateRange(selectedDateRange),
                 style: AppTextStyles.appbarTitle,
               ),
-
             ],
 
             AppDimensions.h10(context),
@@ -208,12 +221,13 @@ class _SalaryScreenState extends State<SalaryScreen> {
     );
   }
 
-  Widget _buildIconContainer({ String? imagePath,
+  Widget _buildIconContainer({
+    String? imagePath,
     IconData? iconData,
     required double width,
     required double height,
-    required final VoidCallback onTap,}
-  ) {
+    required final VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -226,18 +240,18 @@ class _SalaryScreenState extends State<SalaryScreen> {
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
-    children: [
-    if (imagePath != null)
-      Image.asset(imagePath, height: height * 0.02)
-    else if (iconData != null)
-      Icon(
-        iconData,
-        size: height * 0.022,
-        color: AppColors.primaryColor,
+          children: [
+            if (imagePath != null)
+              Image.asset(imagePath, height: height * 0.02)
+            else if (iconData != null)
+              Icon(
+                iconData,
+                size: height * 0.022,
+                color: AppColors.primaryColor,
+              ),
+          ],
+        ),
       ),
-    ],
-      ),
-    )
     );
   }
 
