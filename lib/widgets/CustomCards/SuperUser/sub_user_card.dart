@@ -3,6 +3,7 @@ import '../../../../utils/app_colors.dart';
 import '../../../../utils/flutter_font_styles.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
+import '../../reusable_functions.dart';
 
 class SubUserCard extends StatelessWidget {
   final String name;
@@ -10,6 +11,7 @@ class SubUserCard extends StatelessWidget {
   final String? position;
   final String? phone;
   final String? qcType;
+  final String? factory;
   final double height;
   final double width;
 
@@ -20,6 +22,7 @@ class SubUserCard extends StatelessWidget {
     this.position,
     this.phone,
     this.qcType,
+    this.factory,
     required this.height,
     required this.width,
   });
@@ -53,11 +56,13 @@ class SubUserCard extends StatelessWidget {
               ),
 
               // Right: Date
-              Text(
-                date,
-                style: AppTextStyles.priceTitle,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.right,
+              Expanded(
+                child: Text(
+                  formatToIST(date),
+                  style: AppTextStyles.priceTitle,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                ),
               ),
             ],
           ),
@@ -73,6 +78,7 @@ class SubUserCard extends StatelessWidget {
               _buildInfoRow(imagePath: ImageAssets.call, value: phone!),
               AppDimensions.h10(context),
               _buildInfoRow(imagePath: ImageAssets.qcPng, value: qcType!),
+              //_buildInfoRow(imagePath: ImageAssets.qcPng, value: factory!!),
             ],
           ),
         ],

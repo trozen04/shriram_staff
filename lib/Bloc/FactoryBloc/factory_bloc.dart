@@ -17,7 +17,7 @@ class FactoryBloc extends Bloc<FactoryEvent, FactoryState> {
       try {
         final url = ApiConstants.baseUrl + ApiConstants.getAllFactory;
         final userToken = PrefUtils.getToken();
-        developer.log('Factory API userToken: $userToken');
+        //developer.log('Factory API userToken: $userToken');
 
         final uri = Uri.parse(url);
 
@@ -29,8 +29,8 @@ class FactoryBloc extends Bloc<FactoryEvent, FactoryState> {
           },
         );
 
-        developer.log('Factory API URL: $uri');
-        developer.log('Factory API response: ${response.statusCode}\n${response.body}');
+        // developer.log('Factory API URL: $uri');
+        // developer.log('Factory API response: ${response.statusCode}\n${response.body}');
 
         final responseData = jsonDecode(response.body);
 

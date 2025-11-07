@@ -23,8 +23,8 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
 
         // Build query parameters
         Map<String, String> queryParams = {
-          'page': (event.page ?? 1).toString(), // default page 1
-          'limit': (event.limit ?? 20).toString(), // default 20 per page
+          'page': (event.page ?? 1).toString(),
+          'limit': (event.limit ?? 10).toString(),
         };
 
         if (event.search != null && event.search!.isNotEmpty) {
@@ -32,11 +32,12 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
         }
 
         if (event.factoryId != null && event.factoryId!.isNotEmpty) {
-          queryParams['factory'] = event.factoryId!;
+          queryParams['factoryname'] = event.factoryId!;
         }
 
         final uri = Uri.parse(url).replace(queryParameters: queryParams);
 
+        developer.log('url: $uri');
         final response = await http.get(
           uri,
           headers: {
@@ -77,7 +78,7 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
           "role": event.role,
           "authority": event.authority,
           "salary": event.salary,
-          "factory": event.factoryId,
+          "factoryname": event.factoryId,
           "address": event.address,
           "password": event.password,
           "confirmPassword": event.confirmPassword,

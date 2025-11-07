@@ -7,22 +7,20 @@ class BrokerCard extends StatelessWidget {
   final String? brokerName;
   final String? contactNumber;
   final String date;
-  final String? paddy;
   final double height;
   final double width;
   final VoidCallback onPressed;
-  final bool isPending;
+  final String status; // NEW: status string from API
 
   const BrokerCard({
     super.key,
     this.brokerName,
     this.contactNumber,
-    this.paddy,
     required this.date,
     required this.height,
     required this.width,
     required this.onPressed,
-    required this.isPending,
+    required this.status, // required now
   });
 
   @override
@@ -41,38 +39,31 @@ class BrokerCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top row: Farmer name + date
+            // Top row: Broker name + status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Broker
                 if (brokerName != null && brokerName!.isNotEmpty)
                   _buildInfoRow(
                     text: 'Broker',
                     value: brokerName!,
                     context: context,
                   ),
-                _buildStatusTag(isPending: isPending),
+                _buildStatusTag(status: status),
               ],
             ),
-
             AppDimensions.h10(context),
 
-            // Broker
-            if (contactNumber != null && contactNumber!.isNotEmpty)
-              _buildInfoRow(
-                text: 'Contact No',
-                value: contactNumber!,
-                context: context,
-              ),
-            AppDimensions.h10(context),
+            // Contact & Date row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Broker
-                if (paddy != null && paddy!.isNotEmpty)
-                  _buildInfoRow(text: 'Paddy', value: paddy!, context: context),
-
+                if (contactNumber != null && contactNumber!.isNotEmpty)
+                  _buildInfoRow(
+                    text: 'Contact No',
+                    value: contactNumber!,
+                    context: context,
+                  ),
                 Text(
                   date,
                   style: AppTextStyles.priceTitle,
@@ -82,8 +73,6 @@ class BrokerCard extends StatelessWidget {
               ],
             ),
             AppDimensions.h5(context),
-
-            // Optional status tag
           ],
         ),
       ),
@@ -112,25 +101,40 @@ class BrokerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusTag({required bool isPending, String? text}) {
-    final String statusText =
-        text ?? (isPending ? 'Approval Pending' : 'Approved');
+  Widget _buildStatusTag({required String status}) {
+    Color bgColor;
+    Color textColor;
+
+    switch (status.toLowerCase()) {
+      case 'approve':
+        bgColor = AppColors.successColor.withOpacity(0.21);
+        textColor = AppColors.successColor;
+        break;
+      case 'pending':
+        bgColor = AppColors.pendingColor.withOpacity(0.21);
+        textColor = AppColors.pendingColor;
+        break;
+      case 'cancel':
+        bgColor = AppColors.errorColor.withOpacity(0.21);
+        textColor = AppColors.errorColor;
+        break;
+      default:
+        bgColor = AppColors.primaryColor.withOpacity(0.21);
+        textColor = AppColors.primaryColor;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isPending
-            ? AppColors.pendingColor.withOpacity(0.21)
-            : AppColors.successColor.withOpacity(0.21),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        statusText,
-        style: AppTextStyles.statusFont.copyWith(
-          color: isPending ? AppColors.pendingColor : AppColors.successColor,
-        ),
+        status,
+        style: AppTextStyles.statusFont.copyWith(color: textColor),
         maxLines: 1,
       ),
     );
   }
+
 }

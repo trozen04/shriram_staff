@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
 import 'package:shree_ram_staff/Constants/app_dimensions.dart';
@@ -11,6 +13,8 @@ class SalesDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+
+    developer.log('salesData: $salesData');
 
     return Scaffold(
       appBar: const ReusableAppBar(title: 'Ramesh Yadav'),

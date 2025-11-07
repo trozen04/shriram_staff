@@ -513,8 +513,10 @@ class ReusableTextField extends StatelessWidget {
           onTap: onTap,
           textCapitalization: textCapitalization,
           inputFormatters: [
-            if (keyboardType == TextInputType.phone)
+            if (keyboardType == TextInputType.phone)...[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              LengthLimitingTextInputFormatter(10),
+            ],
             if (keyboardType == TextInputType.number)
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
           ],
@@ -803,7 +805,7 @@ class CustomFAB extends StatelessWidget {
 }
 
 class StaffTable extends StatelessWidget {
-  final data;
+  final List<dynamic> data;
 
   const StaffTable({super.key, required this.data});
 
@@ -814,7 +816,7 @@ class StaffTable extends StatelessWidget {
 
     return Table(
       border: TableBorder.all(
-        color: Colors.transparent, // ✅ ensures no horizontal or vertical lines
+        color: Colors.transparent,
         width: 0,
       ),
       columnWidths: const {
@@ -831,18 +833,18 @@ class StaffTable extends StatelessWidget {
           ],
         ),
         ...data.map(
-          (row) => TableRow(
+              (row) => TableRow(
             children: [
               TableCellWidget(
                 text: row['name'].toString(),
                 textStyle: AppTextStyles.profileDataText,
               ),
               TableCellWidget(
-                text: row['present'].toString(),
+                text: (row['totalPresent'] ?? 0).toString(),
                 textStyle: cellTextStyle,
               ),
               TableCellWidget(
-                text: row['absent'].toString(),
+                text: (row['totalAbsent'] ?? 0).toString(),
                 textStyle: cellTextStyle,
               ),
             ],
@@ -942,7 +944,7 @@ String formatToIST(String? utcDateString) {
     return DateFormat('dd-MM-yy').format(istDate);
   } catch (e) {
     // fallback if parsing fails
-    return '';
+    return '~';
   }
 }
 

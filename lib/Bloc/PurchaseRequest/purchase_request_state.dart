@@ -22,3 +22,15 @@ class NewPurchaseRequestSuccessState extends PurchaseRequestState {
   final dynamic responseData;
   NewPurchaseRequestSuccessState({required this.responseData});
 }
+
+
+// New state for Approve/Reject
+class ApproveRejectPurchaseSuccessState extends PurchaseRequestState {
+  final String message;
+  ApproveRejectPurchaseSuccessState({required this.message});
+}
+
+class ApproveRejectPurchaseErrorState extends PurchaseRequestState {
+  final String message;
+  ApproveRejectPurchaseErrorState({required this.message});
+}

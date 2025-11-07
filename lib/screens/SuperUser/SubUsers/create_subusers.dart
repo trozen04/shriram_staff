@@ -42,6 +42,31 @@
     @override
     void initState() {
       super.initState();
+      developer.log('subUserData: ${widget.subUserData}');
+      if (widget.subUserData != null) {
+        final data = widget.subUserData;
+
+        _nameController.text = data['name'] ?? '';
+        _phoneController.text = data['mobileno'] ?? '';
+        _salaryController.text = data['salary']?.toString() ?? '';
+        _addressController.text = data['address'] ?? '';
+
+        // Authority
+        if (data['authority'] != null && authorities.contains(data['authority'])) {
+          _selectedAuthority = data['authority'];
+        } else {
+          _selectedAuthority = authorities.first;
+        }
+
+        // Factory
+        if (data['factory'] != null) {
+          _selectedFactoryId = data['factory']['_id'];
+          _selectedFactory = data['factory']['factoryname'];
+        }
+      } else {
+        _selectedAuthority = authorities.first;
+      }
+
       context.read<FactoryBloc>().add(FactoryEventHandler());
     }
 

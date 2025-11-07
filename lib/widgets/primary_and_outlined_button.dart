@@ -5,7 +5,7 @@ import '../utils/flutter_font_styles.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
   final bool isLogout;
   final bool? isLogoutText;
@@ -64,7 +64,7 @@ class PrimaryButton extends StatelessWidget {
 
 class ReusableOutlinedButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const ReusableOutlinedButton({

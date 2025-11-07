@@ -10,6 +10,7 @@ final class PurchaseRequestEventHandler extends PurchaseRequestEvent {
   String? fromDate;
   String? toDate;
   String? status;
+  String? factoryName;
 
   PurchaseRequestEventHandler({
     this.page,
@@ -18,6 +19,7 @@ final class PurchaseRequestEventHandler extends PurchaseRequestEvent {
     this.fromDate,
     this.toDate,
     this.status,
+    this.factoryName,
   });
 }
 
@@ -44,3 +46,10 @@ final class NewPurchaseRequestEvent extends PurchaseRequestEvent {
 }
 
 
+// New Event for Approve / Reject
+class ApproveRejectPurchaseEvent extends PurchaseRequestEvent {
+  final String purchaseId;
+  final String status; // "Approve" or "Cancel"
+
+  ApproveRejectPurchaseEvent({required this.purchaseId, required this.status});
+}

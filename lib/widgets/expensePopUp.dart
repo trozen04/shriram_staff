@@ -68,6 +68,7 @@ class _ExpensePopupState extends State<ExpensePopup> {
                   controller: _amountController,
                   validator: (val) =>
                       val == null || val.isEmpty ? 'Please enter amount' : null,
+                  keyboardType: TextInputType.number,
                 ),
                 AppDimensions.h10(context),
 

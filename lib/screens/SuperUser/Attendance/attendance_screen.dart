@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shree_ram_staff/Constants/app_dimensions.dart';
 import 'package:shree_ram_staff/Utils/image_assets.dart';
 import 'package:shree_ram_staff/widgets/custom_app_bar.dart';
+import '../../../Bloc/AttendanceBloc/attendance_bloc.dart';
+import '../../../Bloc/FactoryBloc/factory_bloc.dart';
 import '../../../utils/app_colors.dart';
-import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/reusable_functions.dart';
+import '../../../utils/app_routes.dart';
+import '../../../widgets/custom_snackbar.dart';
+import 'package:intl/intl.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -15,180 +20,263 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  TextEditingController searchController = TextEditingController();
-  DateTimeRange? selectedDateRange;
+  DateTime? selectedMonthYear; // Only month/year
+  Set<String> factoryNames = {};
+  String? selectedFactoryName;
+  bool isLoadingFactory = false;
 
-  final dynamic attendanceData = [
-    {"name": "Suresh Kumar", "present": 20, "absent": 2},
-    {"name": "Ramesh Yadav", "present": 18, "absent": 4},
-    {"name": "Amit Singh", "present": 22, "absent": 0},
-    {"name": "Vijay Kumar", "present": 19, "absent": 3},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    context.read<FactoryBloc>().add(FactoryEventHandler());
+  }
 
-  void _pickDate() async {
-    final DateTimeRange? picked = await pickDateRange(
+  void _pickMonthYear() async {
+    final DateTime now = DateTime.now();
+    final DateTime? picked = await showMonthYearPicker(
       context: context,
-      initialRange: selectedDateRange,
+      initialDate: selectedMonthYear ?? now,
+      firstDate: DateTime(now.year - 5, 1),
+      lastDate: DateTime(now.year + 5, 12),
     );
 
     if (picked != null) {
-      setState(() {
-        selectedDateRange = picked;
-      });
+      setState(() => selectedMonthYear = picked);
+      if (selectedFactoryName != null) _fetchAttendance();
     }
+  }
+
+  void _fetchAttendance() {
+    if (selectedFactoryName == null || selectedMonthYear == null) return;
+
+    context.read<AttendanceBloc>().add(FetchAttendanceEventHandler(
+      month: selectedMonthYear!.month,
+      year: selectedMonthYear!.year,
+      factoryName: selectedFactoryName!,
+    ));
+  }
+
+  String get monthYearLabel {
+    if (selectedMonthYear == null) return 'Select Month/Year';
+    return DateFormat('MMMM yyyy').format(selectedMonthYear!);
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: CustomAppBar(title: 'Attendance', preferredHeight: height * 0.12),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: width * 0.035,
-          vertical: height * 0.015,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// 🔍 Search Field
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search Factory',
-                hintStyle: AppTextStyles.searchFieldFont,
-                suffixIcon: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.05,
-                    vertical: height * 0.015,
-                  ),
-                  child: Image.asset(
-                    ImageAssets.factoryPNG,
-                    height: height * 0.01,
-                  ),
-                ),
-                filled: true,
-                fillColor: AppColors.primaryColor.withAlpha(
-                  (0.16 * 255).toInt(),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: width * 0.035,
-                  vertical: height * 0.01,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(61),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            AppDimensions.h10(context),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<FactoryBloc, FactoryState>(
+            listener: (context, state) {
+              if (state is FactoryLoadingState) setState(() => isLoadingFactory = true);
+              else setState(() => isLoadingFactory = false);
 
-            /// 🔘 Filter / Calendar / Mark Attendance Row
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              if (state is FactorySuccessState) {
+                final dataList = state.factoryData['data'] as List? ?? [];
+                factoryNames = dataList.map((e) => e['factoryname'].toString()).toSet();
+                setState(() {});
+              }
+
+              if (state is FactoryErrorState) {
+                CustomSnackBar.show(context, message: state.message, isError: true);
+              }
+            },
+          ),
+          BlocListener<AttendanceBloc, AttendanceState>(
+            listener: (context, state) {
+              if (state is AttendanceErrorState) {
+                CustomSnackBar.show(context, message: state.message, isError: true);
+              }
+            },
+          ),
+        ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.015),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  _buildIconContainer(width, height, () {
-                    print('filter list');
-                  }, icon: Icons.filter_list),
-                  SizedBox(width: width * 0.045),
-
-                  _buildIconContainer(
-                    width,
-                    height,
-                    _pickDate,
-                    imagePath: ImageAssets.calender,
+                  Expanded(
+                    child: _buildFactoryDropdown(width, height),
                   ),
-
-                  SizedBox(width: width * 0.045),
-
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.markAttendanceScreen,
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: width * 0.065,
-                        vertical: height * 0.015,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withAlpha(
-                          (0.16 * 255).toInt(),
-                        ),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Mark Attendance',
-                            style: AppTextStyles.dateText,
-                          ),
-                          AppDimensions.w10(context),
-                          Image.asset(
-                            ImageAssets.editImage,
-                            height: height * 0.02,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  SizedBox(width: width * 0.04),
+                  _buildIconContainer(width, height, _pickMonthYear, imagePath: ImageAssets.calender),
                 ],
               ),
-            ),
-            AppDimensions.h20(context),
+              AppDimensions.h20(context),
+              if (selectedMonthYear != null)
+                Text(
+                  monthYearLabel,
+                  style: AppTextStyles.appbarTitle,
+                ),
+              AppDimensions.h10(context),
+              Expanded(
+                child: BlocBuilder<AttendanceBloc, AttendanceState>(
+                  builder: (context, state) {
+                    if (state is AttendanceLoadingState) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is AttendanceSuccessState) {
+                      final data = state.attendanceData as Map<String, dynamic>;
+                      final summary = data['summary'] as List<dynamic>? ?? [];
 
-            /// 📅 Date Header
-            if (selectedDateRange != null)
-              Text(
-                formatDateRange(selectedDateRange),
-                style: AppTextStyles.appbarTitle,
-              ),
-            AppDimensions.h10(context),
+                      if (summary.isEmpty) {
+                        return const Center(child: Text('No attendance data found'));
+                      }
 
-            /// 📋 Attendance Table
-            Expanded(
-              child: SingleChildScrollView(
-                child: StaffTable(data: attendanceData),
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Show filter applied
+                            StaffTable(data: summary),
+                          ],
+                        ),
+                      );
+                    } else if (state is AttendanceErrorState) {
+                      return Center(child: Text(state.message));
+                    } else {
+                      return const Center(child: Text('Select a factory and month/year'));
+                    }
+                  },
+                ),
               ),
-            ),
-          ],
+
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildIconContainer(
-    double width,
-    double height,
-    VoidCallback onTap, {
-    IconData? icon,
-    String? imagePath,
-  }) {
+  Widget _buildFactoryDropdown(double width, double height) {
+    if (isLoadingFactory) {
+      return const SizedBox(
+        height: 50,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.005),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+        borderRadius: BorderRadius.circular(61),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: selectedFactoryName,
+          hint: Text('Select Factory', style: AppTextStyles.searchFieldFont),
+          items: factoryNames.map((name) {
+            return DropdownMenuItem<String>(
+              value: name,
+              child: Text(name, style: AppTextStyles.searchFieldFont),
+            );
+          }).toList(),
+          onChanged: (val) {
+            setState(() => selectedFactoryName = val);
+            _fetchAttendance();
+          },
+          icon: Padding(
+            padding: EdgeInsets.only(right: width * 0.03),
+            child: Image.asset(
+              ImageAssets.factoryPNG,
+              height: height * 0.025,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconContainer(double width, double height, VoidCallback onTap, {String? imagePath}) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: width * 0.065,
-          vertical: height * 0.015,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.065, vertical: height * 0.015),
         decoration: BoxDecoration(
           color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
           borderRadius: BorderRadius.circular(30),
         ),
         child: imagePath != null
             ? Image.asset(
-                imagePath,
-                width: width * 0.06,
-                height: width * 0.06,
-                color: AppColors.primaryColor,
-              )
-            : Icon(icon ?? Icons.help_outline, color: AppColors.primaryColor),
+          imagePath,
+          width: width * 0.06,
+          height: width * 0.06,
+          color: AppColors.primaryColor,
+        )
+            : const SizedBox.shrink(),
       ),
     );
   }
+}
+
+/// Month Year Picker helper
+Future<DateTime?> showMonthYearPicker({
+  required BuildContext context,
+  required DateTime initialDate,
+  required DateTime firstDate,
+  required DateTime lastDate,
+}) async {
+  int selectedYear = initialDate.year;
+  int selectedMonth = initialDate.month;
+
+  return showDialog<DateTime>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Select Month and Year'),
+        content: SizedBox(
+          height: 150,
+          child: Column(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ListWheelScrollView.useDelegate(
+                        itemExtent: 40,
+                        perspective: 0.001,
+                        physics: const FixedExtentScrollPhysics(),
+                        onSelectedItemChanged: (index) => selectedMonth = index + 1,
+                        controller: FixedExtentScrollController(initialItem: initialDate.month - 1),
+                        childDelegate: ListWheelChildBuilderDelegate(
+                          builder: (context, index) => Center(child: Text('${index + 1}')),
+                          childCount: 12,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListWheelScrollView.useDelegate(
+                        itemExtent: 40,
+                        perspective: 0.001,
+                        physics: const FixedExtentScrollPhysics(),
+                        onSelectedItemChanged: (index) => selectedYear = firstDate.year + index,
+                        controller: FixedExtentScrollController(initialItem: initialDate.year - firstDate.year),
+                        childDelegate: ListWheelChildBuilderDelegate(
+                          builder: (context, index) => Center(child: Text('${firstDate.year + index}')),
+                          childCount: lastDate.year - firstDate.year + 1,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(DateTime(selectedYear, selectedMonth)),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

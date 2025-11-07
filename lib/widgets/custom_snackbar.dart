@@ -17,7 +17,7 @@ class CustomSnackBar {
       content: Text(message, style: const TextStyle(color: Colors.white)),
       backgroundColor: isError ? Colors.red : Colors.green,
       duration: const Duration(seconds: 3),
-      behavior: SnackBarBehavior.floating,
+      behavior: SnackBarBehavior.fixed,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
 

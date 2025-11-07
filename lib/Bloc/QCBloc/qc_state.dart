@@ -43,3 +43,31 @@ class FinalQcErrorState extends QcState {
   final String message;
   FinalQcErrorState({required this.message});
 }
+
+
+///UpdateQcStatus
+class UpdateQcStatusLoadingState extends QcState {}
+
+class UpdateQcStatusSuccessState extends QcState {
+  final dynamic responseData;
+  UpdateQcStatusSuccessState({required this.responseData});
+}
+
+class UpdateQcStatusErrorState extends QcState {
+  final String message;
+  UpdateQcStatusErrorState({required this.message});
+}
+
+
+///Final Qc
+class getFinalQcLoadingState extends QcState {}
+
+class getFinalQcSuccessState extends QcState {
+  dynamic responseData;
+  getFinalQcSuccessState({required this.responseData});
+}
+
+class getFinalQcErrorState extends QcState {
+  final String message;
+  getFinalQcErrorState({required this.message});
+}

@@ -214,7 +214,7 @@ Widget _buildStatusTag(CardType cardType, String status) {
 
     default:
       text = status;
-      color = AppColors.successColor;
+      color = Colors.grey;
   }
 
   return Container(

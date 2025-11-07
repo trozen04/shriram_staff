@@ -17,7 +17,7 @@ class StaffDetails extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: ReusableAppBar(title: 'Ram'),
+      appBar: ReusableAppBar(title: subUserData['name'] ?? 'Details'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: width * 0.035,
@@ -32,7 +32,7 @@ class StaffDetails extends StatelessWidget {
                   Navigator.pushNamed(
                     context,
                     AppRoutes.createSubUserPage,
-                    arguments: null,
+                    arguments: subUserData,
                   );
                 },
                 child: Container(
@@ -56,12 +56,12 @@ class StaffDetails extends StatelessWidget {
               ),
             ),
             AppDimensions.h10(context),
-            ProfileRow(label: 'Name', value: 'Ram'),
-            ProfileRow(label: 'Contact No.', value: '+91 9128918291'),
-            ProfileRow(label: 'Role', value: 'Worker'),
-            ProfileRow(label: 'Factory', value: 'Factory 1'),
-            ProfileRow(label: 'Authority', value: 'Initial QC'),
-            ProfileRow(label: 'Password', value: 'qq09193p'),
+            ProfileRow(label: 'Name', value: subUserData['name']),
+            ProfileRow(label: 'Contact No.', value: subUserData['mobileno']),
+            ProfileRow(label: 'Role', value: subUserData['role']),
+            ProfileRow(label: 'Factory', value: subUserData['factory']['factoryname']),
+            ProfileRow(label: 'Authority', value: subUserData['authority']),
+            // ProfileRow(label: 'Password', value: subUserData['password']),
           ],
         ),
       ),

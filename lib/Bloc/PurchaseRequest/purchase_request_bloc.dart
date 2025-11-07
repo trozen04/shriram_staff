@@ -29,6 +29,7 @@ class PurchaseRequestBloc
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
         if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
+        if (event.factoryName != null && event.factoryName!.isNotEmpty) queryParams['factoryname'] = event.factoryName!;
         // Build final URI safely
         final uri = Uri.parse(
           url,
@@ -43,7 +44,7 @@ class PurchaseRequestBloc
         );
         developer.log('API queryParams: $queryParams');
         developer.log('API URL: $uri');
-        //developer.log('response: ${response.statusCode}\n${response.body}');
+        developer.log('response: ${response.statusCode}\n${response.body}');
         final responseData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(PurchaseRequestSuccessState(purchaseRequestData: responseData));
@@ -62,6 +63,48 @@ class PurchaseRequestBloc
             message: 'Oops! Something went wrong. Please try again later.',
           ),
         );
+      }
+    });
+
+
+    /// Approve/Reject Purchase Event
+    on<ApproveRejectPurchaseEvent>((event, emit) async {
+      emit(PurchaseRequestLoadingState());
+
+      try {
+        final url = '${ApiConstants.baseUrl}/api/purchase/updatestatus/${event.purchaseId}';
+        final userToken = PrefUtils.getToken();
+
+        developer.log('Approve/Reject API URL: $url');
+        developer.log('User Token: $userToken');
+        developer.log('Request Body: ${jsonEncode({'status': event.status})}');
+
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $userToken',
+          },
+          body: jsonEncode({'status': event.status}),
+        );
+
+        developer.log('Response Status Code: ${response.statusCode}');
+        developer.log('Response Body: ${response.body}');
+
+        final responseData = jsonDecode(response.body);
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          emit(ApproveRejectPurchaseSuccessState(
+            message: 'Purchase request ${event.status.toLowerCase()}d successfully.',
+          ));
+        } else {
+          emit(ApproveRejectPurchaseErrorState(
+            message: responseData['message'] ?? 'Failed to ${event.status} purchase request.',
+          ));
+        }
+      } catch (e) {
+        developer.log('Exception: $e');
+        emit(ApproveRejectPurchaseErrorState(message: 'Something went wrong.'));
       }
     });
 

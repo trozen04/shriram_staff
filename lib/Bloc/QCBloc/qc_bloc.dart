@@ -76,6 +76,7 @@ class QcBloc extends Bloc<QcEvent, QcState> {
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromDate'] = event.fromDate!;
         if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
+        if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
         // Build final URI safely
         developer.log('🧾 Query Params: $queryParams');
 
@@ -163,6 +164,95 @@ class QcBloc extends Bloc<QcEvent, QcState> {
       }
     });
 
+    ///Update qc status
+    on<UpdateQcStatusEvent>((event, emit) async {
+      emit(UpdateQcStatusLoadingState());
+      try {
+        final url = '${ApiConstants.baseUrl}${ApiConstants.updateQcStatus}${event.qcId}';
+        developer.log('🟢 URL: $url');
+        final token = PrefUtils.getToken();
+        developer.log('🪙 Token: $token');
+
+        final body = {
+          "status": event.status,
+        };
+        developer.log('📤 Body: $body');
+
+        final response = await http.patch(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(body),
+        );
+
+        developer.log('📥 Response: ${response.statusCode} ${response.body}');
+        final data = jsonDecode(response.body);
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          emit(UpdateQcStatusSuccessState(responseData: data));
+        } else {
+          emit(UpdateQcStatusErrorState(
+            message: data['message'] ?? 'Failed to update status.',
+          ));
+        }
+      } catch (e) {
+        developer.log('❌ Update QC Status Error: $e');
+        emit(UpdateQcStatusErrorState(
+          message: 'Something went wrong. Please try again later.',
+        ));
+      }
+    });
+
+    ///Get Final QC
+    on<getFinalQcEventHandler>((event, emit) async {
+      emit(getFinalQcLoadingState());
+      try {
+        final url = ApiConstants.baseUrl + ApiConstants.getFinalQc;
+        developer.log('url: $url');
+        final token = PrefUtils.getToken();
+        developer.log('token : $token');
+        final queryParams = <String, String>{};
+
+        if (event.page != null) queryParams['page'] = event.page.toString();
+        if (event.limit != null) queryParams['limit'] = event.limit.toString();
+        if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromDate'] = event.fromDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
+        if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
+        // Build final URI safely
+        developer.log('🧾 Query Params: $queryParams');
+
+        final uri = Uri.parse(
+          url,
+        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+        developer.log('response: ${response.body}');
+
+        final data = jsonDecode(response.body);
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          emit(getFinalQcSuccessState(responseData: data));
+        } else {
+          emit(getFinalQcErrorState(message: data['message'] ?? 'Oops! Something went wrong. Please try again later.'));
+        }
+      } catch (e) {
+        developer.log('catchError : ${e.toString()}');
+        emit(getFinalQcErrorState(
+          message: 'Oops! Something went wrong. Please try again later.',
+        ),
+        );
+      }
+    });
 
   }
 }

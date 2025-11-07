@@ -78,6 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildProfileRow('Address', profileData!['address']),
               _buildProfileRow('Role', profileData!['role']),
               _buildProfileRow('Authority', profileData!['authority']),
+              if(!widget.isSuperUser)
               _buildProfileRow('Factory', profileData!['factory']),
 
               AppDimensions.h30(context),

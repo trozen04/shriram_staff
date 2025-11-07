@@ -6,11 +6,19 @@ import 'package:shree_ram_staff/screens/SubUser/Home/home_screen.dart';
 import 'package:shree_ram_staff/screens/SuperUser/home/super_user_home_screen.dart';
 import 'package:shree_ram_staff/utils/app_routes.dart';
 import 'package:shree_ram_staff/utils/pref_utils.dart';
+import 'Bloc/AttendanceBloc/attendance_bloc.dart';
 import 'Bloc/AuthBloc/auth_bloc.dart';
+import 'Bloc/BillingBloc/billing_bloc.dart';
+import 'Bloc/Broker/broker_bloc.dart';
+import 'Bloc/ExpenseBloc/expense_bloc.dart';
 import 'Bloc/FactoryBloc/factory_bloc.dart';
+import 'Bloc/LabourBloc/labour_bloc.dart';
+import 'Bloc/ProductBloc/product_bloc.dart';
 import 'Bloc/ProfileBloc/profile_bloc.dart';
 import 'Bloc/PurchaseRequest/purchase_request_bloc.dart';
 import 'Bloc/QCBloc/qc_bloc.dart';
+import 'Bloc/SalaryBloc/salary_bloc.dart';
+import 'Bloc/SalesBloc/sales_bloc.dart';
 import 'Bloc/SubUsers/subusers_bloc.dart';
 
 void main() async {
@@ -41,6 +49,14 @@ class MyApp extends StatelessWidget {
         BlocProvider<QcBloc>(create: (_) => QcBloc()),
         BlocProvider<FactoryBloc>(create: (_) => FactoryBloc()),
         BlocProvider<SubusersBloc>(create: (_) => SubusersBloc()),
+        BlocProvider<BillingBloc>(create: (_) => BillingBloc()),
+        BlocProvider<SalesBloc>(create: (_) => SalesBloc()),
+        BlocProvider<ProductBloc>(create: (_) => ProductBloc()),
+        BlocProvider<LabourBloc>(create: (_) => LabourBloc()),
+        BlocProvider<BrokerBloc>(create: (_) => BrokerBloc()),
+        BlocProvider<ExpenseBloc>(create: (_) => ExpenseBloc()),
+        BlocProvider<AttendanceBloc>(create: (_) => AttendanceBloc()),
+        BlocProvider<SalaryBloc>(create: (_) => SalaryBloc()),
       ],
       child: MaterialApp(
         title: 'Broker App',

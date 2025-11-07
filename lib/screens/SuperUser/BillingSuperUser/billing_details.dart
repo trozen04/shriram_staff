@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/utils/app_colors.dart';
 import 'package:shree_ram_staff/utils/flutter_font_styles.dart';
@@ -8,12 +10,15 @@ import 'package:shree_ram_staff/Constants/app_dimensions.dart';
 import '../../../widgets/generate_pdf.dart';
 
 class BillingDetailScreen extends StatelessWidget {
-  const BillingDetailScreen({super.key});
+  final billingData;
+  const BillingDetailScreen({super.key, required this.billingData});
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+
+    developer.log('billingData: $billingData');
 
     final billingDetails = [
       {

@@ -25,6 +25,7 @@ final class GetAllQcEventHandler extends QcEvent {
   String? fromDate;
   String? toDate;
   String? status;
+  String? factory;
 
   GetAllQcEventHandler({
     this.page,
@@ -33,6 +34,7 @@ final class GetAllQcEventHandler extends QcEvent {
     this.fromDate,
     this.toDate,
     this.status,
+    this.factory,
   });
 }
 
@@ -52,5 +54,34 @@ class SubmitFinalQcEvent extends QcEvent {
     this.deliveryProof,
     required this.transportId,
     required this.finalWeight,
+  });
+}
+
+///Update qc status
+class UpdateQcStatusEvent extends QcEvent {
+  final String qcId;
+  final String status;
+
+  UpdateQcStatusEvent({required this.qcId, required this.status});
+}
+
+///Update qc status
+class getFinalQcEventHandler extends QcEvent {
+  int? page;
+  int? limit;
+  String? search;
+  String? fromDate;
+  String? toDate;
+  String? status;
+  String? factory;
+
+  getFinalQcEventHandler({
+    this.page,
+    this.limit,
+    this.search,
+    this.fromDate,
+    this.toDate,
+    this.status,
+    this.factory,
   });
 }

@@ -195,9 +195,11 @@ class AppRoutes {
         final data = settings.arguments;
         return _buildPageRoute(SalesDetailScreen(salesData: data), settings);
       case billingFillDetailsSuperUser:
-        return _buildPageRoute(BillingFillDetailsSuperUser(), settings);
+        final data = settings.arguments;
+        return _buildPageRoute(BillingFillDetailsSuperUser(billingData: data), settings);
       case billingDetailScreenSuperUser:
-        return _buildPageRoute(BillingDetailScreen(), settings);
+        final data = settings.arguments;
+        return _buildPageRoute(BillingDetailScreen(billingData: data,), settings);
 
       case expenseScreen:
         return _buildPageRoute(ExpenseScreen(), settings);
@@ -208,11 +210,13 @@ class AppRoutes {
       case purchaseRequestScreen:
         return _buildPageRoute(PurchaseRequestScreen(), settings);
       case purchaseRequestDetail:
-        return _buildPageRoute(PurchaseRequestDetail(), settings);
+        final data = settings.arguments;
+        return _buildPageRoute(PurchaseRequestDetail(purchaseData: data,), settings);
       case brokerScreen:
         return _buildPageRoute(BrokerScreen(), settings);
       case brokerDetailScreen:
-        return _buildPageRoute(BrokerDetailScreen(), settings);
+        final data = settings.arguments;
+        return _buildPageRoute(BrokerDetailScreen(brokerData: data!), settings);
       case labourScreen:
         return _buildPageRoute(LabourScreen(), settings);
       case addLabourChargesScreen:

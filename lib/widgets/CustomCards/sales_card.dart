@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/flutter_font_styles.dart';
 import '../../Constants/app_dimensions.dart';
+import '../reusable_functions.dart';
 
 class SalesCard extends StatelessWidget {
   final String name;
@@ -11,7 +12,7 @@ class SalesCard extends StatelessWidget {
   final String? staffName;
   final double height;
   final double width;
-  final bool? isPending;
+  final String? status;
 
   const SalesCard({
     super.key,
@@ -22,7 +23,7 @@ class SalesCard extends StatelessWidget {
     this.staffName,
     required this.height,
     required this.width,
-    this.isPending = false,
+    this.status,
   });
 
   @override
@@ -56,14 +57,14 @@ class SalesCard extends StatelessWidget {
                       maxLines: 1,
                     ),
                     AppDimensions.w10(context),
-                    _buildStatusTag(isPending!),
+                    _buildStatusTag(status!),
                   ],
                 ),
               ),
 
               // Right: Date
               Text(
-                date,
+                formatToIST(date),
                 style: AppTextStyles.priceTitle,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.right,
@@ -80,8 +81,7 @@ class SalesCard extends StatelessWidget {
               _buildInfoRow(text: 'Address', value: address!),
               AppDimensions.h10(context),
               _buildInfoRow(text: 'City/Town', value: city!),
-              if ((staffName!.isNotEmpty || staffName != null) &&
-                  !isPending!) ...[
+              if (staffName != '~')...[
                 AppDimensions.h10(context),
                 _buildInfoRow(text: 'Staff', value: staffName!),
               ],
@@ -112,20 +112,34 @@ class SalesCard extends StatelessWidget {
   }
 }
 
-Widget _buildStatusTag(bool isPending) {
+Widget _buildStatusTag(String status) {
+  // Define colors based on status
+  Color statusColor;
+  switch (status.toLowerCase()) {
+    case 'pending':
+      statusColor = AppColors.pendingColor;
+      break;
+    case 'dispatched':
+    case 'completed':
+      statusColor = AppColors.successColor;
+      break;
+    case 'cancelled':
+    case 'rejected':
+      statusColor = Colors.redAccent;
+      break;
+    default:
+      statusColor = Colors.grey;
+  }
+
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: isPending
-          ? AppColors.pendingColor.withOpacity(0.21)
-          : AppColors.successColor.withOpacity(0.21),
+      color: statusColor.withOpacity(0.21),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(
-      isPending ? 'Loading Pending' : 'Dispatched',
-      style: AppTextStyles.statusFont.copyWith(
-        color: isPending ? AppColors.pendingColor : AppColors.successColor,
-      ),
+      status[0].toUpperCase() + status.substring(1),
+      style: AppTextStyles.statusFont.copyWith(color: statusColor),
       maxLines: 1,
     ),
   );

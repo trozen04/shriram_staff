@@ -11,7 +11,7 @@ class PurchaseRequestCard extends StatelessWidget {
   final double height;
   final double width;
   final VoidCallback onPressed;
-  final bool isPending;
+  final String? status;
 
   const PurchaseRequestCard({
     super.key,
@@ -22,7 +22,7 @@ class PurchaseRequestCard extends StatelessWidget {
     required this.height,
     required this.width,
     required this.onPressed,
-    required this.isPending,
+    this.status,
   });
 
   @override
@@ -53,7 +53,7 @@ class PurchaseRequestCard extends StatelessWidget {
                       context: context,
                     ),
                   ),
-                _buildStatusTag(isPending: isPending),
+                _buildStatusTag(status ?? 'Unknown'),
               ],
             ),
 
@@ -130,23 +130,37 @@ class PurchaseRequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusTag({required bool isPending, String? text}) {
-    final String statusText =
-        text ?? (isPending ? 'Approval Pending' : 'Approved');
+  Widget _buildStatusTag(String statusText) {
+    // Normalize to handle case variations like 'pending', 'Pending', etc.
+    final normalized = statusText.toLowerCase();
+
+    // Choose colors based on status
+    Color bgColor;
+    Color textColor;
+
+    if (normalized.contains('pending')) {
+      bgColor = AppColors.pendingColor.withOpacity(0.21);
+      textColor = AppColors.pendingColor;
+    } else if (normalized.contains('delivered') || normalized.contains('approve')) {
+      bgColor = AppColors.successColor.withOpacity(0.21);
+      textColor = AppColors.successColor;
+    } else if (normalized.contains('rejected') || normalized.contains('cancelled')) {
+      bgColor = AppColors.errorColor.withOpacity(0.21);
+      textColor = AppColors.errorColor;
+    } else {
+      bgColor = Colors.grey.withOpacity(0.2);
+      textColor = Colors.grey;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isPending
-            ? AppColors.pendingColor.withOpacity(0.21)
-            : AppColors.successColor.withOpacity(0.21),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         statusText,
-        style: AppTextStyles.statusFont.copyWith(
-          color: isPending ? AppColors.pendingColor : AppColors.successColor,
-        ),
+        style: AppTextStyles.statusFont.copyWith(color: textColor),
         maxLines: 1,
       ),
     );
