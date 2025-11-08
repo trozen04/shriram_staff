@@ -25,13 +25,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -53,12 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     context.read<AuthBloc>().add(
       LoginRequestEventHandler(
-        phone: _phoneController.text.trim(),
+        email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -152,23 +151,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 AppDimensions.h50(context),
 
-                // Phone Number
-                Text('Phone Number', style: AppTextStyles.label),
+                // Email Field
+                Text('Email', style: AppTextStyles.label),
                 AppDimensions.h5(context),
                 CustomTextFormField(
-                  controller: _phoneController,
-                  hintText: 'Enter Phone Number',
-                  prefixImagePath: ImageAssets.callImage,
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Text('+91', style: AppTextStyles.hintText),
-                  ),
-                  keyboardType: TextInputType.phone,
+                  controller: _emailController,
+                  hintText: 'Enter Email',
+                  prefixIcon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.isEmpty)
-                      return 'Phone number is required';
-                    if (value.length != 10)
-                      return 'Enter a valid 10-digit number';
+                    if (value == null || value.isEmpty) return 'Email is required';
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}').hasMatch(value)) {
+                      return 'Enter a valid email';
+                    }
                     return null;
                   },
                 ),

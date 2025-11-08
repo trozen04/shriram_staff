@@ -17,7 +17,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final url = ApiConstants.baseUrl + ApiConstants.login;
         developer.log('url login: $url');
         final body = {
-          'mobileno': event.phone,
+          'email': event.email,
           'password': event.password,
         };
 

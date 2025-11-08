@@ -83,20 +83,35 @@ class ProfileRow extends StatelessWidget {
       displayValue = value.toString();
     }
 
+    final width = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.01,
+        vertical: MediaQuery.of(context).size.height * 0.008,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: AppTextStyles.bodyText),
-          Flexible(
+          // Label (fixed width)
+          SizedBox(
+            width: width * 0.35, // fixed width for label
             child: Text(
-              displayValue,
-              style: AppTextStyles.profileDataText,
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
+              label,
+              style: AppTextStyles.bodyText,
+            ),
+          ),
+
+          // Value (max width with ellipsis)
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: width * 0.55),
+              child: Text(
+                displayValue,
+                style: AppTextStyles.profileDataText,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
+              ),
             ),
           ),
         ],
@@ -437,6 +452,7 @@ class ReusableTextField extends StatelessWidget {
   final String label;
   final String? hint;
   final TextEditingController? controller;
+  final String? initialValue; // <-- add this
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
@@ -454,6 +470,7 @@ class ReusableTextField extends StatelessWidget {
     required this.label,
     this.hint,
     this.controller,
+    this.initialValue,
     this.onChanged,
     this.validator,
     this.keyboardType = TextInputType.text,
@@ -505,6 +522,7 @@ class ReusableTextField extends StatelessWidget {
         // Text Field
         TextFormField(
           controller: controller,
+          initialValue: controller == null ? initialValue : null, // <-- use initialValue if controller is not provided
           onChanged: onChanged,
           validator: validator,
           keyboardType: keyboardType,
@@ -513,21 +531,20 @@ class ReusableTextField extends StatelessWidget {
           onTap: onTap,
           textCapitalization: textCapitalization,
           inputFormatters: [
-            if (keyboardType == TextInputType.phone)...[
+            if (keyboardType == TextInputType.phone) ...[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               LengthLimitingTextInputFormatter(10),
             ],
             if (keyboardType == TextInputType.number)
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
           ],
-
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.hintText,
             filled: true,
             fillColor: readOnly
                 ? AppColors.readOnlyFillColor
-                : Colors.white, // same logic
+                : Colors.white,
             contentPadding: EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.035,
               vertical: MediaQuery.of(context).size.height * 0.015,

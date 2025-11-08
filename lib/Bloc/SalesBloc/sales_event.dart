@@ -24,6 +24,30 @@ class GetAllSalesLeadsSuperUserEvent extends SalesEvent {
   });
 }
 
+
+
+/// Subuser: Get all sales leads
+class GetAllSalesLeadsSubUserEvent extends SalesEvent {
+  int? page;
+  int? limit;
+  String? search;
+  String? fromDate;
+  String? toDate;
+  String? status;
+
+  GetAllSalesLeadsSubUserEvent({
+    this.page,
+    this.limit,
+    this.search,
+    this.fromDate,
+    this.toDate,
+    this.status,
+  });
+}
+
+
+
+
 class CreateSalesLeadEvent extends SalesEvent {
   final String customerName;
   final String phoneNo;
@@ -40,4 +64,14 @@ class CreateSalesLeadEvent extends SalesEvent {
     required this.factoryId,
     required this.finalQCItems,
   });
+}
+
+
+// 🆕 Add this new event for report fetching
+class GetSalesReportEvent extends SalesEvent {
+  final String? fromDate;
+  final String? toDate;
+  final String? factory;
+
+  GetSalesReportEvent({this.fromDate, this.toDate, this.factory});
 }

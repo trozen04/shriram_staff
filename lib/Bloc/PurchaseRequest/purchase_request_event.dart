@@ -23,6 +23,27 @@ final class PurchaseRequestEventHandler extends PurchaseRequestEvent {
   });
 }
 
+final class purchaseRequest extends PurchaseRequestEvent {
+  int? page;
+  int? limit;
+  String? search;
+  String? fromDate;
+  String? toDate;
+  String? status;
+  String? factoryName;
+
+  purchaseRequest({
+    this.page,
+    this.limit,
+    this.search,
+    this.fromDate,
+    this.toDate,
+    this.status,
+    this.factoryName,
+  });
+}
+
+
 final class NewPurchaseRequestEvent extends PurchaseRequestEvent {
   final String paddyType;
   final String name;
@@ -45,11 +66,9 @@ final class NewPurchaseRequestEvent extends PurchaseRequestEvent {
   });
 }
 
-
 // New Event for Approve / Reject
 class ApproveRejectPurchaseEvent extends PurchaseRequestEvent {
   final String purchaseId;
-  final String status; // "Approve" or "Cancel"
-
+  final String status;
   ApproveRejectPurchaseEvent({required this.purchaseId, required this.status});
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -68,7 +69,7 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
     String? factoryId, // now passing factory name
   }) {
     context.read<PurchaseRequestBloc>().add(
-      PurchaseRequestEventHandler(
+      purchaseRequest(
         page: page,
         limit: limit,
         search: query,
@@ -191,30 +192,25 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
               }
 
               if (state is FactorySuccessState) {
-                // Extract unique factory names
-                final factoryNamesSet = <String>{};
-                factoryList = (state.factoryData['data'] as List)
-                    .where((e) => e['factoryname'] != null)
-                    .map((e) {
-                  factoryNamesSet.add(e['factoryname'].toString());
-                  return {
-                    '_id': e['_id'].toString(),
-                    'name': e['factoryname'].toString(),
-                  };
+                final rawFactories = (state.factoryData['data'] as List).cast<Map<String, dynamic>>();
+                final seenFactories = <String>{};
+
+                factoryList = rawFactories
+                    .where((e) => seenFactories.add(e['factoryname'].toString()))
+                    .map((e) => {
+                  '_id': e['_id'].toString(),
+                  'name': e['factoryname'].toString(),
                 })
                     .toList();
 
-                // Keep only unique names
-                final uniqueFactoryNames = factoryNamesSet.toList();
-
                 // Default select first factory
-                if (uniqueFactoryNames.isNotEmpty && selectedFactoryId == null) {
-                  selectedFactoryId = factoryList
-                      .firstWhere((e) => e['name'] == uniqueFactoryNames.first)['_id'];
+                if (factoryList.isNotEmpty && selectedFactoryId == null) {
+                  selectedFactoryId = factoryList.first['_id'];
                 }
 
                 setState(() {});
               }
+
 
 
               if (state is FactoryErrorState) {
@@ -234,6 +230,7 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
                   setState(() => isFetchingMore = true);
                 }
               } else if (state is PurchaseRequestSuccessState) {
+                developer.log('PurchaseRequestSuccessState: ${state.purchaseRequestData}');
                 final List<dynamic> fetchedData =
                     state.purchaseRequestData['data'] ?? [];
                 setState(() {
@@ -286,16 +283,27 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
                       onTap: _pickDate,
                     ),
                     SizedBox(width: width * 0.045),
-                    SizedBox(
-                      width: width * 0.3,
+                    Container(
+                      width: width * 0.35,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.16),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                       child: DropdownButtonFormField<String>(
                         isExpanded: true,
                         value: selectedFactoryId,
-                        hint: Text('Factory', style: AppTextStyles.hintText),
+                        hint: Text(
+                          'Select Factory',
+                          style: AppTextStyles.hintText.copyWith(fontSize: 14),
+                        ),
                         items: factoryList.map<DropdownMenuItem<String>>((e) {
                           return DropdownMenuItem<String>(
                             value: e['_id'],
-                            child: Text(e['name'], style: AppTextStyles.hintText),
+                            child: Text(
+                              e['name'],
+                              style: AppTextStyles.hintText.copyWith(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         }).toList(),
                         onChanged: (val) {
@@ -304,30 +312,41 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
                             currentPage = 1;
                           });
 
-                          // Get factory name from _id
                           final selectedFactoryName = factoryList
                               .firstWhere((element) => element['_id'] == val)['name'];
 
                           _fetchData(
                             page: 1,
-                            factoryId: selectedFactoryName, // send name to API
+                            factoryId: selectedFactoryName,
                             status: selectedStatus,
                             query: searchQuery,
                           );
                         },
-
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 22),
                         decoration: InputDecoration(
                           isDense: true,
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.primaryColor, width: 1.2),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: width * 0.03,
-                            vertical: height * 0.015,
+                            vertical: height * 0.012,
                           ),
                         ),
                       ),
                     ),
+
 
                     SizedBox(width: width * 0.045),
                     CustomIconButton(
@@ -383,13 +402,13 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: PurchaseRequestCard(
-                          farmerName: purchase['name'] ?? '~',
+                          farmerName: data['name'] ?? '~',
                           brokerName: broker['name'] ?? '~',
-                          date: data['deliverydate'] != null
-                              ? formatToIST(data['deliverydate'])
+                          date: data['date'] != null
+                              ? formatToIST(data['date'])
                               : '~',
                           status: data['status'],
-                          paddy: purchase['paddytype'] ?? '~',
+                          paddy: data['paddytype'] ?? '~',
                           height: height,
                           width: width,
                           onPressed: () async {

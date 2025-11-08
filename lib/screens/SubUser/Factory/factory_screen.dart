@@ -207,7 +207,7 @@ class _FactoryScreenState extends State<FactoryScreen> {
         children: [
           Text('Factory name: ', style: AppTextStyles.bodyText),
           AppDimensions.h10(context),
-          Text('Weight: 22 Qntl', style: AppTextStyles.bodyText),
+          Text('Weight: 22', style: AppTextStyles.bodyText),
           AppDimensions.h10(context),
           Text('Bags: 2', style: AppTextStyles.bodyText),
           AppDimensions.h10(context),

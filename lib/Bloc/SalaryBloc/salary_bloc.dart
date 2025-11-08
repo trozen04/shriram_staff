@@ -12,6 +12,56 @@ part 'salary_state.dart';
 class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
   SalaryBloc() : super(SalaryInitialState()) {
 
+    on<FetchSalaryEvent>((event, emit) async {
+      emit(SalaryLoadingState());
+
+      try {
+        final userToken = PrefUtils.getToken();
+
+        // Build query parameters dynamically
+        final queryParams = {
+          'fromdate': event.fromDate,
+          'todate': event.toDate,
+          if (event.factoryName != null && event.factoryName!.isNotEmpty)
+            'factoryname': event.factoryName!,
+        };
+
+        // Build URI with query parameters
+        final uri = Uri.parse('${ApiConstants.baseUrl}/api/salary/getall')
+            .replace(queryParameters: queryParams);
+
+        developer.log('Salary API URL: $uri');
+        developer.log('Salary queryParams: $queryParams');
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $userToken',
+          },
+        );
+
+        developer.log('Salary API response: ${response.statusCode}\n${response.body}');
+
+        final responseData = jsonDecode(response.body);
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          developer.log('Salary API responseData: $responseData');
+          emit(SalarySuccessState(salaryData: responseData));
+        } else {
+          emit(SalaryErrorState(
+            responseData['message'] ?? 'Failed to fetch salary data.',
+          ));
+        }
+      } catch (e) {
+        developer.log('Salary API error: $e');
+        emit(SalaryErrorState(
+          'Oops! Something went wrong. Please try again later.',
+        ));
+      }
+    });
+
+
     /// Create Salary
     on<CreateSalaryEvent>((event, emit) async {
       emit(SalaryLoadingState());

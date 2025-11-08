@@ -215,6 +215,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                   setState(() => isFetchingMore = true);
                 }
               } else if (state is PurchaseRequestSuccessState) {
+                developer.log('Data::: ${state.purchaseRequestData}');
                 final List<dynamic> fetchedData = state.purchaseRequestData['data'] ?? [];
                 setState(() {
                   if (currentPage == 1) {
@@ -250,7 +251,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                     setState(() => isFetchingMore = true);
                   }
                 } else if (state is GetAllQcSuccessState) {
-                 // developer.log('GetAllQcSuccessState: ${state.responseData}');
+                 developer.log('GetAllQcSuccessState: ${state.responseData}');
                   final List<dynamic> fetchedData = state.responseData['data'] ?? [];
                   setState(() {
                     if (currentPage == 1) {
@@ -392,6 +393,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                               : '')
                               : (data['weight'] ?? ''),
                           status: data['status'] ?? '',
+
                           height: height,
                           width: width,
                           onPressed: () {

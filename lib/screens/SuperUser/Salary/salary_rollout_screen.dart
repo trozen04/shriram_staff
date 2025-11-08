@@ -68,104 +68,101 @@ class _SalaryRolloutScreenState extends State<SalaryRolloutScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return BlocProvider(
-      create: (_) => SalaryBloc(),
-      child: BlocListener<SalaryBloc, SalaryState>(
-        listener: (context, state) {
-          if (state is SalaryLoadingState) {
-            setState(() => isSubmitting = true);
-          } else if (state is SalaryCreateSuccessState) {
-            setState(() => isSubmitting = false);
-            CustomSnackBar.show(context, message: 'Salary added successfully!');
-            Navigator.pop(context, true);
-          } else if (state is SalaryErrorState) {
-            setState(() => isSubmitting = false);
-            CustomSnackBar.show(context, message: state.message, isError: true);
-          }
-        },
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            appBar: CustomAppBar(
-              isHomePage: false,
-              title: 'Salary',
-              preferredHeight: height * 0.12,
+    return BlocListener<SalaryBloc, SalaryState>(
+      listener: (context, state) {
+        if (state is SalaryLoadingState) {
+          setState(() => isSubmitting = true);
+        } else if (state is SalaryCreateSuccessState) {
+          setState(() => isSubmitting = false);
+          CustomSnackBar.show(context, message: 'Salary added successfully!');
+          Navigator.pop(context, true);
+        } else if (state is SalaryErrorState) {
+          setState(() => isSubmitting = false);
+          CustomSnackBar.show(context, message: state.message, isError: true);
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: CustomAppBar(
+            isHomePage: false,
+            title: 'Salary',
+            preferredHeight: height * 0.12,
+          ),
+          body: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: width * 0.05,
+              vertical: height * 0.015,
             ),
-            body: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: width * 0.05,
-                vertical: height * 0.015,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppDimensions.h20(context),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppDimensions.h20(context),
 
-                    /// Name Field
-                    ReusableTextField(
-                      label: 'Name',
-                      hint: 'Enter Name',
-                      controller: nameController,
-                      readOnly: false,
-                      
-                      
-                    ),
-                    AppDimensions.h20(context),
+                  /// Name Field
+                  ReusableTextField(
+                    label: 'Name',
+                    hint: 'Enter Name',
+                    controller: nameController,
+                    readOnly: false,
 
-                    /// Total Salary Field
-                    ReusableTextField(
-                      label: 'Total Salary',
-                      hint: 'Enter Salary',
-                      controller: totalSalaryController,
-                      keyboardType: TextInputType.number,
-                      
-                      
-                    ),
-                    AppDimensions.h20(context),
 
-                    /// Salary Paid Field
-                    ReusableTextField(
-                      label: 'Salary Paid',
-                      hint: 'Enter Salary',
-                      controller: salaryPaidController,
-                      keyboardType: TextInputType.number,
-                      
-                      
-                    ),
-                    AppDimensions.h20(context),
+                  ),
+                  AppDimensions.h20(context),
 
-                    /// Total Present Field
-                    ReusableTextField(
-                      label: 'Total Present',
-                      hint: 'Enter Days',
-                      controller: totalPresentController,
-                      keyboardType: TextInputType.number,
-                      
-                      
-                    ),
-                    AppDimensions.h20(context),
+                  /// Total Salary Field
+                  ReusableTextField(
+                    label: 'Total Salary',
+                    hint: 'Enter Salary',
+                    controller: totalSalaryController,
+                    keyboardType: TextInputType.number,
 
-                    /// Salary Left Field (Read-only)
-                    ReusableTextField(
-                      label: 'Salary Left',
-                      hint: 'Salary Left',
-                      controller: salaryLeftController,
-                      readOnly: true,
-                      
-                      
-                    ),
-                    AppDimensions.h30(context),
 
-                    /// Submit Button
-                    PrimaryButton(
-                      text: 'Submit',
-                      onPressed: isSubmitting ? null : () => _submitSalary(context),
-                      isLoading: isSubmitting,
-                    ),
-                  ],
-                ),
+                  ),
+                  AppDimensions.h20(context),
+
+                  /// Salary Paid Field
+                  ReusableTextField(
+                    label: 'Salary Paid',
+                    hint: 'Enter Salary',
+                    controller: salaryPaidController,
+                    keyboardType: TextInputType.number,
+
+
+                  ),
+                  AppDimensions.h20(context),
+
+                  /// Total Present Field
+                  ReusableTextField(
+                    label: 'Total Present',
+                    hint: 'Enter Days',
+                    controller: totalPresentController,
+                    keyboardType: TextInputType.number,
+
+
+                  ),
+                  AppDimensions.h20(context),
+
+                  /// Salary Left Field (Read-only)
+                  ReusableTextField(
+                    label: 'Salary Left',
+                    hint: 'Salary Left',
+                    controller: salaryLeftController,
+                    readOnly: true,
+
+
+                  ),
+                  AppDimensions.h30(context),
+
+                  /// Submit Button
+                  PrimaryButton(
+                    text: 'Submit',
+                    onPressed: isSubmitting ? null : () => _submitSalary(context),
+                    isLoading: isSubmitting,
+                  ),
+                ],
               ),
             ),
           ),

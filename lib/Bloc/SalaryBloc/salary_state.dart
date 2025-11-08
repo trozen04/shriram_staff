@@ -16,3 +16,9 @@ class SalaryErrorState extends SalaryState {
   final String message;
   SalaryErrorState(this.message);
 }
+
+
+class SalarySuccessState extends SalaryState {
+  dynamic salaryData;
+  SalarySuccessState({required this.salaryData});
+}

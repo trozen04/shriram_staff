@@ -186,7 +186,7 @@ Widget _buildStatusTag(CardType cardType, String status) {
           text = 'Approval Pending';
           break;
         case CardType.qc:
-          text = 'Final QC Pending';
+          text = 'Initial QC Pending';
           break;
         case CardType.billing:
           text = 'Billing Pending';
@@ -203,8 +203,15 @@ Widget _buildStatusTag(CardType cardType, String status) {
       break;
 
     case 'approve':
-      text = 'Approved';
-      color = AppColors.successColor;
+      switch (cardType) {
+        case CardType.qc:
+          text = 'Final QC Pending';
+          color = AppColors.pendingColor;
+          break;
+        default:
+          text = 'Approved';
+          color = AppColors.successColor;
+      }
       break;
 
     case 'rejected':

@@ -20,29 +20,14 @@ class BillingDetailScreen extends StatelessWidget {
 
     developer.log('billingData: $billingData');
 
-    final billingDetails = [
-      {
-        'paddyType': 'Mohan',
-        'weight': '223 Qntl',
-        'bags': '23',
-        'price': '₹ 7500',
-        'amount': '₹ 175000',
-      },
-      {
-        'paddyType': 'Mohan',
-        'weight': '223 Qntl',
-        'bags': '23',
-        'price': '₹ 7500',
-        'amount': '₹ 175000',
-      },
-      {
-        'paddyType': 'Mohan',
-        'weight': '223 Qntl',
-        'bags': '23',
-        'price': '₹ 7500',
-        'amount': '₹ 175000',
-      },
-    ];
+    final billingItems = billingData['billingItems'] ?? [];
+
+    final deductions = (billingData['deductions'] != null &&
+        billingData['deductions'] is List &&
+        billingData['deductions'].isNotEmpty)
+        ? billingData['deductions'][0]
+        : {};
+
 
     return Scaffold(
       appBar: ReusableAppBar(title: '#22311'),
@@ -57,22 +42,18 @@ class BillingDetailScreen extends StatelessWidget {
             ProfileRow(label: 'Unit ID', value: '#221212'),
             ProfileRow(label: 'Name', value: 'Ramesh Yadav'),
             ProfileRow(label: 'Broker', value: 'Rahul'),
-            ProfileRow(label: 'Initial Weight', value: '511 Qntl'),
-            ProfileRow(label: 'Final Weight', value: '511 Qntl'),
-            ProfileRow(label: 'Net Weight', value: '112 Qntl'),
+            ProfileRow(label: 'Initial Weight', value: '511'),
+            ProfileRow(label: 'Final Weight', value: '${billingData['finalWeight'] ?? 'N/A'}'),
+            ProfileRow(label: 'Net Weight', value: '${billingData['netPayable'] ?? 'N/A'}'),
 
             AppDimensions.h20(context),
             Text('Billing Details', style: AppTextStyles.appbarTitle),
 
             AppDimensions.h10(context),
-
-            // ✅ Scrollable Table Container
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: width * 1.1,
-                ), // ensures proper width
+                constraints: BoxConstraints(minWidth: width * 1.1),
                 child: Table(
                   columnWidths: const {
                     0: FlexColumnWidth(1.6),
@@ -83,7 +64,6 @@ class BillingDetailScreen extends StatelessWidget {
                   },
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: [
-                    // ✅ Header Row
                     TableRow(
                       children: [
                         _headerCell('Paddy Type'),
@@ -93,16 +73,14 @@ class BillingDetailScreen extends StatelessWidget {
                         _headerCell('Amount'),
                       ],
                     ),
-
-                    // ✅ Data Rows
-                    ...billingDetails.map(
-                      (row) => TableRow(
+                    ...billingItems.map(
+                          (item) => TableRow(
                         children: [
-                          _cell(row['paddyType']!),
-                          _cell(row['weight']!),
-                          _cell(row['bags']!),
-                          _cell(row['price']!),
-                          _cell(row['amount']!),
+                          _cell(item['itemName'].toString()),
+                          _cell('${item['weight']}'),
+                          _cell('${item['bags']}'),
+                          _cell('₹ ${item['price']}'),
+                          _cell('₹ ${item['amount']}'),
                         ],
                       ),
                     ),
@@ -113,11 +91,28 @@ class BillingDetailScreen extends StatelessWidget {
 
             AppDimensions.h20(context),
             Text('Deductions', style: AppTextStyles.appbarTitle),
-            ProfileRow(label: 'Labor Charge', value: '₹ 2300'),
-            ProfileRow(label: 'Brokerage', value: '₹ 1220'),
+            ProfileRow(
+              label: 'Labor Charge',
+              value: deductions.isNotEmpty ? '₹ ${deductions['labourcharge']}' : '₹ 0',
+            ),
+            ProfileRow(
+              label: 'Brokerage',
+              value: deductions.isNotEmpty ? '₹ ${deductions['brokerage']}' : '₹ 0',
+            ),
+            ProfileRow(
+              label: 'Enter Amount',
+              value: deductions.isNotEmpty ? '₹ ${deductions['enteramount']}' : '₹ 0',
+            ),
 
             Divider(color: AppColors.dividerColor, height: height * 0.04),
-            ProfileRow(label: 'Total', value: '₹ 2300'),
+            ProfileRow(
+              label: 'Total',
+              value: '₹ ${billingData['totalAmount']}',
+            ),
+            ProfileRow(
+              label: 'Net Payable',
+              value: '₹ ${billingData['netPayable']}',
+            ),
 
             AppDimensions.h30(context),
             Center(
@@ -128,7 +123,7 @@ class BillingDetailScreen extends StatelessWidget {
                   style: AppTextStyles.buttonText.copyWith(color: Colors.white),
                 ),
                 onTap: () async {
-                  await generateBillingPdfToDevice(billingDetails);
+                  await generateBillingPdfToDevice(billingItems);
                 },
               ),
             ),

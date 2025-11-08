@@ -113,36 +113,37 @@ class QcBloc extends Bloc<QcEvent, QcState> {
     on<SubmitFinalQcEvent>((event, emit) async {
       emit(FinalQcLoadingState());
       try {
+        // Correct URL for Final QC submission
         final url = ApiConstants.baseUrl + ApiConstants.submitFinalQC;
-        final userToken = PrefUtils.getToken();
+        final token = PrefUtils.getToken();
+        developer.log('Submitting Final QC to: $url');
+        developer.log('Token: $token');
 
         var request = http.MultipartRequest('POST', Uri.parse(url));
 
-        // Headers
+        // Add headers
         request.headers.addAll({
-          'Authorization': 'Bearer $userToken',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'multipart/form-data',
         });
 
-        // Fields
+        // Add form fields
         request.fields['qcNumber'] = event.qcNumber;
         request.fields['paddyQC'] = jsonEncode(event.paddyQc);
         request.fields['riceQC'] = jsonEncode(event.riceQc);
         request.fields['transportId'] = event.transportId;
         request.fields['finalweight'] = event.finalWeight;
 
-        // File (optional)
-        if (event.deliveryProof != null) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              'deliveryProof',
-              event.deliveryProof!.path,
-            ),
-          );
+        // Add file if present
+        if (event.deliveryProof != null && event.deliveryProof!.existsSync()) {
+          request.files.add(await http.MultipartFile.fromPath(
+            'deliveryProof',
+            event.deliveryProof!.path,
+          ));
+          developer.log('📎 Delivery proof file added: ${event.deliveryProof!.path}');
+        } else {
+          developer.log('No delivery proof uploaded.');
         }
-
-        developer.log('📦 Sending Final QC request: ${request.fields}');
-        developer.log('🧾 File: ${event.deliveryProof?.path}');
 
         // Send request
         final streamedResponse = await request.send();
@@ -155,12 +156,14 @@ class QcBloc extends Bloc<QcEvent, QcState> {
           emit(FinalQcSuccessState(responseData));
         } else {
           emit(FinalQcErrorState(
-              message: responseData['message'] ?? 'Something went wrong.'));
+            message: responseData['message'] ?? 'Something went wrong while submitting Final QC.',
+          ));
         }
       } catch (e) {
-        developer.log('❌ Final QC Error: $e');
+        developer.log('❌ Final QC Submission Error: $e');
         emit(FinalQcErrorState(
-            message: 'Oops! Something went wrong. Please try again later.'));
+          message: 'Oops! Something went wrong. Please try again later.',
+        ));
       }
     });
 

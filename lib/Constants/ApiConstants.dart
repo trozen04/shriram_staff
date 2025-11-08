@@ -10,6 +10,7 @@ class ApiConstants {
 
   ///Delivery
   static String allPurchaseRequest = "/api/transport/allpurchaserequest";
+  static String allAllPurchase = "/api/purchase/getallpurchase";
 
   ///QC
   static String createInitialQC = "/api/qccheck/create";
@@ -34,6 +35,7 @@ class ApiConstants {
 
   ///Sales
   static String getAllSalesLeadsForSuperUser = "/api/saleslead/getallsalesleads";
+  static String getAllSalesLeadsForSubUser = "api/saleslead/getleadstosubuser";
 
   ///Product
   static String getAllProduct = "/api/product/allproduct";

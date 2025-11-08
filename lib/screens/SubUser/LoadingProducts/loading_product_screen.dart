@@ -55,7 +55,7 @@ class _LoadingProductScreenState extends State<LoadingProductScreen> {
                 _buildReadOnlyField('Address', '122/22, Ram Colony'),
                 _buildReadOnlyField('City/Town', 'Gorakhpur'),
                 _buildReadOnlyField('Item', 'Rice'),
-                _buildReadOnlyField('Qty', '112 Qntl'),
+                _buildReadOnlyField('Qty', '112'),
                 AppDimensions.h20(context),
 
                 _buildSectionTitle('Enter Vehicle Details'),

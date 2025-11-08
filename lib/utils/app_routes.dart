@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../screens/CommonScreens/Factory/factory_screen.dart';
 import '../screens/CommonScreens/Notification/notification_screen.dart';
 import '../screens/CommonScreens/Profile/profile_screen.dart';
 import '../screens/CommonScreens/Report/report_screen.dart';
@@ -13,6 +12,7 @@ import '../screens/CommonScreens/BillingCommonScreen/billing_screen.dart';
 import '../screens/SubUser/DetailsPage/after_qc_detail_page.dart';
 import '../screens/SubUser/DetailsPage/delivery_qc_detail_page.dart';
 import '../screens/SubUser/Delivery/delivery_qc_page.dart';
+import '../screens/SubUser/Factory/factory_screen.dart';
 import '../screens/SubUser/LoadingProducts/loading_product_screen.dart';
 import '../screens/SubUser/QualityCheck/quality_check_submit_page.dart';
 import '../screens/SubUser/WeightConfirmationPage/weight_confirmation_page.dart';
@@ -145,7 +145,6 @@ class AppRoutes {
         final args = settings.arguments as Map?;
         return _buildPageRoute(
           ReportScreen(
-            reportData: args?['reportData'],
             isSuperUser: args?['isSuperUser'] ?? false,
           ),
           settings,

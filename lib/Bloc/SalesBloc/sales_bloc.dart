@@ -55,6 +55,47 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
       }
     });
 
+    on<GetAllSalesLeadsSubUserEvent>((event, emit) async {
+      emit(SalesLoading());
+
+      try {
+        final token = PrefUtils.getToken();
+        var queryParams = <String, String>{};
+        if (event.page != null) queryParams['page'] = event.page.toString();
+        if (event.limit != null) queryParams['limit'] = event.limit.toString();
+        if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromDate'] = event.fromDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
+        // Build final URI safely
+        developer.log('🧾 Query Params: $queryParams');
+
+        final url = ApiConstants.baseUrl + ApiConstants.getAllSalesLeadsForSubUser;
+        final uri = Uri.parse(
+          url,
+        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+        developer.log('response: ${response.body}');
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          emit(SalesSuccess(data));
+        } else {
+          emit(SalesError('Failed to fetch sales leads. Status: ${response.statusCode}'));
+        }
+      } catch (e) {
+        developer.log('catchError : ${e.toString()}');
+        emit(SalesError('Oops! Something went wrong. Please try again later.'));
+      }
+    });
+
     on<CreateSalesLeadEvent>((event, emit) async {
       emit(SalesLoading());
       try {
@@ -65,11 +106,12 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
           "phoneno": event.phoneNo,
           "address": event.address,
           "city": event.city,
-          "factoryname": event.factoryId,
-          "finalQCItems": event.finalQCItems,
+          "factory": event.factoryId,
+          "items": event.finalQCItems,
         });
 
         developer.log('Creating Sales Lead with body: $body');
+        developer.log('Creating Sales Lead with url: $url');
 
         final response = await http.post(
           Uri.parse(url),
@@ -93,5 +135,52 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
         emit(SalesError('Something went wrong while creating sales lead.'));
       }
     });
+
+    on<GetSalesReportEvent>((event, emit) async {
+      emit(SalesLoading());
+      try {
+        final token = PrefUtils.getToken();
+
+        final url = ApiConstants.baseUrl + '/api/saleslead/report';
+        var queryParams = <String, String>{};
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) {
+          queryParams['fromDate'] = event.fromDate!;
+        }
+        if (event.toDate != null && event.toDate!.isNotEmpty) {
+          queryParams['toDate'] = event.toDate!;
+        }
+        if (event.factory != null && event.factory!.isNotEmpty) {
+          queryParams['factoryname'] = event.factory!;
+        }
+
+        final uri = Uri.parse(url).replace(
+          queryParameters: queryParams.isEmpty ? null : queryParams,
+        );
+
+        developer.log('📊 Sales Report URI: $uri');
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          emit(SalesReportSuccess(data));
+        } else {
+          emit(SalesError('Failed to fetch sales report. Status: ${response.statusCode}'));
+        }
+      } catch (e) {
+        developer.log('SalesReportError: ${e.toString()}');
+        emit(SalesError('Something went wrong while fetching sales report.'));
+      }
+    });
+
+
+
   }
 }

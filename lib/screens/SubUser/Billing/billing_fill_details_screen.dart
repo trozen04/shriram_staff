@@ -1,10 +1,10 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/utils/app_colors.dart';
 import 'package:shree_ram_staff/utils/flutter_font_styles.dart';
 import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
 import 'package:shree_ram_staff/widgets/reusable_functions.dart';
 import 'package:shree_ram_staff/Constants/app_dimensions.dart';
-
 import '../../../utils/app_routes.dart';
 import '../../../widgets/custom_text_form_field.dart';
 import '../../../widgets/primary_and_outlined_button.dart';
@@ -26,23 +26,65 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
 
   final List<String> paddyTypes = ['Basmati', 'Sona Masoori', 'IR64'];
 
-  /// dynamic paddy entries: each item = {type, weightController, amountController}
   final List<Map<String, dynamic>> paddyEntries = [];
-
-  /// dynamic deductions: each item = {label, controller}
   final List<Map<String, dynamic>> deductions = [];
 
   @override
   void initState() {
     super.initState();
-    // start with one default paddy entry
     _addPaddyEntry();
+
+    // Listeners for labor and brokerage
+    laborChargeController.addListener(_calculateTotalAmount);
+    brokerageController.addListener(_calculateTotalAmount);
+  }
+
+  @override
+  void dispose() {
+    finalWeightController.dispose();
+    laborChargeController.dispose();
+    brokerageController.dispose();
+    totalAmountController.dispose();
+    for (var paddy in paddyEntries) {
+      paddy['weightController'].dispose();
+      paddy['amountController'].dispose();
+      paddy['priceController'].dispose();
+      paddy['bagsController'].dispose();
+    }
+    for (var deduction in deductions) {
+      deduction['controller'].dispose();
+    }
+    super.dispose();
+  }
+
+  // ====== CALCULATE TOTAL ======
+  void _calculateTotalAmount() {
+    double totalPaddyAmount = 0;
+
+    for (var paddy in paddyEntries) {
+      double weight = double.tryParse(paddy['weightController'].text) ?? 0;
+      double price = double.tryParse(paddy['priceController'].text) ?? 0;
+      totalPaddyAmount += weight * price;
+    }
+
+    double laborCharge = double.tryParse(laborChargeController.text) ?? 0;
+    double brokerage = double.tryParse(brokerageController.text) ?? 0;
+
+    double totalDeductions = 0;
+    for (var deduction in deductions) {
+      totalDeductions += double.tryParse(deduction['controller'].text) ?? 0;
+    }
+
+    double finalAmount = totalPaddyAmount - (laborCharge + brokerage + totalDeductions);
+
+    totalAmountController.text = finalAmount.toStringAsFixed(2);
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    developer.log('billingData: ${widget.billingData}');
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -56,11 +98,10 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === BASIC INFO ===
               const ProfileRow(label: 'Unit ID', value: '#221212'),
               const ProfileRow(label: 'Name', value: 'Ramesh Yadav'),
               const ProfileRow(label: 'Broker', value: 'Rahul'),
-              const ProfileRow(label: 'Initial Weight', value: '511 Qntl'),
+              const ProfileRow(label: 'Initial Weight', value: '511'),
 
               AppDimensions.h10(context),
               Text('Final Weight', style: AppTextStyles.label),
@@ -68,19 +109,17 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               CustomTextFormField(
                 controller: finalWeightController,
                 hintText: 'Enter Final weight',
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Final weight is required'
-                    : null,
+                validator: (value) =>
+                value == null || value.isEmpty ? 'Final weight is required' : null,
               ),
 
               AppDimensions.h10(context),
-              const ProfileRow(label: 'Net Weight', value: '112 Qntl'),
+              const ProfileRow(label: 'Net Weight', value: '112'),
               AppDimensions.h20(context),
 
               _buildSectionTitle('Enter Billing Details'),
               AppDimensions.h10(context),
 
-              // === Dynamic Paddy Entries ===
               ..._buildPaddyEntries(),
 
               AppDimensions.h20(context),
@@ -92,7 +131,6 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               CustomTextFormField(
                 controller: laborChargeController,
                 hintText: 'Labor Charge',
-                isReadOnly: true,
               ),
 
               AppDimensions.h10(context),
@@ -101,10 +139,8 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               CustomTextFormField(
                 controller: brokerageController,
                 hintText: 'Brokerage',
-                isReadOnly: true,
               ),
 
-              // === Dynamic Deductions ===
               ..._buildDynamicDeductions(),
 
               AppDimensions.h10(context),
@@ -129,6 +165,7 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               PrimaryButton(
                 text: 'Submit',
                 onPressed: () {
+                  // Add API call or navigation here
                   Navigator.pushNamed(
                     context,
                     AppRoutes.billingDetailsScreen,
@@ -144,29 +181,48 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
     );
   }
 
-  // --- SECTION TITLE ---
   Widget _buildSectionTitle(String title) =>
       Text(title, style: AppTextStyles.appbarTitle);
 
-  // --- ADD NEW PADDY ENTRY ---
+  // ====== PADDY ENTRIES ======
   void _addPaddyEntry() {
+    final weightController = TextEditingController();
+    final priceController = TextEditingController(text: '10');
+    final bagsController = TextEditingController(text: '0');
+    final amountController = TextEditingController();
+
+    void calculateAmount() {
+      double weight = double.tryParse(weightController.text) ?? 0;
+      double price = double.tryParse(priceController.text) ?? 0;
+      amountController.text = (weight * price).toStringAsFixed(2);
+      _calculateTotalAmount();
+    }
+
+    weightController.addListener(calculateAmount);
+    priceController.addListener(calculateAmount);
+
     setState(() {
       paddyEntries.add({
         'type': null,
-        'weightController': TextEditingController(),
-        'amountController': TextEditingController(),
+        'weightController': weightController,
+        'priceController': priceController,
+        'bagsController': bagsController,
+        'amountController': amountController,
       });
     });
   }
 
-  // --- REMOVE PADDY ENTRY ---
   void _removePaddyEntry(int index) {
     setState(() {
+      paddyEntries[index]['weightController'].dispose();
+      paddyEntries[index]['amountController'].dispose();
+      paddyEntries[index]['priceController'].dispose();
+      paddyEntries[index]['bagsController'].dispose();
       paddyEntries.removeAt(index);
     });
+    _calculateTotalAmount();
   }
 
-  // --- BUILD PADDY ENTRY WIDGETS ---
   List<Widget> _buildPaddyEntries() {
     return paddyEntries.asMap().entries.map((entry) {
       int index = entry.key;
@@ -181,25 +237,18 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Paddy Type ${index + 1}', style: AppTextStyles.label),
-                AppDimensions.h5(context),
                 if (index == paddyEntries.length - 1)
                   Row(
                     children: [
                       InkWell(
                         onTap: _addPaddyEntry,
-                        child: Text(
-                          'Add another type',
-                          style: AppTextStyles.underlineText,
-                        ),
+                        child: Text('Add another type', style: AppTextStyles.underlineText),
                       ),
                       AppDimensions.w10(context),
                       if (paddyEntries.length > 1)
                         IconButton(
                           onPressed: () => _removePaddyEntry(index),
-                          icon: const Icon(
-                            Icons.remove_circle,
-                            color: Colors.redAccent,
-                          ),
+                          icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
                         ),
                     ],
                   ),
@@ -212,11 +261,29 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               },
             ),
             AppDimensions.h10(context),
-            Text('Weight', style: AppTextStyles.label),
-            AppDimensions.h5(context),
-            CustomTextFormField(
-              controller: paddy['weightController'],
-              hintText: 'Enter weight',
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextFormField(
+                    controller: paddy['weightController'],
+                    hintText: 'Weight',
+                  ),
+                ),
+                AppDimensions.w10(context),
+                Expanded(
+                  child: CustomTextFormField(
+                    controller: paddy['bagsController'],
+                    hintText: 'Bags',
+                  ),
+                ),
+                AppDimensions.w10(context),
+                Expanded(
+                  child: CustomTextFormField(
+                    controller: paddy['priceController'],
+                    hintText: 'Price',
+                  ),
+                ),
+              ],
             ),
             AppDimensions.h10(context),
             Text('Amount', style: AppTextStyles.label),
@@ -232,7 +299,6 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
     }).toList();
   }
 
-  // --- REUSABLE DROPDOWN ---
   Widget _buildDropdown({
     String? selectedValue,
     required ValueChanged<String?> onChanged,
@@ -246,16 +312,16 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          icon: Icon(Icons.keyboard_arrow_down_outlined),
+          icon: const Icon(Icons.keyboard_arrow_down_outlined),
           value: selectedValue,
           hint: Text('Select Paddy Type', style: AppTextStyles.hintText),
           items: paddyTypes
               .map(
                 (type) => DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type, style: AppTextStyles.hintText),
-                ),
-              )
+              value: type,
+              child: Text(type, style: AppTextStyles.hintText),
+            ),
+          )
               .toList(),
           onChanged: onChanged,
         ),
@@ -263,24 +329,27 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
     );
   }
 
-  // --- ADD NEW DEDUCTION FIELD ---
+  // ====== DEDUCTIONS ======
   void _addDeductionField() {
+    final controller = TextEditingController();
+    controller.addListener(_calculateTotalAmount);
+
     setState(() {
       deductions.add({
         'label': 'Deduction ${deductions.length + 1}',
-        'controller': TextEditingController(),
+        'controller': controller,
       });
     });
   }
 
-  // --- REMOVE DEDUCTION FIELD ---
   void _removeDeduction(int index) {
     setState(() {
+      deductions[index]['controller'].dispose();
       deductions.removeAt(index);
     });
+    _calculateTotalAmount();
   }
 
-  // --- BUILD DEDUCTIONS ---
   List<Widget> _buildDynamicDeductions() {
     return deductions.asMap().entries.map((entry) {
       int index = entry.key;

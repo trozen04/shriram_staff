@@ -16,3 +16,11 @@ class CreateSalaryEvent extends SalaryEvent {
     required this.totalPresent,
   });
 }
+
+class FetchSalaryEvent extends SalaryEvent {
+  final String fromDate;
+  final String toDate;
+  final String? factoryName;
+
+  FetchSalaryEvent({required this.fromDate, required this.toDate, this.factoryName});
+}

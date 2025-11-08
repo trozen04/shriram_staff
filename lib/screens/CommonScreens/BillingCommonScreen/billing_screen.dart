@@ -213,73 +213,77 @@ class _BillingScreenState extends State<BillingScreen> {
                 // 📅 Date picker + Filter + Factory
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      CustomIconButton(
-                        text: formatDateRange(selectedDateRange),
-                        imagePath: ImageAssets.calender,
-                        width: width,
-                        height: height,
-                        onTap: _pickDate,
-                      ),
-                      if (widget.isSuperUser == true) ...[
-                        SizedBox(width: width * 0.045),
-                        isLoadingFactory
-                            ? const SizedBox(
-                          height: 30,
-                          width: 30,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                            : Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: width * 0.03,
-                            vertical: height * 0.00,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.16),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedFactoryId,
-                              hint: Row(
-                                children: [
-                                  Image.asset(
-                                    ImageAssets.factoryPNG,
-                                    height: 18,
-                                    width: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text("Factory",
-                                      style: AppTextStyles.bodyText),
-                                ],
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: width - width * 0.07),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomIconButton(
+                          text: formatDateRange(selectedDateRange),
+                          imagePath: ImageAssets.calender,
+                          width: width,
+                          height: height,
+                          onTap: _pickDate,
+                        ),
+                        if (widget.isSuperUser == true) ...[
+                          SizedBox(width: width * 0.045),
+                          isLoadingFactory
+                              ? const SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                              : Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: width * 0.03,
+                              vertical: height * 0.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.16),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedFactoryId,
+                                hint: Row(
+                                  children: [
+                                    Image.asset(
+                                      ImageAssets.factoryPNG,
+                                      height: 18,
+                                      width: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text("Factory", style: AppTextStyles.bodyText),
+                                  ],
+                                ),
+                                items: factoryList.map((factory) {
+                                  return DropdownMenuItem<String>(
+                                    value: factory['_id'],
+                                    child: Text(factory['name'] ?? '-',
+                                        style: AppTextStyles.hintText),
+                                  );
+                                }).toList(),
+                                onChanged: (val) {
+                                  setState(() => _selectedFactoryId = val);
+                                  _fetchBilling(refresh: true);
+                                },
+                                icon: const Icon(Icons.arrow_drop_down_rounded),
                               ),
-                              items: factoryList.map((factory) {
-                                return DropdownMenuItem<String>(
-                                  value: factory['_id'],
-                                  child: Text(factory['name'] ?? '-',
-                                      style: AppTextStyles.hintText),
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                setState(() => _selectedFactoryId = val);
-                                _fetchBilling(refresh: true);
-                              },
-                              icon: const Icon(Icons.arrow_drop_down_rounded),
                             ),
                           ),
+                        ],
+                        SizedBox(width: width * 0.045),
+                        CustomIconButton(
+                          text: 'Filter',
+                          iconData: Icons.tune,
+                          onTap: _filter,
+                          showIconOnRight: true,
                         ),
                       ],
-                      SizedBox(width: width * 0.045),
-                      CustomIconButton(
-                        text: 'Filter',
-                        iconData: Icons.tune,
-                        onTap: _filter,
-                        showIconOnRight: true,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
+
 
                 AppDimensions.h20(context),
 
@@ -317,27 +321,27 @@ class _BillingScreenState extends State<BillingScreen> {
                           height: height,
                           width: width,
                           onPressed: () {
-                            String status = data['billing']?.toString() ?? '';
+                            // final String status = data['billing']?.toString().toLowerCase() ?? '';
+                            //
+                            // if (status.contains('pending')) {
+                            //   // Pending status → Pending screen
+                            //   final route = widget.isSuperUser!
+                            //       ? AppRoutes.billingFillDetailsSuperUser // SuperUser Pending
+                            //       : AppRoutes.billingFillDetailsScreen;   // Normal Pending
+                            //
+                            //   Navigator.pushNamed(context, route, arguments: data).then((value) {
+                            //     if (value == true) _fetchBilling(refresh: true);
+                            //   });
+                            // }
+                            final route = widget.isSuperUser!
+                                ? AppRoutes.billingFillDetailsSuperUser // SuperUser Pending
+                                : AppRoutes.billingFillDetailsScreen;   // Normal Pending
 
-                            String route;
-
-                            if (status.toLowerCase().contains('pending')) {
-                              // Pending status → Pending screen
-                              route = widget.isSuperUser!
-                                  ? AppRoutes.billingFillDetailsSuperUser // SuperUser Pending
-                                  : AppRoutes.billingFillDetailsSuperUser;       // Normal Pending
-                            } else {
-                              // Other statuses → Completed/Approved screen
-                              route = widget.isSuperUser!
-                                  ? AppRoutes.billingDetailScreenSuperUser // SuperUser Completed
-                                  : AppRoutes.billingDetailScreenSuperUser;   // Normal Completed
-                            }
-
-                            Navigator.pushNamed(context, route, arguments: data)
-                                .then((value) {
+                            Navigator.pushNamed(context, route, arguments: data).then((value) {
                               if (value == true) _fetchBilling(refresh: true);
                             });
                           },
+
 
                           isSuperUser: widget.isSuperUser ?? false,
                         ),

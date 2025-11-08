@@ -74,11 +74,12 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
         developer.log('Create Subuser API userToken: $userToken');
         final body = {
           "name": event.name,
-          "mobileno": event.mobileNo,
+          "email": event.email,
+          "mobileno": event.phone,
           "role": event.role,
           "authority": event.authority,
           "salary": event.salary,
-          "factoryname": event.factoryId,
+          "factory": event.factoryId,
           "address": event.address,
           "password": event.password,
           "confirmPassword": event.confirmPassword,

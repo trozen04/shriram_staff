@@ -17,7 +17,8 @@ class SubUsersFetchEvent extends SubusersEvent {
 /// Create new subuser
 final class SubusersCreateEvent extends SubusersEvent {
   final String name;
-  final String mobileNo;
+  final String email;
+  final String phone;
   final String role;
   final String authority;
   final String salary;
@@ -28,7 +29,8 @@ final class SubusersCreateEvent extends SubusersEvent {
 
   SubusersCreateEvent({
     required this.name,
-    required this.mobileNo,
+    required this.email,
+    required this.phone,
     required this.role,
     required this.authority,
     required this.salary,

@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:open_filex/open_filex.dart';
 
 Future<void> generateBillingPdfToDevice(
-  List<Map<String, String>> billingDetails,
+  final billingDetails,
 ) async {
   // ✅ Request storage permission (Android 11+)
   if (!await Permission.manageExternalStorage.isGranted) {
@@ -48,9 +48,9 @@ Future<void> generateBillingPdfToDevice(
             pw.Text('Unit ID: #221212'),
             pw.Text('Name: Ramesh Yadav'),
             pw.Text('Broker: Rahul'),
-            pw.Text('Initial Weight: 511 Qntl'),
-            pw.Text('Final Weight: 511 Qntl'),
-            pw.Text('Net Weight: 112 Qntl'),
+            pw.Text('Initial Weight: 511'),
+            pw.Text('Final Weight: 511'),
+            pw.Text('Net Weight: 112'),
 
             pw.SizedBox(height: 20),
             pw.Text(

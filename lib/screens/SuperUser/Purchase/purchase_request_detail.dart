@@ -24,7 +24,6 @@ class _PurchaseRequestDetailState extends State<PurchaseRequestDetail> {
     final data = widget.purchaseData;
     developer.log('data: ${widget.purchaseData}');
 
-    final purchase = data['purchaseId'] ?? {};
     final broker = data['brokerId'] ?? {};
 
     double height = MediaQuery.of(context).size.height;
@@ -45,7 +44,7 @@ class _PurchaseRequestDetailState extends State<PurchaseRequestDetail> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: purchase['name'] ?? 'Purchase Detail',
+        title: data['name'] ?? 'Purchase Detail',
         preferredHeight: height * 0.12,
       ),
       body: Padding(
@@ -78,18 +77,18 @@ class _PurchaseRequestDetailState extends State<PurchaseRequestDetail> {
   child: SingleChildScrollView(
           child: Column(
             children: [
-              ProfileRow(label: 'Farmer Name', value: purchase['name'] ?? '~'),
+              ProfileRow(label: 'Farmer Name', value: data['name'] ?? '~'),
               ProfileRow(label: 'Broker Name', value: broker['name'] ?? '~'),
-              ProfileRow(label: 'Paddy Type', value: purchase['paddytype'] ?? '~'),
+              ProfileRow(label: 'Paddy Type', value: data['paddytype'] ?? '~'),
               ProfileRow(
                   label: 'Quantity',
-                  value: purchase['quantity'] != null
-                      ? '${purchase['quantity']} Qntl'
+                  value: data['quantity'] != null
+                      ? '${data['quantity']}'
                       : '~'),
-              ProfileRow(label: 'Address', value: purchase['address'] ?? '~'),
-              ProfileRow(label: 'City/Town', value: purchase['city'] ?? '~'),
-              ProfileRow(label: 'Factory', value: data['factory'] ?? '~'),
-              ProfileRow(label: 'Delivery Date', value: formatDate(data['deliverydate'])),
+              ProfileRow(label: 'Address', value: data['address'] ?? '~'),
+              ProfileRow(label: 'City/Town', value: data['city'] ?? '~'),
+              ProfileRow(label: 'Factory', value: data['factoryname'] ?? '~'),
+              ProfileRow(label: 'Delivery Date', value: formatDate(data['date'])),
               AppDimensions.h30(context),
 
               // Optional Approve/Reject buttons
@@ -99,7 +98,7 @@ class _PurchaseRequestDetailState extends State<PurchaseRequestDetail> {
                   onPressed: () {
                     context.read<PurchaseRequestBloc>().add(
                       ApproveRejectPurchaseEvent(
-                        purchaseId: widget.purchaseData['_id'],
+                        purchaseId: data['_id'],
                         status: 'Approve',
                       ),
                     );
@@ -111,7 +110,7 @@ class _PurchaseRequestDetailState extends State<PurchaseRequestDetail> {
                   onPressed: () {
                     context.read<PurchaseRequestBloc>().add(
                       ApproveRejectPurchaseEvent(
-                        purchaseId: widget.purchaseData['_id'],
+                        purchaseId: data['_id'],
                         status: 'Cancel',
                       ),
                     );

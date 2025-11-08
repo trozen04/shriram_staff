@@ -5,10 +5,10 @@ sealed class AuthEvent {}
 
 /// LOGIN EVENT
 final class LoginRequestEventHandler extends AuthEvent {
-  final String phone;
+  final String email;
   final String password;
 
-  LoginRequestEventHandler({required this.phone, required this.password});
+  LoginRequestEventHandler({required this.email, required this.password});
 }
 
 
