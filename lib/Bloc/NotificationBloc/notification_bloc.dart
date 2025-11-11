@@ -18,8 +18,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         emit(NotificationLoading());
 
         final url = ApiConstants.baseUrl + ApiConstants.getAllNotification;
-        //final userToken = PrefUtils.getToken();
-        final userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGY0MmMzNzljY2M4NDhjMGM5YWMzMCIsImVtYWlsIjoiYW1hbkBnbWFpbC5jb20iLCJyb2xlIjoic3VidXNlciIsImlhdCI6MTc2Mjc2NzcxMCwiZXhwIjoxNzYzNjMxNzEwfQ.Sx1ZAIo0-g055EfXbHMwvFsLwK7aV4BteR5TmPwymm0';
+        final userToken = PrefUtils.getToken();
+        //final userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGY0MmMzNzljY2M4NDhjMGM5YWMzMCIsImVtYWlsIjoiYW1hbkBnbWFpbC5jb20iLCJyb2xlIjoic3VidXNlciIsImlhdCI6MTc2Mjc2NzcxMCwiZXhwIjoxNzYzNjMxNzEwfQ.Sx1ZAIo0-g055EfXbHMwvFsLwK7aV4BteR5TmPwymm0';
 
         developer.log('🔔 Fetch Notifications API: $url');
         developer.log('🔑 Token: $userToken');
