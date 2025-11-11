@@ -50,8 +50,8 @@ class DeliveryQcDetailPage extends StatelessWidget {
     final String huskIn = getNestedValue(userData, ['huskin']);
     final String discolor = getNestedValue(userData, ['discolor']);
     final String status = isQcPage
-        ? getNestedValue(userData, ['status'])
-        : getNestedValue(userData, ['purchaseId', 'status']);
+        ? getNestedValue(userData, ['transportId', 'status'])
+        : getNestedValue(userData, ['status']);
 
 
     /// ✅ Format unit id with max 6 digits
@@ -106,7 +106,7 @@ class DeliveryQcDetailPage extends StatelessWidget {
             AppDimensions.h30(context),
 
             /// ✅ Action Button
-            if (!isQcPage && status.toLowerCase().contains('QC-Check'))
+            if (!isQcPage && status.toLowerCase().contains('pending'))
               PrimaryButton(
                 text: 'Ready to Unload',
                 onPressed: () {
@@ -118,7 +118,7 @@ class DeliveryQcDetailPage extends StatelessWidget {
                 },
                 isLoading: false,
               ),
-            if (isQcPage && status.toLowerCase().contains('approve'))
+            if (isQcPage && status.toLowerCase().contains('qc-check'))
               PrimaryButton(
                 text: 'Start Final QC',
                 onPressed: () {

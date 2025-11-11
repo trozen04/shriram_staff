@@ -21,7 +21,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final uri = Uri.parse(ApiConstants.baseUrl + ApiConstants.getAllProduct);
 
         Map<String, String> queryParams = {};
-        if (event.fromDate != null) queryParams['fromDate'] = event.fromDate!;
+        if (event.fromDate != null) queryParams['fromdate'] = event.fromDate!;
         if (event.toDate != null) queryParams['toDate'] = event.toDate!;
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
 

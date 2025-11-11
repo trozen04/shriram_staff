@@ -149,6 +149,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               : null,
                           keyboardType: TextInputType.number,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Moisture %',
                           hint: 'Enter Moisture %',
@@ -158,6 +159,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               ? 'Please enter moisture %'
                               : null,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Rice (g)',
                           hint: 'Enter Rice Quantity',
@@ -167,6 +169,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               ? 'Please enter rice quantity'
                               : null,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Husk (g)',
                           hint: 'Enter Husk Quantity',
@@ -176,6 +179,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               ? 'Please enter husk quantity'
                               : null,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Discolor %',
                           hint: 'Enter Discolor %',
@@ -241,6 +245,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               : null,
                           keyboardType: TextInputType.number,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Discolor %',
                           hint: 'Enter Discolor %',
@@ -250,6 +255,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               ? 'Please enter discolor %'
                               : null,
                         ),
+                        AppDimensions.h10(context),
                         ReusableTextField(
                           label: 'Broken %',
                           hint: 'Enter Broken %',
@@ -259,6 +265,7 @@ class _QualityCheckSubmitPageState extends State<QualityCheckSubmitPage> {
                               ? 'Please enter broken %'
                               : null,
                         ),
+
                         if (index != riceGroups.length - 1) ...[
                           AppDimensions.h20(context),
                           const Divider(thickness: 1),

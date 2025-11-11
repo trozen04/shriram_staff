@@ -27,15 +27,18 @@ class ApiConstants {
   static String getSubUser = "/api/user/getsubuserbysuperuser";
 
   ///Notification
-  static String getAllNotification = "/api/notification/notification";
+  static String getAllNotification = "/api/notification/getallnotification";
+  static String markNotificationAsRead = "/api/notification/marknotificationasread";
 
   ///Billing
   static String getBillingData = "/api/billing/getallbilling";
   static String generateBilling = "/api/billing/generate";
+  static String getBillingDetails = "/api/billing/getdetails";
 
   ///Sales
   static String getAllSalesLeadsForSuperUser = "/api/saleslead/getallsalesleads";
-  static String getAllSalesLeadsForSubUser = "api/saleslead/getleadstosubuser";
+  static String getAllSalesLeadsForSubUser = "/api/saleslead/getleadstosubuser";
+  static String loadProducts = "/api/loading/upsert";
 
   ///Product
   static String getAllProduct = "/api/product/allproduct";

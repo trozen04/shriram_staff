@@ -30,3 +30,13 @@ class BillingGenerateErrorState extends BillingState {
 
   BillingGenerateErrorState({required this.message});
 }
+
+class BillingLoading extends BillingState {}
+class BillingDetailsSuccess extends BillingState {
+  final dynamic data;
+  BillingDetailsSuccess(this.data);
+}
+class BillingError extends BillingState {
+  final String message;
+  BillingError(this.message);
+}

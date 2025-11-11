@@ -45,7 +45,7 @@ class _WeightConfirmationPageState extends State<WeightConfirmationPage> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
+    developer.log('data: $data');
     return Scaffold(
       appBar: const ReusableAppBar(title: 'Delivery & Initial QC'),
       body: BlocListener<QcBloc, QcState>(

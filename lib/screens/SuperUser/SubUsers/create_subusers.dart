@@ -38,7 +38,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
   bool isLoading = false;
 
   List<Map<String, String>> factoryList = [];
-  final List<String> authorities = ['Select Authority', 'Full', 'Limited'];
+  final List<String> authorities = ['Select Authority', 'SubUser'];
 
   @override
   void initState() {
@@ -114,21 +114,33 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                 setState(() => isLoading = false);
               }
               if (state is FactorySuccessState) {
-                factoryList = (state.factoryData['data'] as List)
-                    .map(
-                      (e) => {
-                        '_id': e['_id'].toString(),
-                        'name': e['factoryname'].toString(),
-                      },
-                    )
-                    .toList();
+                // Original list from API
+                final List factories = state.factoryData['data'] ?? [];
 
+                // Use a Set to track unique names
+                final Set<String> uniqueNames = {};
+                factoryList = [];
+
+                for (var e in factories) {
+                  final name = e['factoryname']?.toString() ?? '';
+                  if (!uniqueNames.contains(name)) {
+                    uniqueNames.add(name);
+                    factoryList.add({
+                      '_id': e['_id'].toString(),
+                      'name': name,
+                    });
+                  }
+                }
+
+                // Set first factory as default (if any)
                 if (factoryList.isNotEmpty) {
                   _selectedFactory = factoryList.first['name'];
                   _selectedFactoryId = factoryList.first['_id'];
                 }
+
                 setState(() {});
               }
+
               if (state is FactoryErrorState) {
                 developer.log('FactoryErrorState: ${state.message}');
                 CustomSnackBar.show(
@@ -168,6 +180,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                         label: 'Phone',
                         hint: 'Enter phone',
                         controller: _phoneController,
+                        keyboardType: TextInputType.phone,
                         validator: (val) =>
                         val == null || val.isEmpty ? 'Enter phone' : null,
                       ),

@@ -70,18 +70,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                           height: screenWidth * 0.09,
                         ),
                         SizedBox(width: screenWidth * 0.03),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(PrefUtils.getUserName(), style: AppTextStyles.appbarName),
-                            Text('Worker', style: AppTextStyles.appbarWork),
-                          ],
+                        SizedBox(
+                          width: screenWidth * 0.5,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(PrefUtils.getUserName(), style: AppTextStyles.appbarName, maxLines: 2,),
+                              Text('Worker', style: AppTextStyles.appbarWork),
+                            ],
+                          ),
                         ),
                       ],
                     ),
 
                     Row(
                       children: [
+                        if(!superUser!)
                         InkWell(
                           onTap: () {
                             Navigator.pushNamed(

@@ -74,13 +74,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildProfileRow('Name', profileData!['name']),
-              _buildProfileRow('Mobile', profileData!['mobileno']),
+              _buildProfileRow('Email', profileData!['email']),
               _buildProfileRow('Address', profileData!['address']),
               _buildProfileRow('Role', profileData!['role']),
               _buildProfileRow('Authority', profileData!['authority']),
               if(!widget.isSuperUser)
-              _buildProfileRow('Factory', profileData!['factory']),
-
+                _buildProfileRow(
+                  'Factory',
+                  profileData?['factory'] != null
+                      ? (profileData!['factory']['factoryname'] ?? 'N/A')
+                      : 'N/A',
+                ),
               AppDimensions.h30(context),
               PrimaryButton(
                 text: 'Logout',
@@ -92,6 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     confirmText: "Logout",
                     cancelText: "Cancel",
                     confirmColor: AppColors.logoutColor,
+                    cancelColor: AppColors.primaryColor
                   );
 
                   if (confirm) {

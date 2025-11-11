@@ -26,7 +26,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _getReportData(); // initial API call
+    final bloc = context.read<SalesBloc>();
+
+    if (bloc.lastReportData == null) { // <- store last fetched data in Bloc
+      _getReportData(); // only fetch if no cached data
+    } else {
+      reportData = bloc.lastReportData!; // restore cached data
+    }
   }
 
   void _pickDate() async {
@@ -85,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'stockLeft': "${item['leftStock'] ?? 0}",
                 };
               }).toList();
-              developer.log("✅ Parsed Report Data: $reportData");
+             // developer.log("✅ Parsed Report Data: $reportData");
             });
           } else if (state is SalesError) {
             setState(() => isLoading = false);

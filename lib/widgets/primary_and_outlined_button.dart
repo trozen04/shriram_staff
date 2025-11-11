@@ -9,6 +9,7 @@ class PrimaryButton extends StatelessWidget {
   final bool isLoading;
   final bool isLogout;
   final bool? isLogoutText;
+  final Color? buttonColor; // new optional color
 
   const PrimaryButton({
     super.key,
@@ -17,19 +18,20 @@ class PrimaryButton extends StatelessWidget {
     this.isLoading = false,
     this.isLogout = false,
     this.isLogoutText = false,
+    this.buttonColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final Color bgColor = buttonColor ?? (isLogout ? AppColors.logoutColor : AppColors.primaryColor);
+
     return SizedBox(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.06,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isLogout
-              ? AppColors.logoutColor
-              : AppColors.primaryColor,
+          backgroundColor: bgColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
@@ -37,26 +39,26 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: isLoading
             ? const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              )
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        )
             : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (isLogout && !isLogoutText!) ...[
-                    Image.asset(
-                      ImageAssets.logoutImage,
-                      height: MediaQuery.of(context).size.height * 0.035,
-                    ),
-                    SizedBox(width: 4),
-                  ],
-                  Text(
-                    text,
-                    style: AppTextStyles.buttonText,
-                    overflow: TextOverflow.ellipsis, // optional
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLogout && !isLogoutText!) ...[
+              Image.asset(
+                ImageAssets.logoutImage,
+                height: MediaQuery.of(context).size.height * 0.035,
               ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              text,
+              style: AppTextStyles.buttonText,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

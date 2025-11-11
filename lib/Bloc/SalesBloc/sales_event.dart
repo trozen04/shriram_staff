@@ -34,6 +34,7 @@ class GetAllSalesLeadsSubUserEvent extends SalesEvent {
   String? fromDate;
   String? toDate;
   String? status;
+  bool isSuperUser;
 
   GetAllSalesLeadsSubUserEvent({
     this.page,
@@ -42,11 +43,9 @@ class GetAllSalesLeadsSubUserEvent extends SalesEvent {
     this.fromDate,
     this.toDate,
     this.status,
+    required this.isSuperUser,
   });
 }
-
-
-
 
 class CreateSalesLeadEvent extends SalesEvent {
   final String customerName;
@@ -66,7 +65,6 @@ class CreateSalesLeadEvent extends SalesEvent {
   });
 }
 
-
 // 🆕 Add this new event for report fetching
 class GetSalesReportEvent extends SalesEvent {
   final String? fromDate;
@@ -74,4 +72,41 @@ class GetSalesReportEvent extends SalesEvent {
   final String? factory;
 
   GetSalesReportEvent({this.fromDate, this.toDate, this.factory});
+}
+
+class UpsertLoadingEvent extends SalesEvent {
+  final String salesLeadId;
+  final String driverName;
+  final String phoneNo;
+  final String ownerName;
+  final String ownerPhoneNo;
+  final String? initialWeight; // optional
+  final String? finalWeight;   // optional
+  final bool? isSave;   // optional
+
+  final File? adharCard;
+  final File? driverLicence;
+  final File? vehicleRC;
+  final File? deliveryProof;
+
+  UpsertLoadingEvent({
+    required this.salesLeadId,
+    required this.driverName,
+    required this.phoneNo,
+    required this.ownerName,
+    required this.ownerPhoneNo,
+    this.initialWeight,
+    this.isSave = false,
+    this.finalWeight,
+    this.adharCard,
+    this.driverLicence,
+    this.vehicleRC,
+    this.deliveryProof,
+  });
+}
+
+class AcceptSalesLeadEvent extends SalesEvent {
+  final String leadId;
+
+  AcceptSalesLeadEvent({required this.leadId});
 }

@@ -155,8 +155,8 @@ class _BillingFillDetailsSuperUserState
   }
 
   void _saveBillingItem(int index) {
-    final map   = billingItems[index];
-    final id    = map['itemId']?.toString() ?? '';
+    final map = billingItems[index];
+    final id  = map['itemId']?.toString() ?? '';
     final name  = map['itemName']?.toString() ?? '';
     final weight = double.tryParse(weightControllers[index].text) ?? 0;
     final bags   = bagsControllers[index].text.trim();

@@ -102,6 +102,7 @@ class _SalesScreenState extends State<SalesScreen> {
     } else {
       context.read<SalesBloc>().add(
         GetAllSalesLeadsSubUserEvent(
+          isSuperUser: widget.isSuperUser ?? false,
           page: currentPage,
           limit: limit,
           search: searchController.text.trim().isEmpty
@@ -166,7 +167,7 @@ class _SalesScreenState extends State<SalesScreen> {
             }
 
             if (state is SalesSuccess) {
-              developer.log("✅ Sales Success: ${state.responseData}");
+              //developer.log("✅ Sales Success: ${state.responseData}");
               final dataList = state.responseData['data'] ?? [];
               if (dataList.length < limit) hasMore = false;
               salesData.addAll(dataList);
@@ -177,6 +178,35 @@ class _SalesScreenState extends State<SalesScreen> {
             if (state is SalesError) {
               CustomSnackBar.show(context,
                   message: state.message, isError: true);
+            }
+
+
+          },
+        ),
+        BlocListener<SalesBloc, SalesState>(
+          listener: (context, state) {
+            if (state is AcceptSalesLeadLoading) {
+              setState(() => isLoading = true); // optional: show overlay
+            } else {
+              setState(() => isLoading = false);
+            }
+
+            if (state is AcceptSalesLeadSuccess) {
+              CustomSnackBar.show(
+                context,
+                message: "Sale accepted successfully",
+                isError: false,
+              );
+
+              _fetchSales(refresh: true);
+            }
+
+            if (state is AcceptSalesLeadError) {
+              CustomSnackBar.show(
+                context,
+                message: state.message,
+                isError: true,
+              );
             }
           },
         ),
@@ -221,114 +251,119 @@ class _SalesScreenState extends State<SalesScreen> {
           title: 'Sales',
           preferredHeight: height * 0.12,
         ),
-        body: RefreshIndicator(
-          onRefresh: () async => _fetchSales(refresh: true),
-          child: Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.035,
-                  vertical: height * 0.015,
-                ),
-                child: Column(
-                  children: [
-                    // 🔍 Search
-                    ReusableSearchField(
-                      controller: searchController,
-                      hintText: 'Search by Truck No./Farmer/Broker',
-                      onChanged: _onSearchChanged,
-                    ),
+        body: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: width * 0.035,
+                vertical: height * 0.015,
+              ),
+              child: Column(
+                children: [
+                  // 🔍 Search
+                  ReusableSearchField(
+                    controller: searchController,
+                    hintText: 'Search by Truck No./Farmer/Broker',
+                    onChanged: _onSearchChanged,
+                  ),
 
-                    AppDimensions.h20(context),
+                  AppDimensions.h20(context),
 
-                    // 📅 Filters Row
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minWidth: width - width * 0.07),
+                  // 📅 Filters Row
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: width - width * 0.07),
 
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomIconButton(
-                              text: formatDateRange(selectedDateRange),
-                              imagePath: ImageAssets.calender,
-                              width: width,
-                              height: height,
-                              onTap: _pickDate,
-                            ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomIconButton(
+                            text: formatDateRange(selectedDateRange),
+                            imagePath: ImageAssets.calender,
+                            width: width,
+                            height: height,
+                            onTap: _pickDate,
+                          ),
 
-                            // 🔹 Factory Filter (SuperUser only)
-                            if (widget.isSuperUser == true) ...[
-                              SizedBox(width: width * 0.045),
-                              isLoadingFactory
-                                  ? const SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                                  : Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: width * 0.03,
-                                  vertical: height * 0.00,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor.withOpacity(0.16),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: selectedFactoryId,
-                                    hint: Row(
-                                      children: [
-                                        Image.asset(
-                                          ImageAssets.factoryPNG,
-                                          height: 18,
-                                          width: 18,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text("Factory", style: AppTextStyles.bodyText),
-                                      ],
-                                    ),
-                                    items: factoryList.map((factory) {
-                                      final factoryName = factory['name'] ?? '';
-                                      return DropdownMenuItem<String>(
-                                        value: factoryName,
-                                        child: Text(factoryName, style: AppTextStyles.hintText),
-                                      );
-                                    }).toList(),
-                                    onChanged: (val) {
-                                      setState(() => selectedFactoryId = val);
-                                      _fetchSales(refresh: true);
-                                    },
-                                    icon: const Icon(Icons.arrow_drop_down_rounded),
-                                  ),
-                                ),
-
-                              ),
-                            ],
-
+                          // 🔹 Factory Filter (SuperUser only)
+                          if (widget.isSuperUser == true) ...[
                             SizedBox(width: width * 0.045),
+                            isLoadingFactory
+                                ? const SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                                : Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: width * 0.03,
+                                vertical: height * 0.00,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor.withOpacity(0.16),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: selectedFactoryId,
+                                  hint: Row(
+                                    children: [
+                                      Image.asset(
+                                        ImageAssets.factoryPNG,
+                                        height: 18,
+                                        width: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text("Factory", style: AppTextStyles.bodyText),
+                                    ],
+                                  ),
+                                  items: factoryList.map((factory) {
+                                    final factoryName = factory['name'] ?? '';
+                                    return DropdownMenuItem<String>(
+                                      value: factoryName,
+                                      child: Text(factoryName, style: AppTextStyles.hintText),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    setState(() => selectedFactoryId = val);
+                                    _fetchSales(refresh: true);
+                                  },
+                                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                                ),
+                              ),
 
-                            // 🔹 Status Filter Button
-                            CustomIconButton(
-                              text: 'Filter',
-                              iconData: Icons.tune,
-                              onTap: _filter,
-                              showIconOnRight: true,
                             ),
                           ],
-                        ),
+
+                          SizedBox(width: width * 0.045),
+
+                          // 🔹 Status Filter Button
+                          CustomIconButton(
+                            text: 'Filter',
+                            iconData: Icons.tune,
+                            onTap: _filter,
+                            showIconOnRight: true,
+                          ),
+                        ],
                       ),
                     ),
+                  ),
 
-                    AppDimensions.h20(context),
+                  AppDimensions.h20(context),
 
-                    // 🧾 Sales List
-                    Expanded(
+                  // 🧾 Sales List
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async => _fetchSales(refresh: true),
                       child: isLoading && salesData.isEmpty
-                          ? const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                          ? ListView(
+                        children: [
+                          SizedBox(
+                            height: height * 0.6, // fill space to allow pull
+                            child: Center(child: Text('No sales records found')),
+                          ),
+                        ],
                       )
                           : salesData.isEmpty
                           ? Center(
@@ -361,7 +396,8 @@ class _SalesScreenState extends State<SalesScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                developer.log('status: $status');
                                 if (widget.isSuperUser!) {
                                   Navigator.pushNamed(
                                     context,
@@ -369,13 +405,46 @@ class _SalesScreenState extends State<SalesScreen> {
                                     arguments: data,
                                   );
                                 } else {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.loadingProductScreen,
-                                    arguments: data,
-                                  );
+                                  if (status.contains('pending')) {
+                                    final confirmed = await CustomConfirmationDialog.show(
+                                      context: context,
+                                      title: "Pending Sale",
+                                      description: "Do you want to accept this sale?",
+                                      confirmText: "Accept",
+                                      cancelText: "Cancel",
+                                      confirmColor: AppColors.primaryColor,
+                                    );
+
+                                    if (confirmed) {
+                                      developer.log("Sale accepted: ${data['_id']}");
+                                      context.read<SalesBloc>().add(
+                                        AcceptSalesLeadEvent(leadId: data['_id']),
+                                      );
+                                    } else {
+                                      developer.log("Sale cancelled: ${data['_id']}");
+                                    }
+                                    // 🔹 Do NOT navigate to loading screen, keep logic as is
+                                  } else if(status.contains('accepted')) {
+                                    final result = await Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.loadingProductScreen,
+                                      arguments: data,
+                                    );
+
+                                    // 🔹 If LoadingProductScreen returns true, fetch sales again
+                                    if (result == true) {
+                                      _fetchSales(refresh: true);
+                                    }
+                                  } else {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.salesDetailScreen,
+                                      arguments: data,
+                                    );
+                                  }
                                 }
                               },
+
                               child: SalesCard(
                                 name: data['customername'] ?? '~',
                                 date: data['createdAt'] ?? '~',
@@ -383,7 +452,9 @@ class _SalesScreenState extends State<SalesScreen> {
                                 city: data['city'] ?? '~',
                                 height: height,
                                 width: width,
-                                staffName: data['staffname'] ?? '~',
+                                staffName: (data['acceptedBy'] != null && data['acceptedBy'] is Map && (data['acceptedBy']['name'] ?? '').toString().isNotEmpty)
+                                    ? data['acceptedBy']['name']
+                                    : '~',
                                 status: data['status'] ?? '',
                               ),
                             ),
@@ -391,26 +462,26 @@ class _SalesScreenState extends State<SalesScreen> {
                         },
                       ),
                     ),
+                  ),
 
-                  ],
-                ),
+                ],
               ),
-              if (widget.isSuperUser!)
-                CustomFAB(
-                  onTap: () async {
-                    final result = await Navigator.pushNamed(
-                      context,
-                      AppRoutes.createSalesLeadScreen,
-                    );
+            ),
+            if (widget.isSuperUser!)
+              CustomFAB(
+                onTap: () async {
+                  final result = await Navigator.pushNamed(
+                    context,
+                    AppRoutes.createSalesLeadScreen,
+                  );
 
-                    if (result == true) {
-                      _fetchSales(refresh: true);
-                    }
-                  },
-                ),
+                  if (result == true) {
+                    _fetchSales(refresh: true);
+                  }
+                },
+              ),
 
-            ],
-          ),
+          ],
         ),
       ),
     );

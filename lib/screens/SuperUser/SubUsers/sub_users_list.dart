@@ -262,6 +262,7 @@ class _SubUsersListState extends State<SubUsersList> {
                         date: data['createdAt'] ?? '~',
                         position: data['role'] ?? '~',
                         phone: data['mobileno'] ?? '~',
+                        email: data['email'] ?? '~',
                         qcType: data['authority'] ?? '~',
                        // factory: data?['factory']?['factoryname'] ?? '~',
                         height: height,

@@ -1,13 +1,15 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:shree_ram_staff/utils/app_colors.dart';
 import 'package:shree_ram_staff/utils/flutter_font_styles.dart';
 import 'package:shree_ram_staff/widgets/reusable_appbar.dart';
 import 'package:shree_ram_staff/widgets/reusable_functions.dart';
 import 'package:shree_ram_staff/Constants/app_dimensions.dart';
-import '../../../utils/app_routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../Bloc/BillingBloc/billing_bloc.dart';
+import '../../../Utils/app_routes.dart';
 import '../../../widgets/custom_text_form_field.dart';
 import '../../../widgets/primary_and_outlined_button.dart';
+import '../../../widgets/custom_snackbar.dart';
 
 class BillingFillDetailsScreen extends StatefulWidget {
   final dynamic billingData;
@@ -24,73 +26,197 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
   final TextEditingController brokerageController = TextEditingController();
   final TextEditingController totalAmountController = TextEditingController();
 
-  final List<String> paddyTypes = ['Basmati', 'Sona Masoori', 'IR64'];
-
-  final List<Map<String, dynamic>> paddyEntries = [];
+  late final dynamic currentBillingData;
+  bool isButtonLoading = false;
+  final List<Map<String, dynamic>> qcEntries = [];
   final List<Map<String, dynamic>> deductions = [];
+
+  List<String> availableQcTypes = [];
+  List<Map<String, dynamic>> allQcList = [];
+
+  bool showSavedCard = false;
+  double totalAmount = 0;
 
   @override
   void initState() {
     super.initState();
-    _addPaddyEntry();
+    currentBillingData = widget.billingData;
 
-    // Listeners for labor and brokerage
-    laborChargeController.addListener(_calculateTotalAmount);
-    brokerageController.addListener(_calculateTotalAmount);
+    allQcList = [
+      ...?currentBillingData['paddyQC'],
+      ...?currentBillingData['riceQC']
+    ];
+
+    availableQcTypes =
+        allQcList.map((qc) => qc['type'].toString()).toSet().toList();
+
+    finalWeightController.text =
+        currentBillingData?['finalweight']?.toString() ?? '';
+
+    laborChargeController.text =
+        currentBillingData?['laborCharge']?.toString() ?? '';
+    brokerageController.text =
+        currentBillingData?['brokerage']?.toString() ?? '';
+
+    // Add listeners for deduction updates
+    laborChargeController.addListener(_updateTotalAmount);
+    brokerageController.addListener(_updateTotalAmount);
+
+    _addQcEntry();
+  }
+
+  // --- Add new QC entry
+  void _addQcEntry() {
+    if (availableQcTypes.isEmpty) return;
+    setState(() {
+      qcEntries.add({
+        'type': null,
+        'bagsController': TextEditingController(),
+        'weightController': TextEditingController(),
+        'priceController': TextEditingController(),
+        'amountController': TextEditingController(),
+      });
+    });
+  }
+
+  void _removeQcEntry(int index) {
+    setState(() {
+      final removedType = qcEntries[index]['type'];
+      if (removedType != null && !availableQcTypes.contains(removedType)) {
+        availableQcTypes.add(removedType);
+      }
+      qcEntries.removeAt(index);
+    });
+  }
+
+  void _updateAmount(int index) {
+    final entry = qcEntries[index];
+    final weightStr = entry['weightController'].text;
+    final priceStr = entry['priceController'].text;
+
+    final weightValue =
+        double.tryParse(weightStr.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    final priceValue = double.tryParse(priceStr) ?? 0;
+
+    final amount = weightValue * priceValue;
+    entry['amountController'].text = amount.toStringAsFixed(2);
+  }
+
+  void _onSavePressed() {
+    bool allFilled = true;
+    double total = 0;
+
+    for (var entry in qcEntries) {
+      if (entry['type'] == null ||
+          entry['bagsController'].text.isEmpty ||
+          entry['weightController'].text.isEmpty ||
+          entry['priceController'].text.isEmpty ||
+          entry['amountController'].text.isEmpty) {
+        allFilled = false;
+        break;
+      }
+      total += double.tryParse(entry['amountController'].text) ?? 0;
+    }
+
+    if (!allFilled) {
+      CustomSnackBar.show(
+        context,
+        message: 'Please fill all QC details before saving.',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() {
+      showSavedCard = true;
+      totalAmount = total;
+      _updateTotalAmount();
+    });
+  }
+
+  void _updateTotalAmount() {
+    double deductionTotal = 0;
+
+    deductionTotal += double.tryParse(laborChargeController.text) ?? 0;
+    deductionTotal += double.tryParse(brokerageController.text) ?? 0;
+
+    for (var d in deductions) {
+      deductionTotal += double.tryParse(d['controller'].text) ?? 0;
+    }
+
+    final finalTotal = totalAmount - deductionTotal;
+    totalAmountController.text = finalTotal.toStringAsFixed(2);
+  }
+
+  void _addDeductionField() {
+    final controller = TextEditingController();
+    controller.addListener(_updateTotalAmount);
+    setState(() {
+      deductions.add({
+        'label': 'Deduction ${deductions.length + 1}',
+        'controller': controller,
+      });
+    });
+  }
+
+  void _removeDeduction(int index) {
+    setState(() {
+      deductions.removeAt(index);
+      _updateTotalAmount();
+    });
   }
 
   @override
   void dispose() {
-    finalWeightController.dispose();
     laborChargeController.dispose();
     brokerageController.dispose();
     totalAmountController.dispose();
-    for (var paddy in paddyEntries) {
-      paddy['weightController'].dispose();
-      paddy['amountController'].dispose();
-      paddy['priceController'].dispose();
-      paddy['bagsController'].dispose();
-    }
-    for (var deduction in deductions) {
-      deduction['controller'].dispose();
+    for (var e in qcEntries) {
+      e.values.whereType<TextEditingController>().forEach((c) => c.dispose());
     }
     super.dispose();
   }
 
-  // ====== CALCULATE TOTAL ======
-  void _calculateTotalAmount() {
-    double totalPaddyAmount = 0;
-
-    for (var paddy in paddyEntries) {
-      double weight = double.tryParse(paddy['weightController'].text) ?? 0;
-      double price = double.tryParse(paddy['priceController'].text) ?? 0;
-      totalPaddyAmount += weight * price;
-    }
-
-    double laborCharge = double.tryParse(laborChargeController.text) ?? 0;
-    double brokerage = double.tryParse(brokerageController.text) ?? 0;
-
-    double totalDeductions = 0;
-    for (var deduction in deductions) {
-      totalDeductions += double.tryParse(deduction['controller'].text) ?? 0;
-    }
-
-    double finalAmount = totalPaddyAmount - (laborCharge + brokerage + totalDeductions);
-
-    totalAmountController.text = finalAmount.toStringAsFixed(2);
-  }
-
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    developer.log('billingData: ${widget.billingData}');
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: const ReusableAppBar(title: '#22311'),
-        body: SingleChildScrollView(
+        appBar: const ReusableAppBar(title: 'Billing Details'),
+        body: BlocListener<BillingBloc, BillingState>(
+          listener: (context, state) {
+            if (state is BillingGenerateLoadingState) {
+              setState(() {
+                isButtonLoading = true;
+              });
+            } else {
+              setState(() {
+                isButtonLoading = false;
+              });
+            }
+
+            if (state is BillingGenerateSuccessState) {
+              CustomSnackBar.show(
+                context,
+                message: 'Billing generated successfully!',
+                isError: false,
+              );
+              Navigator.pop(context, true);
+              // Navigator.pushNamed(context, AppRoutes.billingDetailScreenSuperUser, arguments: state.billingData);
+            }
+
+            if (state is BillingGenerateErrorState) {
+              CustomSnackBar.show(
+                context,
+                message: state.message,
+                isError: true,
+              );
+            }
+          },
+  child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: width * 0.035,
             vertical: height * 0.015,
@@ -98,63 +224,68 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ProfileRow(label: 'Unit ID', value: '#221212'),
-              const ProfileRow(label: 'Name', value: 'Ramesh Yadav'),
-              const ProfileRow(label: 'Broker', value: 'Rahul'),
-              const ProfileRow(label: 'Initial Weight', value: '511'),
-
-              AppDimensions.h10(context),
-              Text('Final Weight', style: AppTextStyles.label),
-              AppDimensions.h5(context),
-              CustomTextFormField(
-                controller: finalWeightController,
-                hintText: 'Enter Final weight',
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Final weight is required' : null,
-              ),
-
-              AppDimensions.h10(context),
-              const ProfileRow(label: 'Net Weight', value: '112'),
-              AppDimensions.h20(context),
-
-              _buildSectionTitle('Enter Billing Details'),
-              AppDimensions.h10(context),
-
-              ..._buildPaddyEntries(),
+              ProfileRow(label: 'Unit ID', value: currentBillingData['transportId']?['purchaseId']?['_id']?.toString() ?? '-'),
+              ProfileRow(label: 'Name', value: currentBillingData['transportId']?['purchaseId']?['name'] ?? '-'),
+              ProfileRow(label: 'Broker', value: currentBillingData['transportId']?['brokerId']?['name'] ?? '-'),
+              ProfileRow(
+                  label: 'Initial Weight',
+                  value: '${currentBillingData['transportId']['weight'] ?? '-'}'),
+              ProfileRow(
+                  label: 'Final Weight',
+                  value: '${currentBillingData['finalweight'] ?? '-'}'),
 
               AppDimensions.h20(context),
-              _buildSectionTitle('Extra Charges to be deduct'),
 
+              Text('Enter Billing Details', style: AppTextStyles.appbarTitle),
               AppDimensions.h10(context),
+
+              ..._buildQcEntries(),
+
+              if (availableQcTypes.isNotEmpty)
+                InkWell(
+                  onTap: _addQcEntry,
+                  child: Text('+ Add another type',
+                      style: AppTextStyles.underlineText),
+                ),
+              AppDimensions.h20(context),
+
+              ReusableOutlinedButton(text: 'Save', onPressed: _onSavePressed),
+
+              if (showSavedCard) _buildSavedCard(),
+
+              AppDimensions.h20(context),
+              Text('Extra Charges to be deduct',
+                  style: AppTextStyles.appbarTitle),
+              AppDimensions.h10(context),
+
               Text('Labor Charge', style: AppTextStyles.label),
-              AppDimensions.h5(context),
               CustomTextFormField(
                 controller: laborChargeController,
                 hintText: 'Labor Charge',
+                isReadOnly:
+                laborChargeController.text.isNotEmpty ? true : false,
+                keyboardType: TextInputType.number,
               ),
 
               AppDimensions.h10(context),
               Text('Brokerage', style: AppTextStyles.label),
-              AppDimensions.h5(context),
               CustomTextFormField(
                 controller: brokerageController,
                 hintText: 'Brokerage',
+                isReadOnly:
+                brokerageController.text.isNotEmpty ? true : false,
+                keyboardType: TextInputType.number,
               ),
 
               ..._buildDynamicDeductions(),
-
-              AppDimensions.h10(context),
               InkWell(
                 onTap: _addDeductionField,
-                child: Text(
-                  '+ Add another deduction',
-                  style: AppTextStyles.underlineText,
-                ),
+                child: Text('+ Add another deduction',
+                    style: AppTextStyles.underlineText),
               ),
 
               AppDimensions.h20(context),
               Text('Total Amount', style: AppTextStyles.label),
-              AppDimensions.h5(context),
               CustomTextFormField(
                 controller: totalAmountController,
                 hintText: 'Total Amount',
@@ -164,69 +295,133 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
               AppDimensions.h30(context),
               PrimaryButton(
                 text: 'Submit',
+                isLoading: isButtonLoading,
                 onPressed: () {
-                  // Add API call or navigation here
-                  Navigator.pushNamed(
+                  // 1️⃣ Check if QC card is saved
+                  if (!showSavedCard) {
+                    CustomSnackBar.show(
+                      context,
+                      message: 'Please save QC details before submitting.',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  // 2️⃣ Validate each QC entry
+                  bool allFilled = true;
+                  for (var entry in qcEntries) {
+                    if (entry['type'] == null ||
+                        entry['bagsController'].text.isEmpty ||
+                        entry['weightController'].text.isEmpty ||
+                        entry['priceController'].text.isEmpty ||
+                        entry['amountController'].text.isEmpty) {
+                      allFilled = false;
+                      break;
+                    }
+                  }
+
+                  if (!allFilled) {
+                    CustomSnackBar.show(
+                      context,
+                      message: 'Please complete all QC details — some fields are missing or not saved.',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  // 3️⃣ Check if any QC type is left unsaved (for Paddy/Rice, etc.)
+                  final unsavedTypes = allQcList
+                      .map((e) => e['type'].toString())
+                      .where((type) => !qcEntries.any((q) => q['type'] == type))
+                      .toList();
+
+                  if (unsavedTypes.isNotEmpty) {
+                    CustomSnackBar.show(
+                      context,
+                      message: 'Some QC types (${unsavedTypes.join(', ')}) are not filled or saved.',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  // 4️⃣ Check total amount validity
+                  if (totalAmountController.text.isEmpty ||
+                      double.tryParse(totalAmountController.text) == null) {
+                    CustomSnackBar.show(
+                      context,
+                      message: 'Invalid total amount. Please check entered values.',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  // 5️⃣ Build billingItems list safely
+                  final billingItems = qcEntries.map((entry) {
+                    return {
+                      "itemName": entry['type'] ?? '',
+                      "weight": entry['weightController'].text,
+                      "bags": int.tryParse(entry['bagsController'].text) ?? 0,
+                      "price": double.tryParse(entry['priceController'].text) ?? 0,
+                      "amount": double.tryParse(entry['amountController'].text) ?? 0,
+                    };
+                  }).toList();
+
+                  // 6️⃣ Build deductions object safely (renamed to `deductionList`)
+                  final deductionList = [
+                    {
+                      "labourcharge": double.tryParse(laborChargeController.text) ?? 0,
+                      "brokerage": double.tryParse(brokerageController.text) ?? 0,
+                      "enteramount": this.deductions.fold<double>(
+                        0,
+                            (sum, d) => sum + (double.tryParse(d['controller'].text) ?? 0),
+                      ),
+                    }
+                  ];
+
+                  // 7️⃣ Ensure we have valid QC ID
+                  final finalQCId = currentBillingData['_id']?.toString() ?? '';
+                  if (finalQCId.isEmpty) {
+                    CustomSnackBar.show(
+                      context,
+                      message: 'Missing QC ID. Cannot generate billing.',
+                      isError: true,
+                    );
+                    return;
+                  }
+
+                  // 8️⃣ Dispatch Bloc event
+                  context.read<BillingBloc>().add(
+                    GenerateBillingEvent(
+                      finalQCId: finalQCId,
+                      billingItems: billingItems,
+                      deductions: deductionList,
+                    ),
+                  );
+
+                  CustomSnackBar.show(
                     context,
-                    AppRoutes.billingDetailsScreen,
-                    arguments: null,
+                    message: 'Billing generation initiated!',
+                    isError: false,
                   );
                 },
+
               ),
-              AppDimensions.h20(context),
+
             ],
           ),
         ),
+),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) =>
-      Text(title, style: AppTextStyles.appbarTitle);
+  List<Widget> _buildQcEntries() {
+    return qcEntries.asMap().entries.map((entry) {
+      final index = entry.key;
+      final qc = entry.value;
 
-  // ====== PADDY ENTRIES ======
-  void _addPaddyEntry() {
-    final weightController = TextEditingController();
-    final priceController = TextEditingController(text: '10');
-    final bagsController = TextEditingController(text: '0');
-    final amountController = TextEditingController();
-
-    void calculateAmount() {
-      double weight = double.tryParse(weightController.text) ?? 0;
-      double price = double.tryParse(priceController.text) ?? 0;
-      amountController.text = (weight * price).toStringAsFixed(2);
-      _calculateTotalAmount();
-    }
-
-    weightController.addListener(calculateAmount);
-    priceController.addListener(calculateAmount);
-
-    setState(() {
-      paddyEntries.add({
-        'type': null,
-        'weightController': weightController,
-        'priceController': priceController,
-        'bagsController': bagsController,
-        'amountController': amountController,
-      });
-    });
-  }
-
-  void _removePaddyEntry(int index) {
-    setState(() {
-      paddyEntries[index]['weightController'].dispose();
-      paddyEntries[index]['amountController'].dispose();
-      paddyEntries[index]['priceController'].dispose();
-      paddyEntries[index]['bagsController'].dispose();
-      paddyEntries.removeAt(index);
-    });
-    _calculateTotalAmount();
-  }
-
-  List<Widget> _buildPaddyEntries() {
-    return paddyEntries.asMap().entries.map((entry) {
-      int index = entry.key;
-      var paddy = entry.value;
+      // Add listener for price updates
+      qc['priceController'].addListener(() => _updateAmount(index));
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -236,61 +431,57 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Paddy Type ${index + 1}', style: AppTextStyles.label),
-                if (index == paddyEntries.length - 1)
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: _addPaddyEntry,
-                        child: Text('Add another type', style: AppTextStyles.underlineText),
-                      ),
-                      AppDimensions.w10(context),
-                      if (paddyEntries.length > 1)
-                        IconButton(
-                          onPressed: () => _removePaddyEntry(index),
-                          icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
-                        ),
-                    ],
+                Text('Type ${index + 1}', style: AppTextStyles.label),
+                if (qcEntries.length > 1)
+                  IconButton(
+                    onPressed: () => _removeQcEntry(index),
+                    icon: const Icon(Icons.remove_circle, color: Colors.red),
                   ),
               ],
             ),
             _buildDropdown(
-              selectedValue: paddy['type'],
+              selectedValue: qc['type'],
               onChanged: (val) {
-                setState(() => paddy['type'] = val);
+                setState(() {
+                  qc['type'] = val;
+                  availableQcTypes.remove(val);
+
+                  final qcData = allQcList
+                      .firstWhere((q) => q['type'].toString() == val);
+
+                  qc['bagsController'].text =
+                      qcData['bags']?.toString() ?? '';
+                  qc['weightController'].text =
+                      qcData['weight']?.toString() ?? '';
+                });
               },
             ),
             AppDimensions.h10(context),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextFormField(
-                    controller: paddy['weightController'],
-                    hintText: 'Weight',
-                  ),
-                ),
-                AppDimensions.w10(context),
-                Expanded(
-                  child: CustomTextFormField(
-                    controller: paddy['bagsController'],
-                    hintText: 'Bags',
-                  ),
-                ),
-                AppDimensions.w10(context),
-                Expanded(
-                  child: CustomTextFormField(
-                    controller: paddy['priceController'],
-                    hintText: 'Price',
-                  ),
-                ),
-              ],
+            Text('Bags', style: AppTextStyles.label),
+            CustomTextFormField(
+              controller: qc['bagsController'],
+              hintText: 'Bags',
+              isReadOnly: qc['bagsController'].text.isNotEmpty,
+            ),
+            AppDimensions.h10(context),
+            Text('Weight', style: AppTextStyles.label),
+            CustomTextFormField(
+              controller: qc['weightController'],
+              hintText: 'Weight',
+              isReadOnly: qc['weightController'].text.isNotEmpty,
+            ),
+            AppDimensions.h10(context),
+            Text('Price', style: AppTextStyles.label),
+            CustomTextFormField(
+              controller: qc['priceController'],
+              hintText: 'Enter Price',
+              keyboardType: TextInputType.number,
             ),
             AppDimensions.h10(context),
             Text('Amount', style: AppTextStyles.label),
-            AppDimensions.h5(context),
             CustomTextFormField(
-              controller: paddy['amountController'],
-              hintText: 'Amount (auto calculate)',
+              controller: qc['amountController'],
+              hintText: 'Auto calculated amount',
               isReadOnly: true,
             ),
           ],
@@ -303,6 +494,10 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
     String? selectedValue,
     required ValueChanged<String?> onChanged,
   }) {
+    final List<String> options = selectedValue != null
+        ? [selectedValue, ...availableQcTypes]
+        : availableQcTypes;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       width: double.infinity,
@@ -314,8 +509,8 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
         child: DropdownButton<String>(
           icon: const Icon(Icons.keyboard_arrow_down_outlined),
           value: selectedValue,
-          hint: Text('Select Paddy Type', style: AppTextStyles.hintText),
-          items: paddyTypes
+          hint: Text('Select QC Type', style: AppTextStyles.hintText),
+          items: options
               .map(
                 (type) => DropdownMenuItem<String>(
               value: type,
@@ -329,31 +524,78 @@ class _BillingFillDetailsScreenState extends State<BillingFillDetailsScreen> {
     );
   }
 
-  // ====== DEDUCTIONS ======
-  void _addDeductionField() {
-    final controller = TextEditingController();
-    controller.addListener(_calculateTotalAmount);
-
-    setState(() {
-      deductions.add({
-        'label': 'Deduction ${deductions.length + 1}',
-        'controller': controller,
-      });
-    });
+  Widget _buildSavedCard() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.borderColor),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: qcEntries.map((e) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.borderColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildInfoRow('Type', e['type']?.toString() ?? ''),
+                    Text(formatAmount(e['amountController']?.text ?? 0), style: AppTextStyles.cardHeading,)
+                  ],
+                ),
+                _buildInfoRow('Bags', e['bagsController']?.text ?? ''),
+                _buildInfoRow('Weight', e['weightController']?.text ?? ''),
+                _buildInfoRow('Price', e['priceController']?.text ?? ''),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
-  void _removeDeduction(int index) {
-    setState(() {
-      deductions[index]['controller'].dispose();
-      deductions.removeAt(index);
-    });
-    _calculateTotalAmount();
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.15,
+            child: Text(
+              '$label:',
+              style: AppTextStyles.bodyText,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.15,
+            child: Text(
+              value.isNotEmpty ? value : '-',
+              style: AppTextStyles.cardText,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> _buildDynamicDeductions() {
     return deductions.asMap().entries.map((entry) {
-      int index = entry.key;
-      var deduction = entry.value;
+      final index = entry.key;
+      final deduction = entry.value;
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),

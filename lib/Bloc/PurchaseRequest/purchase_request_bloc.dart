@@ -26,7 +26,7 @@ class PurchaseRequestBloc
         if (event.page != null) queryParams['page'] = event.page.toString();
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
-        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromDate'] = event.fromDate!;
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
         if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factoryName != null && event.factoryName!.isNotEmpty) queryParams['factoryname'] = event.factoryName!;
@@ -79,7 +79,7 @@ class PurchaseRequestBloc
         if (event.page != null) queryParams['page'] = event.page.toString();
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
-        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromDate'] = event.fromDate!;
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
         if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factoryName != null && event.factoryName!.isNotEmpty) queryParams['factoryname'] = event.factoryName!;

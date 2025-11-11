@@ -33,3 +33,10 @@ class GenerateBillingEvent extends BillingEvent {
     required this.deductions,
   });
 }
+
+
+class GetBillingDetailsEvent extends BillingEvent {
+  final String billingId;
+
+  GetBillingDetailsEvent({required this.billingId});
+}

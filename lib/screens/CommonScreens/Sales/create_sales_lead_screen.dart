@@ -124,6 +124,7 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
               setState(() {});
             }
 
+
             if (state is FactoryErrorState) {
               CustomSnackBar.show(context,
                   message: state.message, isError: true);
@@ -200,6 +201,7 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                   label: 'Customer Name',
                   hint: 'Enter Name',
                   controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
                   validator: (val) => val == null || val.isEmpty
                       ? 'Customer name is required'
                       : null,
@@ -364,7 +366,7 @@ class _CreateSalesLeadScreenState extends State<CreateSalesLeadScreen> {
                         label: 'Weight',
                         hint: 'Enter Weight',
                         controller: item.qtyController,
-                        keyboardType: TextInputType.number,
+                        // keyboardType: TextInputType.number,
                         validator: (val) =>
                         val == null || val.isEmpty ? 'Enter weight' : null,
                       ),

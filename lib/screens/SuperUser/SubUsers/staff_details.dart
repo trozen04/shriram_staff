@@ -57,7 +57,7 @@ class StaffDetails extends StatelessWidget {
             ),
             AppDimensions.h10(context),
             ProfileRow(label: 'Name', value: subUserData['name']),
-            ProfileRow(label: 'Contact No.', value: subUserData['mobileno']),
+            ProfileRow(label: 'Email', value: subUserData['email']),
             ProfileRow(label: 'Role', value: subUserData['role']),
             ProfileRow(label: 'Factory', value: subUserData['factory']['factoryname']),
             ProfileRow(label: 'Authority', value: subUserData['authority']),

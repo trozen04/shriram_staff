@@ -10,6 +10,7 @@ class SubUserCard extends StatelessWidget {
   final String date;
   final String? position;
   final String? phone;
+  final String? email;
   final String? qcType;
   final String? factory;
   final double height;
@@ -21,6 +22,7 @@ class SubUserCard extends StatelessWidget {
     required this.date,
     this.position,
     this.phone,
+    this.email,
     this.qcType,
     this.factory,
     required this.height,
@@ -75,7 +77,11 @@ class SubUserCard extends StatelessWidget {
             children: [
               _buildInfoRow(imagePath: ImageAssets.work, value: position!),
               AppDimensions.h10(context),
+              if(phone != '~')
               _buildInfoRow(imagePath: ImageAssets.call, value: phone!),
+              if(email!.isNotEmpty)
+                _buildInfoRow(icon: Icons.email_outlined, value: email!),
+
               AppDimensions.h10(context),
               _buildInfoRow(imagePath: ImageAssets.qcPng, value: qcType!),
               //_buildInfoRow(imagePath: ImageAssets.qcPng, value: factory!!),

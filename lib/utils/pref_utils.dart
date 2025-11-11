@@ -10,6 +10,7 @@ class PrefUtils {
   static const String _userIdKey = 'userId';
   static const String _userNameKey = 'userName';
   static const String _userMobileKey = 'userMobile';
+  static const String _factoryIdKey = 'factoryId';
 
   /// 🏁 Must call once before runApp()
   static Future<void> init() async {
@@ -36,6 +37,7 @@ class PrefUtils {
     required String mobile,
     required String role,
     required String token,
+    required String factoryId,
   }) {
     _prefs.setBool(_isLoggedInKey, true);
     _prefs.setString(_userIdKey, id);
@@ -43,6 +45,7 @@ class PrefUtils {
     _prefs.setString(_userMobileKey, mobile);
     _prefs.setString(_userRoleKey, role);
     _prefs.setString(_tokenKey, token);
+    _prefs.setString(_factoryIdKey, factoryId);
   }
 
   static String getUserId() => _prefs.getString(_userIdKey) ?? '';
@@ -50,6 +53,7 @@ class PrefUtils {
   static String getUserMobile() => _prefs.getString(_userMobileKey) ?? '';
   static String getUserRole() => _prefs.getString(_userRoleKey) ?? '';
   static String getToken() => _prefs.getString(_tokenKey) ?? '';
+  static String getFactoryId() => _prefs.getString(_factoryIdKey) ?? '';
 
   // ───────────────────────────────
   // LOGOUT / CLEAR

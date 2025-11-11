@@ -13,20 +13,29 @@ class SalesDetailScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    developer.log('salesData: $salesData');
+    // actualData is the real object, in case API sends data inside { data: {...} }
+    final actualData = salesData['data'] ?? salesData;
+    developer.log('actualData: $actualData');
 
-    final factoryData = salesData['factory'] ?? {};
-    final createdBy = salesData['createdBy'] ?? {};
-    final List<dynamic> items = salesData['items'] ?? [];
+    final factoryData = actualData['factory'] ?? {};
+    final createdBy = actualData['createdBy'] ?? {};
+    final acceptedBy = actualData['acceptedBy'] ?? {};
+    final loading = actualData['loadingDetails'] ?? {};
+    final List<dynamic> items = actualData['items'] ?? [];
 
-    // 🧮 Combine all item names in a comma-separated string
-    final itemNames = items.map((e) => e['item'].toString()).join(', ');
-    // 🧮 Date format (basic)
-    final date = (salesData['createdAt'] ?? '').toString().split('T').first;
+    // Combine all item names into comma-separated string
+    final itemNames = items.map((e) {
+      final name = e['item'] is Map ? e['item']['name'] : e['item']?.toString();
+      return name ?? '~';
+    }).join(', ');
+
+    // Date formatting (basic)
+    final date = (actualData['createdAt'] ?? '').toString().split('T').first;
+    final acceptedAt = (actualData['acceptedAt'] ?? '').toString().split('T').first;
 
     return Scaffold(
       appBar: ReusableAppBar(
-        title: salesData['customername'] ?? 'Sales Details',
+        title: actualData['customername'] ?? 'Sales Details',
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -36,23 +45,23 @@ class SalesDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProfileRow(label: 'Name', value: salesData['customername'] ?? '~'),
-            ProfileRow(label: 'Address', value: salesData['address'] ?? '~'),
-            ProfileRow(label: 'City/Town', value: salesData['city'] ?? '~'),
+            ProfileRow(label: 'Name', value: actualData['customername'] ?? '~'),
+            ProfileRow(label: 'Address', value: actualData['address'] ?? '~'),
+            ProfileRow(label: 'City/Town', value: actualData['city'] ?? '~'),
             ProfileRow(label: 'Factory', value: factoryData['factoryname'] ?? '~'),
             ProfileRow(label: 'Date', value: date.isEmpty ? '~' : date),
             ProfileRow(label: 'Item(s)', value: itemNames.isEmpty ? '~' : itemNames),
-            ProfileRow(label: 'Driver Name', value: salesData['driverName'] ?? '~'),
-            ProfileRow(label: 'Driver Phone No.', value: salesData['driverPhone'] ?? '~'),
-            ProfileRow(label: 'Owner Name', value: salesData['ownerName'] ?? '~'),
-            ProfileRow(label: 'Owner Phone No.', value: salesData['ownerPhone'] ?? '~'),
-            ProfileRow(label: 'Vehicle No.', value: salesData['vehicleNo'] ?? '~'),
-            ProfileRow(label: 'Vehicle RC', value: salesData['vehicleRc'] ?? '~'),
-            ProfileRow(label: 'Driver License', value: salesData['driverLicense'] ?? '~'),
-            ProfileRow(label: 'Driver Aadhar Card', value: salesData['driverAadhar'] ?? '~'),
-            ProfileRow(label: 'Delivery Proof', value: salesData['deliveryProof'] ?? '~'),
-            ProfileRow(label: 'Created By', value: createdBy['name'] ?? '~'),
-            ProfileRow(label: 'Status', value: salesData['status'] ?? '~'),
+
+            // Vehicle Details (from loadingDetails)
+            ProfileRow(label: 'Driver Name', value: loading['drivername'] ?? '~'),
+            ProfileRow(label: 'Driver Phone No.', value: loading['phoneno'] ?? '~'),
+            ProfileRow(label: 'Owner Name', value: loading['ownername'] ?? '~'),
+            ProfileRow(label: 'Owner Phone No.', value: loading['ownerphoneno'] ?? '~'),
+            ProfileRow(label: 'Vehicle RC', value: loading['vehiclerc'] ?? '~'),
+            ProfileRow(label: 'Driver License', value: loading['driverlicence'] ?? '~'),
+            ProfileRow(label: 'Driver Aadhar Card', value: loading['adharcard'] ?? '~'),
+            ProfileRow(label: 'Delivery Proof', value: loading['deliveryproof'] ?? '~'),
+
             AppDimensions.h20(context),
           ],
         ),

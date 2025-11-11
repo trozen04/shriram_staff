@@ -128,6 +128,7 @@ class CustomConfirmationDialog {
     String confirmText = 'Yes',
     String cancelText = 'No',
     Color confirmColor = AppColors.logoutColor,
+    Color cancelColor = AppColors.logoutColor,
   }) async {
     final size = MediaQuery.of(context).size;
     final double padding = size.width * 0.05;
@@ -174,6 +175,7 @@ class CustomConfirmationDialog {
                           child: PrimaryButton(
                             text: cancelText,
                             onPressed: () => Navigator.pop(context, false),
+                            buttonColor: cancelColor,
                             isLogout: false,
                           ),
                         ),
@@ -575,14 +577,16 @@ class ReusableTextField extends StatelessWidget {
 
 class ReusableNotificationCard extends StatelessWidget {
   final String title;
-  final String time;
+  final bool isRead;
+  final String date;
   final double height;
   final double width;
 
   const ReusableNotificationCard({
     super.key,
     required this.title,
-    required this.time,
+    this.isRead = false,
+    required this.date,
     required this.height,
     required this.width,
   });
@@ -599,17 +603,15 @@ class ReusableNotificationCard extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Notification 1', style: AppTextStyles.label),
-              if (true)
-                Icon(Icons.circle, size: 10, color: AppColors.primaryColor)
-              else
-                Text(''),
+              Expanded(child: Text(title, style: AppTextStyles.label)),
+              if (!isRead)
+                Icon(Icons.circle, size: 10, color: AppColors.primaryColor),
             ],
           ),
           AppDimensions.h10(context),
@@ -617,8 +619,8 @@ class ReusableNotificationCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Monday, 4:41 pm', style: AppTextStyles.dateAndTime),
-              Text('3 Hours ago', style: AppTextStyles.timeLeft),
+              Text(formatToDayTime(date), style: AppTextStyles.dateAndTime),
+              Text(timeAgoSinceDate(date), style: AppTextStyles.timeLeft),
             ],
           ),
         ],
@@ -977,3 +979,37 @@ String formatToISTFull(String? utcDateString) {
   }
 }
 
+
+/// Converts ISO 8601 date string to "Monday, 4:41 PM" format
+String formatToDayTime(String isoDate) {
+  try {
+    final dateTime = DateTime.parse(isoDate).toLocal(); // convert to local
+    return DateFormat('EEEE, h:mm a').format(dateTime); // Monday, 4:41 PM
+  } catch (e) {
+    return '';
+  }
+}
+
+/// Returns relative time from current IST time, e.g. "2 hours ago", "1 day ago"
+String timeAgoSinceDate(String isoDate) {
+  try {
+    final dateTime = DateTime.parse(isoDate).toLocal(); // convert UTC to local time
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) {
+      return 'just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inDays < 30) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else {
+      final months = difference.inDays ~/ 30;
+      return '$months month${months > 1 ? 's' : ''} ago';
+    }
+  } catch (e) {
+    return '';
+  }
+}

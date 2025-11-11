@@ -215,7 +215,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                   setState(() => isFetchingMore = true);
                 }
               } else if (state is PurchaseRequestSuccessState) {
-                developer.log('Data::: ${state.purchaseRequestData}');
+                // developer.log('Data::: ${state.purchaseRequestData}');
                 final List<dynamic> fetchedData = state.purchaseRequestData['data'] ?? [];
                 setState(() {
                   if (currentPage == 1) {
@@ -251,7 +251,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                     setState(() => isFetchingMore = true);
                   }
                 } else if (state is GetAllQcSuccessState) {
-                 developer.log('GetAllQcSuccessState: ${state.responseData}');
+                // developer.log('GetAllQcSuccessState: ${state.responseData}');
                   final List<dynamic> fetchedData = state.responseData['data'] ?? [];
                   setState(() {
                     if (currentPage == 1) {
@@ -353,14 +353,26 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                       final data = widget.isQCPage
                           ? qcData[index]
                           : deliveryData[index];
+                      // 🧠 Compute final status
+                      final transportStatus = data?['transportId']?['status'] ?? '';
+                      final qcStatus = data?['status'] ?? '';
+
+                      String finalStatus = '';
+                      if (qcStatus.toLowerCase() == 'approve' && transportStatus.toLowerCase() == 'qc-check') {
+                        finalStatus = 'final-qc-pending';
+                      } else if (qcStatus.toLowerCase() == 'pending' && transportStatus.toLowerCase() == 'qc-check') {
+                        finalStatus = 'initial-qc-pending';
+                      } else {
+                        finalStatus = transportStatus.isNotEmpty ? transportStatus : qcStatus;
+                      }
+
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: HomeInfoCard(
                           cardType: widget.isQCPage ? CardType.qc : CardType.delivery,
                           id: widget.isQCPage
-                              ? (data['transportId'] != null
-                              ? (data['transportId']['_id'] ?? '')
-                              : '')
+                              ? data['_id'] ?? ''
                               : '',
                           farmerName: widget.isQCPage
                               ? (data['transportId'] != null &&
@@ -392,7 +404,10 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                               ? (data['transportId']['weight'] ?? '')
                               : '')
                               : (data['weight'] ?? ''),
-                          status: data['status'] ?? '',
+                          status: widget.isQCPage
+                              ? finalStatus
+                              : data?['status'] ?? '',
+
 
                           height: height,
                           width: width,
@@ -405,7 +420,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
                                 'isQcPage': widget.isQCPage ? true : false,
                               },
                             ).then((_) {
-                              _fetchData(page: 1); // 🔁 Refresh after pop
+                              _fetchData(page: 1);
                             });
                           },
                         ),

@@ -53,5 +53,44 @@ class FactoryBloc extends Bloc<FactoryEvent, FactoryState> {
       }
     });
 
+    /// Insert / Update factory inventory
+    on<InsertFactoryInventoryEvent>((event, emit) async {
+      emit(FactoryLoadingState());
+      try {
+        final factoryId = PrefUtils.getFactoryId();
+        final token = PrefUtils.getToken();
+        final url = '${ApiConstants.baseUrl}/api/factoryinventory/insert/${factoryId}';
+        final uri = Uri.parse(url);
+
+        developer.log('Inserting inventory for factory ${factoryId}');
+        developer.log('Inventory Data: ${event.inventoryData}');
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(event.inventoryData),
+        );
+
+        final data = jsonDecode(response.body);
+        developer.log('Insert Inventory Response: ${response.body}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          emit(FactoryInventorySuccessState(responseData: data));
+        } else {
+          emit(FactoryErrorState(
+            message: data['message'] ?? 'Failed to insert inventory.',
+          ));
+        }
+      } catch (e) {
+        developer.log('InsertInventoryError: $e');
+        emit(FactoryErrorState(
+          message: 'Something went wrong while inserting inventory.',
+        ));
+      }
+    });
+
   }
 }

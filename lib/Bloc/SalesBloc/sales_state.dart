@@ -43,3 +43,23 @@ class getSubUserSalesLeadError extends SalesState {
   getSubUserSalesLeadError(this.message);
 }
 
+/// 🆕 NEW STATE
+class SalesLoadingUpsertSuccess extends SalesState {
+  final dynamic data;
+  final bool isSave;
+  SalesLoadingUpsertSuccess({required this.data, required this.isSave});
+}
+
+class AcceptSalesLeadLoading extends SalesState {}
+
+class AcceptSalesLeadSuccess extends SalesState {
+  final Map<String, dynamic> response;
+
+  AcceptSalesLeadSuccess(this.response);
+}
+
+class AcceptSalesLeadError extends SalesState {
+  final String message;
+
+  AcceptSalesLeadError(this.message);
+}

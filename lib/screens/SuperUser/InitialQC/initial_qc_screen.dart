@@ -40,28 +40,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
   String? _selectedFactoryId;
   String? _selectedFactoryName;
 
-  dynamic qcData = [
-    {
-      'name': 'Suresh Kumar',
-      'date': '21-09-25',
-      'location': 'Lucknow, UP',
-      'quantity': '30',
-      'item': 'Wheat',
-      'price': '15,000',
-      'vehicleNumber': 'DL 12 AB 2198',
-      'driverName': 'Sunil Pal',
-    },
-    {
-      'name': 'Suresh Kumar',
-      'date': '21-09-25',
-      'location': 'Lucknow, UP',
-      'quantity': '30',
-      'item': 'Wheat',
-      'price': '15,000',
-      'vehicleNumber': 'DL 12 AB 2198',
-      'driverName': 'Sunil Pal',
-    },
-  ];
+  dynamic qcData = [];
 
   @override
   void initState() {
@@ -259,7 +238,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
             setState(() => isFetchingMore = true);
           }
         } else if (state is GetAllQcSuccessState) {
-          developer.log('GetAllQcSuccessState: ${state.responseData}');
+          //developer.log('GetAllQcSuccessState: ${state.responseData}');
           final List<dynamic> fetchedData = state.responseData['data'] ?? [];
           setState(() {
             if (currentPage == 1) {
@@ -396,6 +375,21 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
                         final broker = transport['brokerId'];
                         final purchase = transport['purchaseId'];
                         final user = data['userId'];
+                        final transportStatus = (data['transportId']?['status'] ?? '').toLowerCase();
+                        final qcStatus = (data['status'] ?? '').toLowerCase();
+
+                        String finalStatus = '';
+
+                        if (qcStatus == 'pending' && transportStatus == 'qc-check') {
+                          finalStatus = 'initial-qc-pending';
+                        } else if (qcStatus == 'approve' && transportStatus == 'qc-check') {
+                          finalStatus = 'approve';
+                        } else if (qcStatus == 'approve' && transportStatus == 'delivered') {
+                          finalStatus = 'delivered';
+                        } else {
+                          finalStatus = transportStatus;
+                        }
+
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: GestureDetector(
@@ -415,7 +409,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
                               staffName: user['name'] ?? '~',
                               height: height,
                               width: width,
-                              status: data['status'] ?? '~',
+                              status: finalStatus,
                               weight: transport['weight'] ?? '~',
                               isSuperUser: true,
                               onPressed: () async {

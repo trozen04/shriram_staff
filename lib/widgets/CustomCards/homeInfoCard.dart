@@ -40,6 +40,7 @@ class HomeInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return InkWell(
       onTap: onPressed,
       child: Container(
@@ -77,6 +78,7 @@ class HomeInfoCard extends StatelessWidget {
                       const SizedBox(width: 4),
 
                       // ✅ Call _buildStatusTag with a boolean
+                      if(status.isNotEmpty)
                       _buildStatusTag(cardType, status),
 
                       const SizedBox(width: 4),
@@ -166,7 +168,7 @@ class HomeInfoCard extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          value ?? '',
+          value,
           style: AppTextStyles.cardText,
           overflow: TextOverflow.ellipsis,
         ),
@@ -176,65 +178,62 @@ class HomeInfoCard extends StatelessWidget {
 }
 
 Widget _buildStatusTag(CardType cardType, String status) {
-  late final String text;
-  late final Color color;
-
-  switch (status.toLowerCase()) {
-    case 'pending':
-      switch (cardType) {
-        case CardType.delivery:
-          text = 'Approval Pending';
-          break;
-        case CardType.qc:
-          text = 'Initial QC Pending';
-          break;
-        case CardType.billing:
-          text = 'Billing Pending';
-          break;
-        default:
-          text = 'Pending';
+  return FutureBuilder<void>(
+    future: Future.delayed(const Duration(seconds: 1)),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState != ConnectionState.done) {
+        return const SizedBox(
+          height: 18,
+          width: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        );
       }
-      color = AppColors.pendingColor;
-      break;
 
-    case 'dispatched':
-      text = 'Dispatched';
-      color = AppColors.successColor;
-      break;
+      // ✅ Your existing logic runs after 1s delay
+      String text = '';
+      Color color = Colors.grey;
 
-    case 'approve':
-      switch (cardType) {
-        case CardType.qc:
+      switch (status.toLowerCase()) {
+        case 'initial-qc-pending':
+          text = 'Initial QC Pending';
+          color = AppColors.pendingColor;
+          break;
+        case 'final-qc-pending':
           text = 'Final QC Pending';
           color = AppColors.pendingColor;
           break;
-        default:
+        case 'pending':
+          text = 'Pending';
+          color = AppColors.pendingColor;
+          break;
+        case 'dispatched':
+          text = 'Dispatched';
+          color = AppColors.successColor;
+          break;
+        case 'delivered':
+          text = 'Delivered';
+          color = AppColors.successColor;
+        case 'approve':
           text = 'Approved';
           color = AppColors.successColor;
+          break;
+        default:
+          text = status;
       }
-      break;
 
-    case 'rejected':
-      text = 'Rejected';
-      color = AppColors.errorColor;
-      break;
-
-    default:
-      text = status;
-      color = Colors.grey;
-  }
-
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.21),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Text(
-      text,
-      style: AppTextStyles.statusFont.copyWith(color: color),
-      maxLines: 1,
-    ),
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.21),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          text,
+          style: AppTextStyles.statusFont.copyWith(color: color),
+          maxLines: 1,
+        ),
+      );
+    },
   );
 }
 

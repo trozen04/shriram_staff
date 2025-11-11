@@ -19,7 +19,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         final queryParams = {
           'page': event.page.toString(),
           'limit': event.limit.toString(),
-          if (event.fromDate != null) 'fromDate': event.fromDate!,
+          if (event.fromDate != null) 'fromdate': event.fromDate!,
           if (event.toDate != null) 'toDate': event.toDate!,
           if (event.search != null && event.search!.isNotEmpty)
             'search': event.search!,
@@ -100,6 +100,47 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
         ));
       }
     });
+
+
+    on<GetBillingDetailsEvent>((event, emit) async {
+      emit(BillingLoading());
+
+      try {
+        final token = PrefUtils.getToken();
+        final url = '${ApiConstants.baseUrl}${ApiConstants.getBillingDetails}/${event.billingId}';
+        final uri = Uri.parse(url);
+
+        developer.log('🔗 Fetching Billing Details: $uri');
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        developer.log('🧾 Billing Details Response: ${response.body}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = jsonDecode(response.body);
+
+          // handle response shape safely
+          if (data != null && data.isNotEmpty) {
+            emit(BillingDetailsSuccess(data));
+          } else {
+            emit(BillingError('No billing details found.'));
+          }
+        } else {
+          emit(BillingError('Failed to fetch billing details. Status: ${response.statusCode}'));
+        }
+      } catch (e, stackTrace) {
+        developer.log('❌ Billing Details Error: $e');
+        developer.log('StackTrace: $stackTrace');
+        emit(BillingError('Oops! Something went wrong. Please try again later.'));
+      }
+    });
+
 
 
   }

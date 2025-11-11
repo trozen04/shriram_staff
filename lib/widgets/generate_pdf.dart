@@ -3,34 +3,51 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
-Future<void> generateBillingPdfToDevice(
-  final billingDetails,
-) async {
-  // ✅ Request storage permission (Android 11+)
-  if (!await Permission.manageExternalStorage.isGranted) {
-    final status = await Permission.manageExternalStorage.request();
-    if (!status.isGranted) {
-      print('Storage permission not granted');
-      await openAppSettings();
-      return;
+Future<void> generateBillingPdfToDevice(Map<String, dynamic> data) async {
+  try {
+    // ✅ Ask for both permissions (for Android 11+ and below)
+    if (!await Permission.manageExternalStorage.isGranted &&
+        !await Permission.storage.isGranted) {
+      final manageStatus = await Permission.manageExternalStorage.request();
+      final storageStatus = await Permission.storage.request();
+
+      if (!manageStatus.isGranted && !storageStatus.isGranted) {
+        print('❌ Storage permission denied — reopening settings');
+        await openAppSettings();
+        return;
+      }
     }
-  }
 
-  final pdf = pw.Document();
+    // ✅ Build PDF
+    final pdf = pw.Document();
 
-  // ✅ Convert ₹ to Rs. to avoid missing glyph issue
-  List<Map<String, String>> cleanedDetails = billingDetails.map((row) {
-    return row.map((key, value) => MapEntry(key, value.replaceAll('₹', 'Rs.')));
-  }).toList();
+    final finalQC = (data['finalQCId'] ?? {}) as Map<String, dynamic>;
+    final transport = (finalQC['transportId'] ?? {}) as Map<String, dynamic>;
+    final purchase = (transport['purchaseId'] ?? {}) as Map<String, dynamic>;
+    final broker = (transport['brokerId'] ?? {}) as Map<String, dynamic>;
 
-  // ✅ Generate full-page PDF content
-  pdf.addPage(
-    pw.Page(
-      margin: const pw.EdgeInsets.all(20),
-      pageFormat: PdfPageFormat.a4,
-      build: (context) {
-        return pw.Column(
+    final billingItems = (data['billingItems'] as List?) ?? [];
+    final deductions =
+    ((data['deductions'] as List?)?.isNotEmpty ?? false) ? data['deductions'][0] : {};
+
+    final tableData = billingItems.map((item) {
+      final map = item as Map<String, dynamic>;
+      return [
+        map['itemName']?.toString() ?? '~',
+        map['weight']?.toString() ?? '~',
+        map['bags']?.toString() ?? '~',
+        map['price']?.toString() ?? '~',
+        map['amount']?.toString() ?? '~',
+      ];
+    }).toList();
+
+    pdf.addPage(
+      pw.Page(
+        margin: const pw.EdgeInsets.all(20),
+        pageFormat: PdfPageFormat.a4,
+        build: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Center(
@@ -43,70 +60,56 @@ Future<void> generateBillingPdfToDevice(
               ),
             ),
             pw.SizedBox(height: 20),
-
-            // Basic info section
-            pw.Text('Unit ID: #221212'),
-            pw.Text('Name: Ramesh Yadav'),
-            pw.Text('Broker: Rahul'),
-            pw.Text('Initial Weight: 511'),
-            pw.Text('Final Weight: 511'),
-            pw.Text('Net Weight: 112'),
+            pw.Text('Unit ID: #${finalQC['_id'] ?? '~'}'),
+            pw.Text('Name: ${purchase['name'] ?? '~'}'),
+            pw.Text('Broker: ${broker['name'] ?? '~'}'),
+            pw.Text('Initial Weight: ${transport['weight'] ?? '~'}'),
+            pw.Text('Final Weight: ${finalQC['finalweight'] ?? '~'}'),
 
             pw.SizedBox(height: 20),
-            pw.Text(
-              'Billing Details',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-            ),
+            pw.Text('Billing Details',
+                style: pw.TextStyle(
+                    fontSize: 16, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 10),
-
-            // Billing table
             pw.TableHelper.fromTextArray(
               border: pw.TableBorder.all(width: 0.5),
-              headerDecoration: const pw.BoxDecoration(
-                color: PdfColors.grey300,
-              ),
+              headerDecoration:
+              const pw.BoxDecoration(color: PdfColors.grey300),
               headers: ['Paddy Type', 'Weight', 'Bags', 'Price', 'Amount'],
-              data: cleanedDetails.map((item) {
-                return [
-                  item['paddyType']!,
-                  item['weight']!,
-                  item['bags']!,
-                  item['price']!,
-                  item['amount']!,
-                ];
-              }).toList(),
+              data: tableData,
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellStyle: const pw.TextStyle(fontSize: 12),
-              cellAlignment: pw.Alignment.centerLeft,
-              headerAlignment: pw.Alignment.centerLeft,
             ),
 
             pw.SizedBox(height: 20),
-            pw.Text(
-              'Deductions',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.Text('Labor Charge: Rs. 2300'),
-            pw.Text('Brokerage: Rs. 1220'),
+            pw.Text('Deductions',
+                style: pw.TextStyle(
+                    fontSize: 16, fontWeight: pw.FontWeight.bold)),
+            pw.Text('Labour Charge: Rs. ${deductions['labourcharge'] ?? 0}'),
+            pw.Text('Brokerage: Rs. ${deductions['brokerage'] ?? 0}'),
+            pw.Text('Other: Rs. ${deductions['enteramount'] ?? 0}'),
 
             pw.Divider(),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text(
-                  'Total:',
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                pw.Text(
-                  'Rs. 2300',
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
+                pw.Text('Total:',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+                pw.Text('Rs. ${data['totalAmount'] ?? 0}',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Net Payable:',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+                pw.Text('Rs. ${data['netPayable'] ?? 0}',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
               ],
             ),
 
@@ -123,22 +126,34 @@ Future<void> generateBillingPdfToDevice(
               ),
             ),
           ],
-        );
-      },
-    ),
-  );
+        ),
+      ),
+    );
 
-  // ✅ Save to Downloads folder
-  final downloadsDir = Directory('/storage/emulated/0/Download');
-  if (!await downloadsDir.exists()) {
-    await downloadsDir.create(recursive: true);
+    // ✅ Save to Downloads (works on Android 10 & 11+)
+    Directory? downloadsDir;
+    try {
+      downloadsDir = Directory('/storage/emulated/0/Download');
+      if (!await downloadsDir.exists()) {
+        downloadsDir = await getExternalStorageDirectory();
+      }
+    } catch (_) {
+      downloadsDir = await getExternalStorageDirectory();
+    }
+
+    final customerName = (purchase['name'] ?? 'customer')
+        .toString()
+        .replaceAll(' ', '_')
+        .toLowerCase();
+    final filePath =
+        '${downloadsDir!.path}/billing_${customerName}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+
+    print('✅ PDF saved to: $filePath');
+    await OpenFilex.open(file.path);
+  } catch (e, st) {
+    print('❌ Error generating PDF: $e');
+    print(st);
   }
-
-  final filePath =
-      '${downloadsDir.path}/billing_${DateTime.now().millisecondsSinceEpoch}.pdf';
-  final file = File(filePath);
-  await file.writeAsBytes(await pdf.save());
-
-  print('✅ PDF saved to: $filePath');
-  await OpenFilex.open(file.path);
 }

@@ -321,26 +321,28 @@ class _BillingScreenState extends State<BillingScreen> {
                           height: height,
                           width: width,
                           onPressed: () {
-                            // final String status = data['billing']?.toString().toLowerCase() ?? '';
-                            //
-                            // if (status.contains('pending')) {
-                            //   // Pending status → Pending screen
-                            //   final route = widget.isSuperUser!
-                            //       ? AppRoutes.billingFillDetailsSuperUser // SuperUser Pending
-                            //       : AppRoutes.billingFillDetailsScreen;   // Normal Pending
-                            //
-                            //   Navigator.pushNamed(context, route, arguments: data).then((value) {
-                            //     if (value == true) _fetchBilling(refresh: true);
-                            //   });
-                            // }
-                            final route = widget.isSuperUser!
-                                ? AppRoutes.billingFillDetailsSuperUser // SuperUser Pending
-                                : AppRoutes.billingFillDetailsScreen;   // Normal Pending
+                            final String status = data['billing']?.toString().toLowerCase() ?? '';
 
-                            Navigator.pushNamed(context, route, arguments: data).then((value) {
-                              if (value == true) _fetchBilling(refresh: true);
-                            });
+                            if (status.contains('pending')) {
+                              // 🔹 Pending → Go to fill details screen
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.billingFillDetailsScreen,
+                                arguments: data,
+                              ).then((value) {
+                                if (value == true) _fetchBilling(refresh: true);
+                              });
+                            } else {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.billingDetailScreenSuperUser,
+                                arguments: data,
+                              ).then((value) {
+                                if (value == true) _fetchBilling(refresh: true);
+                              });
+                            }
                           },
+
 
 
                           isSuperUser: widget.isSuperUser ?? false,

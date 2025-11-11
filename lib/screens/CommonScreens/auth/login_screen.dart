@@ -88,13 +88,14 @@ class _LoginScreenState extends State<LoginScreen> {
       final id = data['id'] ?? '';
       final name = data['name'] ?? '';
       final mobile = data['mobileno'] ?? '';
-
+      final factoryId = data['factory'] ?? '';
       PrefUtils.setUserDetails(
         id: id,
         name: name,
         mobile: mobile,
         role: role,
         token: token,
+        factoryId: factoryId
       );
 
       PrefUtils.setLoggedIn(true);

@@ -13,6 +13,7 @@ import 'Bloc/Broker/broker_bloc.dart';
 import 'Bloc/ExpenseBloc/expense_bloc.dart';
 import 'Bloc/FactoryBloc/factory_bloc.dart';
 import 'Bloc/LabourBloc/labour_bloc.dart';
+import 'Bloc/NotificationBloc/notification_bloc.dart';
 import 'Bloc/ProductBloc/product_bloc.dart';
 import 'Bloc/ProfileBloc/profile_bloc.dart';
 import 'Bloc/PurchaseRequest/purchase_request_bloc.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ExpenseBloc>(create: (_) => ExpenseBloc()),
         BlocProvider<AttendanceBloc>(create: (_) => AttendanceBloc()),
         BlocProvider<SalaryBloc>(create: (_) => SalaryBloc()),
+        BlocProvider<NotificationBloc>(create: (_) => NotificationBloc()),
       ],
       child: MaterialApp(
         title: 'Broker App',

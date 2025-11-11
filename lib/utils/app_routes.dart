@@ -140,7 +140,7 @@ class AppRoutes {
         );
       case AppRoutes.loadingProductScreen:
         final data = settings.arguments;
-        return _buildPageRoute(LoadingProductScreen(userData: data), settings);
+        return _buildPageRoute(LoadingProductScreen(salesData: data), settings);
       case AppRoutes.reportScreen:
         final args = settings.arguments as Map?;
         return _buildPageRoute(
