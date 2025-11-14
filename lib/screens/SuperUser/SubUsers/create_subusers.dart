@@ -21,7 +21,8 @@ class CreateSubUserPage extends StatefulWidget {
 
 class _CreateSubUserPageState extends State<CreateSubUserPage> {
   final _formKey = GlobalKey<FormState>();
-
+  bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController(); // replaced phone with email
@@ -290,6 +291,18 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                         label: 'Password',
                         hint: 'Enter Password',
                         controller: _passwordController,
+                        obscureText: _isPasswordObscured,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordObscured ? Icons.visibility_off : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordObscured = !_isPasswordObscured;
+                            });
+                          },
+                        ),
                         validator: (val) => val == null || val.isEmpty
                             ? 'Enter Password'
                             : null,
@@ -301,13 +314,23 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                         label: 'Confirm Password',
                         hint: 'Enter Password',
                         controller: _confirmPasswordController,
+                        obscureText: _isConfirmPasswordObscured,
                         validator: (val) {
-                          if (val == null || val.isEmpty)
-                            return 'Confirm Password';
-                          if (val != _passwordController.text)
-                            return 'Passwords do not match';
+                          if (val == null || val.isEmpty) return 'Confirm Password';
+                          if (val != _passwordController.text) return 'Passwords do not match';
                           return null;
                         },
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isConfirmPasswordObscured ? Icons.visibility_off : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isConfirmPasswordObscured = !_isConfirmPasswordObscured;
+                            });
+                          },
+                        ),
                       ),
                       AppDimensions.h30(context),
 

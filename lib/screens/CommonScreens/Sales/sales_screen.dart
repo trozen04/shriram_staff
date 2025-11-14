@@ -405,7 +405,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                     arguments: data,
                                   );
                                 } else {
-                                  if (status.contains('pending')) {
+                                  if (status.contains('pending') && !status.contains('pendingload')) {
                                     final confirmed = await CustomConfirmationDialog.show(
                                       context: context,
                                       title: "Pending Sale",
@@ -424,7 +424,7 @@ class _SalesScreenState extends State<SalesScreen> {
                                       developer.log("Sale cancelled: ${data['_id']}");
                                     }
                                     // 🔹 Do NOT navigate to loading screen, keep logic as is
-                                  } else if(status.contains('accepted')) {
+                                  }else if(status.contains('accepted') || status.contains('pendingload')) {
                                     final result = await Navigator.pushNamed(
                                       context,
                                       AppRoutes.loadingProductScreen,

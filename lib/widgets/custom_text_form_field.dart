@@ -53,7 +53,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(10),
                 ]
-              : null,
+              : [
+                LengthLimitingTextInputFormatter(40),
+              ],
           validator: (value) {
             final result = widget.validator?.call(value);
             setState(() {

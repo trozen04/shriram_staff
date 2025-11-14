@@ -454,7 +454,7 @@ class ReusableTextField extends StatelessWidget {
   final String label;
   final String? hint;
   final TextEditingController? controller;
-  final String? initialValue; // <-- add this
+  final String? initialValue;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
@@ -466,6 +466,10 @@ class ReusableTextField extends StatelessWidget {
   final VoidCallback? onActionTap;
   final IconData? actionIcon;
   final VoidCallback? onIconTap;
+
+  // NEW
+  final bool obscureText;
+  final Widget? suffixIcon;
 
   const ReusableTextField({
     super.key,
@@ -484,6 +488,8 @@ class ReusableTextField extends StatelessWidget {
     this.onActionTap,
     this.actionIcon,
     this.onIconTap,
+    this.obscureText = false, // default false
+    this.suffixIcon,          // optional suffix widget
   });
 
   @override
@@ -524,7 +530,7 @@ class ReusableTextField extends StatelessWidget {
         // Text Field
         TextFormField(
           controller: controller,
-          initialValue: controller == null ? initialValue : null, // <-- use initialValue if controller is not provided
+          initialValue: controller == null ? initialValue : null,
           onChanged: onChanged,
           validator: validator,
           keyboardType: keyboardType,
@@ -532,6 +538,7 @@ class ReusableTextField extends StatelessWidget {
           maxLines: maxLines,
           onTap: onTap,
           textCapitalization: textCapitalization,
+          obscureText: obscureText, // NEW
           inputFormatters: [
             if (keyboardType == TextInputType.phone) ...[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
@@ -539,14 +546,14 @@ class ReusableTextField extends StatelessWidget {
             ],
             if (keyboardType == TextInputType.number)
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+            if (keyboardType == TextInputType.text)
+              LengthLimitingTextInputFormatter(40),
           ],
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.hintText,
             filled: true,
-            fillColor: readOnly
-                ? AppColors.readOnlyFillColor
-                : Colors.white,
+            fillColor: readOnly ? AppColors.readOnlyFillColor : Colors.white,
             contentPadding: EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.035,
               vertical: MediaQuery.of(context).size.height * 0.015,
@@ -568,6 +575,7 @@ class ReusableTextField extends StatelessWidget {
                 width: 2,
               ),
             ),
+            suffixIcon: suffixIcon, // NEW
           ),
         ),
       ],

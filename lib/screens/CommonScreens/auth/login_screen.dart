@@ -24,7 +24,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
+  bool _obscurePassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 CustomTextFormField(
                   controller: _emailController,
                   hintText: 'Enter Email',
-                  prefixIcon: Icons.email,
+                  prefix: Icon(Icons.email, color: AppColors.primaryColor,),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Email is required';
@@ -178,6 +178,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   hintText: 'Enter Password',
                   prefixImagePath: ImageAssets.passwordImage,
+                  obscureText: _obscurePassword,
+                  suffix: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: AppColors.primaryColor, // your color
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'password is required';
                     return null;

@@ -76,7 +76,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(PrefUtils.getUserName(), style: AppTextStyles.appbarName, maxLines: 2,),
-                              Text('Worker', style: AppTextStyles.appbarWork),
+                              Text(superUser! ? 'Superuser' : 'Worker', style: AppTextStyles.appbarWork),
                             ],
                           ),
                         ),
