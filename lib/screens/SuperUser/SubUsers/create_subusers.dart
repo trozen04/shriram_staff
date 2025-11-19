@@ -33,32 +33,47 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
 
   String? _selectedFactory;
   String? _selectedFactoryId;
-  String? _selectedAuthority;
+  List<String> _selectedAuthorities = [];
+
 
   bool isButtonLoading = false;
   bool isLoading = false;
 
   List<Map<String, String>> factoryList = [];
-  final List<String> authorities = ['Select Authority', 'SubUser'];
+  final List<String> authorities = [
+    'Select Authority',
+    'Delivery',
+    'Finalqc',
+    'Billing',
+    'Factory',
+    'Sales',
+    'Report',
+  ];
 
   @override
   void initState() {
     super.initState();
     developer.log('subUserData: ${widget.subUserData}');
+
     if (widget.subUserData != null) {
       final data = widget.subUserData;
 
       _nameController.text = data['name'] ?? '';
-      _emailController.text = data['email'] ?? ''; // replace phone with email
+      _emailController.text = data['email'] ?? '';
       _salaryController.text = data['salary']?.toString() ?? '';
       _addressController.text = data['address'] ?? '';
 
-      // Authority
-      if (data['authority'] != null &&
-          authorities.contains(data['authority'])) {
-        _selectedAuthority = data['authority'];
+      // Authority: handle multiple authorities
+      if (data['authority'] != null) {
+        // Assuming backend stores authorities as comma-separated string
+        List<String> savedAuthorities = data['authority']
+            .toString()
+            .split(',')
+            .where((auth) => authorities.contains(auth))
+            .toList();
+        _selectedAuthorities = savedAuthorities;
       } else {
-        _selectedAuthority = authorities.first;
+        _selectedAuthorities = [];
       }
 
       // Factory
@@ -67,11 +82,12 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
         _selectedFactory = data['factory']['factoryname'];
       }
     } else {
-      _selectedAuthority = authorities.first;
+      _selectedAuthorities = [];
     }
 
     context.read<FactoryBloc>().add(FactoryEventHandler());
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -270,20 +286,81 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
 
                       AppDimensions.h10(context),
 
-                      // Authority Dropdown
+                      // Authority Multi-Select
                       Text('Authority', style: AppTextStyles.label),
                       AppDimensions.h5(context),
-                      ReusableDropdown(
-                        items: authorities,
-                        value: _selectedAuthority ?? authorities.first,
-                        onChanged: (val) =>
-                            setState(() => _selectedAuthority = val),
-                        hintText: 'Select Authority',
-                        validator: (val) =>
-                            val == null || val == authorities.first
-                            ? 'Select Authority'
-                            : null,
+                      SizedBox(
+                        width: double.infinity,
+                        child: InkWell(
+                          onTap: () async {
+                            final List<String> selected = await showDialog(
+                              context: context,
+                              builder: (context) {
+                                List<String> tempSelected = List.from(_selectedAuthorities);
+                                return StatefulBuilder(
+                                  builder: (context, setStateDialog) {
+                                    return AlertDialog(
+                                      title: Text('Select Authorities', style: AppTextStyles.appbarTitle),
+                                      content: SingleChildScrollView(
+                                        child: Column(
+                                          children: authorities
+                                              .where((a) => a != 'Select Authority')
+                                              .map((authority) => CheckboxListTile(
+                                            title: Text(authority, style: AppTextStyles.bodyText),
+                                            value: tempSelected.contains(authority),
+                                            onChanged: (bool? value) {
+                                              setStateDialog(() {
+                                                if (value == true) {
+                                                  tempSelected.add(authority);
+                                                } else {
+                                                  tempSelected.remove(authority);
+                                                }
+                                              });
+                                            },
+                                          ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, _selectedAuthorities),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, tempSelected),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+
+                            if (selected != null) {
+                              setState(() => _selectedAuthorities = selected);
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: width * 0.035,
+                              vertical: height * 0.015,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _selectedAuthorities.isEmpty
+                                  ? 'Select Authority'
+                                  : _selectedAuthorities.join(', '),
+                              style: AppTextStyles.hintText,
+                            ),
+                          ),
+                        ),
                       ),
+
+
                       AppDimensions.h10(context),
 
                       // Password
@@ -344,8 +421,7 @@ class _CreateSubUserPageState extends State<CreateSubUserPage> {
                                 email: _emailController.text,
                                 phone: _phoneController.text,
                                 role: 'subuser',
-                                authority:
-                                    _selectedAuthority ?? authorities.first,
+                                authorities: _selectedAuthorities,
                                 salary: _salaryController.text.trim(),
                                 factoryId: _selectedFactoryId ?? '',
                                 address: _addressController.text,

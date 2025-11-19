@@ -16,6 +16,7 @@ import 'package:shree_ram_staff/widgets/custom_app_bar.dart';
 import 'package:shree_ram_staff/widgets/custom_snackbar.dart';
 import 'package:shree_ram_staff/widgets/reusable_functions.dart';
 import '../../../widgets/filter_popup.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 
 class BillingScreen extends StatefulWidget {
   final bool? isSuperUser;
@@ -30,7 +31,7 @@ class _BillingScreenState extends State<BillingScreen> {
   final ScrollController scrollController = ScrollController();
   DateTimeRange? selectedDateRange;
   String? selectedStatus;
-
+  bool isDownload = false;
   List<Map<String, String>> factoryList = [];
   String? _selectedFactoryId;
   bool isLoadingFactory = false;
@@ -98,12 +99,13 @@ class _BillingScreenState extends State<BillingScreen> {
     _fetchBilling(refresh: true);
   }
 
-  void _fetchBilling({bool refresh = false}) {
+  void _fetchBilling({bool refresh = false, bool isDownload = false}) {
     if (refresh) {
       billingList.clear();
       currentPage = 1;
       hasMore = true;
     }
+
     String? normalizedStatus;
     if (selectedStatus != null && selectedStatus!.isNotEmpty) {
       if (selectedStatus!.toLowerCase().contains('pending')) {
@@ -112,6 +114,7 @@ class _BillingScreenState extends State<BillingScreen> {
         normalizedStatus = 'Approve';
       }
     }
+
     context.read<QcBloc>().add(getFinalQcEventHandler(
       page: currentPage,
       limit: limit,
@@ -120,6 +123,7 @@ class _BillingScreenState extends State<BillingScreen> {
       toDate: selectedDateRange?.end.toIso8601String(),
       factory: _selectedFactoryId,
       status: normalizedStatus,
+      isDownload: isDownload, // ✅ pass flag
     ));
   }
 
@@ -134,7 +138,7 @@ class _BillingScreenState extends State<BillingScreen> {
         BlocListener<QcBloc, QcState>(
           listener: (context, state) {
             if (state is getFinalQcLoadingState) {
-              setState(() => isLoading = true);
+              if (!isDownload) setState(() => isLoading = true);
             } else {
               setState(() => isLoading = false);
             }
@@ -202,10 +206,29 @@ class _BillingScreenState extends State<BillingScreen> {
             child: Column(
               children: [
                 // 🔍 Search Field
-                ReusableSearchField(
-                  controller: searchController,
-                  hintText: 'Search Sample No./Farmer/Broker',
-                  onChanged: _onSearchChanged,
+                Row(
+                  children: [
+                    Expanded(
+                      child: ReusableSearchField(
+                        controller: searchController,
+                        hintText: 'Search Sample No./Farmer/Broker',
+                        onChanged: _onSearchChanged,
+                      ),
+                    ),
+                    AppDimensions.w10(context),
+                    SizedBox(
+                      width: width * 0.25,
+                      child: PrimaryButton(
+                        text: 'Save',
+                        onPressed: () {
+                          _fetchBilling(
+                            refresh: true,
+                            isDownload: true, // ✅ trigger download without loading
+                          );
+                        },
+                      )
+                    )
+                  ],
                 ),
 
                 AppDimensions.h20(context),

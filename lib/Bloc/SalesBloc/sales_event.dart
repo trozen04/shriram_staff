@@ -12,6 +12,7 @@ class GetAllSalesLeadsSuperUserEvent extends SalesEvent {
   String? toDate;
   String? status;
   String? factory;
+  bool isDownload; // ✅ Added isDownload
 
   GetAllSalesLeadsSuperUserEvent({
     this.page,
@@ -21,10 +22,9 @@ class GetAllSalesLeadsSuperUserEvent extends SalesEvent {
     this.toDate,
     this.status,
     this.factory,
+    this.isDownload = false, // ✅ Default to false
   });
 }
-
-
 
 /// Subuser: Get all sales leads
 class GetAllSalesLeadsSubUserEvent extends SalesEvent {
@@ -35,6 +35,7 @@ class GetAllSalesLeadsSubUserEvent extends SalesEvent {
   String? toDate;
   String? status;
   bool isSuperUser;
+  bool isDownload; // ✅ Added isDownload
 
   GetAllSalesLeadsSubUserEvent({
     this.page,
@@ -44,6 +45,7 @@ class GetAllSalesLeadsSubUserEvent extends SalesEvent {
     this.toDate,
     this.status,
     required this.isSuperUser,
+    this.isDownload = false, // ✅ Default to false
   });
 }
 
@@ -53,7 +55,7 @@ class CreateSalesLeadEvent extends SalesEvent {
   final String address;
   final String city;
   final String factoryId;
-  final List<Map<String, dynamic>> finalQCItems; // List of QC items with items inside
+  final List<Map<String, dynamic>> finalQCItems;
 
   CreateSalesLeadEvent({
     required this.customerName,
@@ -70,8 +72,14 @@ class GetSalesReportEvent extends SalesEvent {
   final String? fromDate;
   final String? toDate;
   final String? factory;
+  final bool isDownload; // ✅ Added isDownload
 
-  GetSalesReportEvent({this.fromDate, this.toDate, this.factory});
+  GetSalesReportEvent({
+    this.fromDate,
+    this.toDate,
+    this.factory,
+    this.isDownload = false, // ✅ Default to false
+  });
 }
 
 class UpsertLoadingEvent extends SalesEvent {

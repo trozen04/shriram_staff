@@ -20,7 +20,7 @@ class BillingBloc extends Bloc<BillingEvent, BillingState> {
           'page': event.page.toString(),
           'limit': event.limit.toString(),
           if (event.fromDate != null) 'fromdate': event.fromDate!,
-          if (event.toDate != null) 'toDate': event.toDate!,
+          if (event.toDate != null) 'todate': event.toDate!,
           if (event.search != null && event.search!.isNotEmpty)
             'search': event.search!,
           if (event.factoryId != null && event.factoryId!.isNotEmpty)

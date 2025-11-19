@@ -21,6 +21,7 @@ class FetchSalaryEvent extends SalaryEvent {
   final String fromDate;
   final String toDate;
   final String? factoryName;
+  final bool? isDownload;
 
-  FetchSalaryEvent({required this.fromDate, required this.toDate, this.factoryName});
+  FetchSalaryEvent({required this.fromDate, required this.toDate, this.factoryName, this.isDownload});
 }

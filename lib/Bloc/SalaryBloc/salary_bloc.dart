@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../Constants/ApiConstants.dart';
 import '../../utils/pref_utils.dart';
 
@@ -13,8 +16,6 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
   SalaryBloc() : super(SalaryInitialState()) {
 
     on<FetchSalaryEvent>((event, emit) async {
-      emit(SalaryLoadingState());
-
       try {
         final userToken = PrefUtils.getToken();
 
@@ -24,6 +25,7 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
           'todate': event.toDate,
           if (event.factoryName != null && event.factoryName!.isNotEmpty)
             'factoryname': event.factoryName!,
+          if (event.isDownload == true) 'download': 'pdf',
         };
 
         // Build URI with query parameters
@@ -32,6 +34,11 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
 
         developer.log('Salary API URL: $uri');
         developer.log('Salary queryParams: $queryParams');
+
+        // Emit loading only for JSON requests
+        if (event.isDownload == false) {
+          emit(SalaryLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -43,8 +50,20 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
 
         developer.log('Salary API response: ${response.statusCode}\n${response.body}');
 
-        final responseData = jsonDecode(response.body);
+        final contentType = response.headers['content-type'] ?? '';
 
+        // PDF handling
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/salary_report.pdf');
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // skip emitting any other state
+        }
+
+        // Normal JSON response
+        final responseData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           developer.log('Salary API responseData: $responseData');
           emit(SalarySuccessState(salaryData: responseData));

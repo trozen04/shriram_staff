@@ -20,7 +20,7 @@ final class SubusersCreateEvent extends SubusersEvent {
   final String email;
   final String phone;
   final String role;
-  final String authority;
+  final List<String> authorities;
   final String salary;
   final String factoryId;
   final String address;
@@ -32,7 +32,7 @@ final class SubusersCreateEvent extends SubusersEvent {
     required this.email,
     required this.phone,
     required this.role,
-    required this.authority,
+    required this.authorities,
     required this.salary,
     required this.factoryId,
     required this.address,

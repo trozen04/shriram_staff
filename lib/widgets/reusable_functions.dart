@@ -108,7 +108,7 @@ class ProfileRow extends StatelessWidget {
               child: Text(
                 displayValue,
                 style: AppTextStyles.profileDataText,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.right,
               ),

@@ -89,13 +89,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final name = data['name'] ?? '';
       final mobile = data['mobileno'] ?? '';
       final factoryId = data['factory'] ?? '';
+      final authorityList = List<String>.from(data['authority'] ?? []);
+
       PrefUtils.setUserDetails(
         id: id,
         name: name,
         mobile: mobile,
         role: role,
         token: token,
-        factoryId: factoryId
+        factoryId: factoryId,
+        authority: authorityList,
       );
 
       PrefUtils.setLoggedIn(true);

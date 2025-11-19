@@ -10,6 +10,7 @@ import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_app_bar.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../widgets/expensePopUp.dart';
 import '../../../widgets/custom_snackbar.dart';
@@ -25,7 +26,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   DateTimeRange? selectedDateRange;
   Timer? _debounce;
   ScrollController scrollController = ScrollController();
-
+  bool isDownload = false;
   // Factories
   Map<String, String> factoryMap = {}; // name -> id (not needed now)
   Set<String> factoryNames = {};
@@ -74,14 +75,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     }
   }
 
-  void _fetchExpenses({bool reset = false}) {
+  void _fetchExpenses({bool reset = false, bool isDownload = false}) {
     if (reset) {
       currentPage = 1;
       hasMore = true;
       expenseData.clear();
     }
 
-    setState(() => isLoadingMore = true);
+    if (!isDownload) {
+      setState(() => isLoadingMore = true);
+    }
 
     final fromDate = selectedDateRange?.start.toIso8601String();
     final toDate = selectedDateRange?.end.toIso8601String();
@@ -96,6 +99,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       fromDate: fromDate,
       toDate: toDate,
       factoryName: factoryName,
+      isDownload: isDownload,
     ));
   }
 
@@ -191,65 +195,84 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Date + Factory buttons
-              Row(
-                children: [
-                  CustomIconButton(
-                    text: formatDateRange(selectedDateRange),
-                    imagePath: ImageAssets.calender,
-                    width: width,
-                    height: height,
-                    onTap: _pickDate,
-                  ),
-                  AppDimensions.w20(context),
-                  isLoadingFactory
-                      ? const SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                      : Container(
-                    padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(30),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    CustomIconButton(
+                      text: formatDateRange(selectedDateRange),
+                      imagePath: ImageAssets.calender,
+                      width: width,
+                      height: height,
+                      onTap: _pickDate,
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedFactoryName,
-                        hint: Row(
-                          children: [
-                            Image.asset(ImageAssets.factoryPNG, height: 18, width: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Factory',
-                              style: AppTextStyles.bodyText.copyWith(
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.w500,
+                    AppDimensions.w20(context),
+                    isLoadingFactory
+                        ? const SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                        : Container(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.16),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedFactoryName,
+                          hint: Row(
+                            children: [
+                              Image.asset(ImageAssets.factoryPNG, height: 18, width: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Factory',
+                                style: AppTextStyles.bodyText.copyWith(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          items: factoryNames.map((name) {
+                            return DropdownMenuItem<String>(
+                              value: name,
+                              child: Text(
+                                name,
+                                style: AppTextStyles.bodyText.copyWith(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() => selectedFactoryName = val);
+                            _fetchExpenses(reset: true);
+                          },
+                          icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primaryColor),
                         ),
-                        items: factoryNames.map((name) {
-                          return DropdownMenuItem<String>(
-                            value: name,
-                            child: Text(
-                              name,
-                              style: AppTextStyles.bodyText.copyWith(
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(() => selectedFactoryName = val);
-                          _fetchExpenses(reset: true);
-                        },
-                        icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primaryColor),
                       ),
                     ),
-                  ),
-                ],
+                    AppDimensions.w20(context),
+                    SizedBox(
+                      width: width * 0.25,
+                      child: PrimaryButton(
+                        text: 'Save',
+                        onPressed: () {
+                          setState(() {
+                            isDownload = true;
+                          });
+
+                          _fetchExpenses(
+                            isDownload: true,
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
               AppDimensions.h20(context),
 

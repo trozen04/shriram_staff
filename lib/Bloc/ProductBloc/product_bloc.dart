@@ -22,7 +22,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
         Map<String, String> queryParams = {};
         if (event.fromDate != null) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null) queryParams['todate'] = event.toDate!;
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
 
         final finalUri = queryParams.isNotEmpty ? uri.replace(queryParameters: queryParams) : uri;

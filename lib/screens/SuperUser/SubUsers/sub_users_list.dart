@@ -263,7 +263,11 @@ class _SubUsersListState extends State<SubUsersList> {
                         position: data['role'] ?? '~',
                         phone: data['mobileno'] ?? '~',
                         email: data['email'] ?? '~',
-                        qcType: data['authority'] ?? '~',
+                        authorities: data['authority'] != null
+                            ? (data['authority'] is String
+                            ? (data['authority'] as String).split(',').map((e) => e.trim()).toList()
+                            : List<String>.from(data['authority']))
+                            : [],
                        // factory: data?['factory']?['factoryname'] ?? '~',
                         height: height,
                         width: width,

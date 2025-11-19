@@ -11,6 +11,7 @@ class PrefUtils {
   static const String _userNameKey = 'userName';
   static const String _userMobileKey = 'userMobile';
   static const String _factoryIdKey = 'factoryId';
+  static const String _authorityKey = 'authorityList'; // new key
 
   /// 🏁 Must call once before runApp()
   static Future<void> init() async {
@@ -38,6 +39,7 @@ class PrefUtils {
     required String role,
     required String token,
     required String factoryId,
+    List<String>? authority, // new param
   }) {
     _prefs.setBool(_isLoggedInKey, true);
     _prefs.setString(_userIdKey, id);
@@ -46,6 +48,12 @@ class PrefUtils {
     _prefs.setString(_userRoleKey, role);
     _prefs.setString(_tokenKey, token);
     _prefs.setString(_factoryIdKey, factoryId);
+
+    if (authority != null) {
+      _prefs.setStringList(_authorityKey, authority);
+    } else {
+      _prefs.remove(_authorityKey);
+    }
   }
 
   static String getUserId() => _prefs.getString(_userIdKey) ?? '';
@@ -54,6 +62,9 @@ class PrefUtils {
   static String getUserRole() => _prefs.getString(_userRoleKey) ?? '';
   static String getToken() => _prefs.getString(_tokenKey) ?? '';
   static String getFactoryId() => _prefs.getString(_factoryIdKey) ?? '';
+
+  /// ✅ Get saved authority list
+  static List<String> getAuthority() => _prefs.getStringList(_authorityKey) ?? [];
 
   // ───────────────────────────────
   // LOGOUT / CLEAR
@@ -65,6 +76,7 @@ class PrefUtils {
     _prefs.remove(_userMobileKey);
     _prefs.remove(_userRoleKey);
     _prefs.remove(_tokenKey);
+    _prefs.remove(_authorityKey); // remove authority
   }
 
   static void clearPrefs() {

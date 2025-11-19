@@ -1,8 +1,9 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> generateBillingPdfToDevice(Map<String, dynamic> data) async {
@@ -150,10 +151,10 @@ Future<void> generateBillingPdfToDevice(Map<String, dynamic> data) async {
     final file = File(filePath);
     await file.writeAsBytes(await pdf.save());
 
-    print('✅ PDF saved to: $filePath');
-    await OpenFilex.open(file.path);
+    developer.log('✅ PDF saved to: $filePath');
+    await OpenFile.open(file.path);
   } catch (e, st) {
-    print('❌ Error generating PDF: $e');
+    developer.log('❌ Error generating PDF: $e');
     print(st);
   }
 }

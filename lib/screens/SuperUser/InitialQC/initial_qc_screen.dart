@@ -104,6 +104,7 @@ class _InitialQcScreenState extends State<InitialQcScreen> {
         status: normalizedStatus,
         search: query,
         factory: _selectedFactoryName,
+
       ),
     );
 

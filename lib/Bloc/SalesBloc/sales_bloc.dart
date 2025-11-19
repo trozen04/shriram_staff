@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shree_ram_staff/Constants/ApiConstants.dart';
 
 import '../../utils/pref_utils.dart';
@@ -17,8 +19,6 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
   SalesBloc() : super(SalesInitial()) {
 
     on<GetAllSalesLeadsSuperUserEvent>((event, emit) async {
-      emit(SalesLoading());
-
       try {
         final token = PrefUtils.getToken();
         var queryParams = <String, String>{};
@@ -26,16 +26,24 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
-        // Build final URI safely
+
+        // ✅ Add download param
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+
         developer.log('🧾 Query Params: $queryParams');
 
         final url = ApiConstants.baseUrl + ApiConstants.getAllSalesLeadsForSuperUser;
-        final uri = Uri.parse(
-          url,
-        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+        developer.log('🧾 url: $url');
+
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit Loading only if NOT downloading
+        if (event.isDownload == false) {
+          emit(SalesLoading());
+        }
 
         final response = await http.get(
           uri,
@@ -44,8 +52,21 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
             'Authorization': 'Bearer $token',
           },
         );
+
+        // ✅ Handle PDF download separately
+        final contentType = response.headers['content-type'] ?? '';
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/sales_leads_superuser.pdf'); // Unique name
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // Stop execution here
+        }
+
         developer.log('response: ${response.body}');
         final data = jsonDecode(response.body);
+
         if (response.statusCode == 200) {
           emit(SalesSuccess(data));
         } else {
@@ -60,8 +81,6 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
     });
 
     on<GetAllSalesLeadsSubUserEvent>((event, emit) async {
-      emit(SalesLoading());
-
       try {
         final token = PrefUtils.getToken();
         var queryParams = <String, String>{};
@@ -69,21 +88,28 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
-        // Build final URI safely
+
+        // ✅ Add download param
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+
         developer.log('🧾 Query Params: $queryParams');
+
         String url;
         if (event.isSuperUser == true) {
-          // SuperUser → no factory filter
           url = '${ApiConstants.baseUrl}${ApiConstants.getAllSalesLeadsForSuperUser}';
         } else {
-          // SubUser → factory-specific
           final factoryId = PrefUtils.getFactoryId();
           url = '${ApiConstants.baseUrl}${ApiConstants.getAllSalesLeadsForSubUser}/$factoryId';
         }
+        developer.log('🧾 url: $url');
         final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
 
+        // ✅ Emit Loading only if NOT downloading
+        if (event.isDownload == false) {
+          emit(SalesLoading());
+        }
 
         final response = await http.get(
           uri,
@@ -92,8 +118,21 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
             'Authorization': 'Bearer $token',
           },
         );
+
+        // ✅ Handle PDF download separately
+        final contentType = response.headers['content-type'] ?? '';
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/sales_leads_subuser.pdf'); // Unique name
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // Stop execution here
+        }
+
         developer.log('response: ${response.body}');
         final data = jsonDecode(response.body);
+
         if (response.statusCode == 200) {
           emit(SalesSuccess(data));
         } else {
@@ -102,6 +141,67 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
       } catch (e) {
         developer.log('catchError : ${e.toString()}');
         emit(SalesError('Oops! Something went wrong. Please try again later.'));
+      }
+    });
+
+    on<GetSalesReportEvent>((event, emit) async {
+      // ✅ Bypass cache check if downloading
+      // if (event.isDownload == false &&
+      //     lastReportData != null &&
+      //     event.fromDate == null &&
+      //     event.toDate == null &&
+      //     (event.factory == null || event.factory!.isEmpty)) {
+      //   emit(SalesReportSuccess({'data': lastReportData}));
+      //   return;
+      // }
+
+      try {
+        final token = PrefUtils.getToken();
+        final url = '${ApiConstants.baseUrl}/api/saleslead/report';
+        var queryParams = <String, String>{};
+
+        if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
+        if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
+        developer.log('🧾 queryParams: $queryParams');
+        // ✅ Add download param
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+        developer.log('🧾report url: $url');
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit Loading only if NOT downloading
+        if (event.isDownload == false) {
+          emit(SalesLoading());
+        }
+
+        final response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        // ✅ Handle PDF download separately
+        final contentType = response.headers['content-type'] ?? '';
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/sales_report.pdf'); // Unique name
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // Stop execution here
+        }
+
+        final data = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          emit(SalesReportSuccess(data));
+        } else {
+          emit(SalesError(data['message'] ?? 'Failed to fetch sales report. Status: ${response.statusCode}'));
+        }
+      } catch (e) {
+        developer.log('SalesReportError: ${e.toString()}');
+        emit(SalesError('Something went wrong while fetching sales report.'));
       }
     });
 
@@ -142,56 +242,6 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
       } catch (e) {
         developer.log('CreateSalesLeadError: ${e.toString()}');
         emit(SalesError('Something went wrong while creating sales lead.'));
-      }
-    });
-
-    on<GetSalesReportEvent>((event, emit) async {
-      if (lastReportData != null &&
-          event.fromDate == null &&
-          event.toDate == null &&
-          (event.factory == null || event.factory!.isEmpty)) {
-        emit(SalesReportSuccess({'data': lastReportData}));
-        return;
-      }
-      emit(SalesLoading());
-      try {
-        final token = PrefUtils.getToken();
-
-        final url = ApiConstants.baseUrl + '/api/saleslead/report';
-        var queryParams = <String, String>{};
-        if (event.fromDate != null && event.fromDate!.isNotEmpty) {
-          queryParams['fromdate'] = event.fromDate!;
-        }
-        if (event.toDate != null && event.toDate!.isNotEmpty) {
-          queryParams['toDate'] = event.toDate!;
-        }
-        if (event.factory != null && event.factory!.isNotEmpty) {
-          queryParams['factoryname'] = event.factory!;
-        }
-
-        final uri = Uri.parse(url).replace(
-          queryParameters: queryParams.isEmpty ? null : queryParams,
-        );
-
-       // developer.log('📊 Sales Report URI: $uri');
-
-        final response = await http.get(
-          uri,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-        );
-
-        final data = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          emit(SalesReportSuccess(data));
-        } else {
-          emit(SalesError(data['message'] ?? 'Failed to fetch sales report. Status: ${response.statusCode}'));
-        }
-      } catch (e) {
-        developer.log('SalesReportError: ${e.toString()}');
-        emit(SalesError('Something went wrong while fetching sales report.'));
       }
     });
 

@@ -9,6 +9,7 @@ import '../../../utils/app_colors.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/custom_snackbar.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _ReportScreenState extends State<ReportScreen> {
   Set<String> factoryNames = {};
   String? selectedFactoryName;
   bool isLoadingFactory = false;
-
+  bool isDownload = false;
   // Report state
   bool isLoading = false;
   List<Map<String, String>> reportData = [];
@@ -55,7 +56,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   // Fetch report
-  void _fetchReportData() {
+  void _fetchReportData({bool? isDownload = false}) {
     final fromDate = selectedDateRange?.start.toIso8601String().split('T').first;
     final toDate = selectedDateRange?.end.toIso8601String().split('T').first;
 
@@ -63,7 +64,8 @@ class _ReportScreenState extends State<ReportScreen> {
       GetSalesReportEvent(
         fromDate: fromDate,
         toDate: toDate,
-        factory: selectedFactoryName, // 🟢 send factory name instead of id
+        factory: selectedFactoryName,
+        isDownload: isDownload ?? false
       ),
     );
 
@@ -147,7 +149,6 @@ class _ReportScreenState extends State<ReportScreen> {
                     height: height,
                     onTap: _pickDate,
                   ),
-                  SizedBox(width: width * 0.045),
 
                   // 🏭 Factory Dropdown (Same UI as BrokerScreen)
                   if (widget.isSuperUser)
@@ -203,6 +204,22 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                     ),
+
+                  SizedBox(
+                    width: width * 0.25,
+                    child: PrimaryButton(
+                      text: 'Save',
+                      onPressed: () {
+                        setState(() {
+                          isDownload = true; // trigger download param
+                        });
+
+                        _fetchReportData(
+                          isDownload: true, // pass flag
+                        );
+                      },
+                    ),
+                  )
                 ],
               ),
 

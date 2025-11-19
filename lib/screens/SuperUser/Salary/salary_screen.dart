@@ -8,6 +8,7 @@ import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../widgets/custom_app_bar.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../Bloc/SalaryBloc/salary_bloc.dart';
 import '../../../Bloc/FactoryBloc/factory_bloc.dart';
@@ -21,7 +22,7 @@ class SalaryScreen extends StatefulWidget {
 
 class _SalaryScreenState extends State<SalaryScreen> {
   DateTimeRange? selectedDateRange;
-
+  bool isDownload = false;
   // Salary state
   List<dynamic> salaryData = [];
   bool isLoading = false;
@@ -62,7 +63,7 @@ class _SalaryScreenState extends State<SalaryScreen> {
     }
   }
 
-  void _fetchSalary() {
+  void _fetchSalary({bool isDownload = false}) {
     if (selectedDateRange == null) return;
 
     final fromDate = selectedDateRange!.start.toIso8601String().split('T')[0];
@@ -77,6 +78,7 @@ class _SalaryScreenState extends State<SalaryScreen> {
       fromDate: fromDate,
       toDate: toDate,
       factoryName: factoryName,
+      isDownload: isDownload
     ));
   }
 
@@ -143,39 +145,60 @@ class _SalaryScreenState extends State<SalaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Factory dropdown container (same UI as before)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.0),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    isLoadingFactory
-                        ? const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 2))
-                        : DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedFactoryName,
-                        items: factoryNames.map((name) {
-                          return DropdownMenuItem<String>(
-                            value: name,
-                            child: Text(
-                              name,
-                              style: AppTextStyles.dateText,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(() => selectedFactoryName = val);
-                          _fetchSalary();
-                        },
-                        icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primaryColor),
-                      ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: width * 0.035, vertical: height * 0.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withAlpha((0.16 * 255).toInt()),
+                      borderRadius: BorderRadius.circular(60),
                     ),
-                    Image.asset(ImageAssets.factoryPNG, height: height * 0.025),
-                  ],
-                ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        isLoadingFactory
+                            ? const SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 2))
+                            : DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedFactoryName,
+                            items: factoryNames.map((name) {
+                              return DropdownMenuItem<String>(
+                                value: name,
+                                child: Text(
+                                  name,
+                                  style: AppTextStyles.dateText,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setState(() => selectedFactoryName = val);
+                              _fetchSalary();
+                            },
+                            icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primaryColor),
+                          ),
+                        ),
+                        Image.asset(ImageAssets.factoryPNG, height: height * 0.025),
+                      ],
+                    ),
+                  ),
+                  AppDimensions.w10(context),
+                  SizedBox(
+                    width: width * 0.25,
+                    child: PrimaryButton(
+                      text: 'Save',
+                      onPressed: () {
+                        setState(() {
+                          isDownload = true; // trigger download param
+                        });
+
+                        _fetchSalary(
+                          isDownload: true,
+                        );
+                      },
+                    ),
+                  )
+                ],
               ),
 
               AppDimensions.h10(context),

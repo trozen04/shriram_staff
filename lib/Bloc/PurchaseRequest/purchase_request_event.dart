@@ -11,6 +11,7 @@ final class PurchaseRequestEventHandler extends PurchaseRequestEvent {
   String? toDate;
   String? status;
   String? factoryName;
+  bool? isDownload;
 
   PurchaseRequestEventHandler({
     this.page,
@@ -20,6 +21,7 @@ final class PurchaseRequestEventHandler extends PurchaseRequestEvent {
     this.toDate,
     this.status,
     this.factoryName,
+    this.isDownload,
   });
 }
 
@@ -31,6 +33,7 @@ final class purchaseRequest extends PurchaseRequestEvent {
   String? toDate;
   String? status;
   String? factoryName;
+  bool? isDownload;
 
   purchaseRequest({
     this.page,
@@ -40,6 +43,7 @@ final class purchaseRequest extends PurchaseRequestEvent {
     this.toDate,
     this.status,
     this.factoryName,
+    this.isDownload,
   });
 }
 

@@ -7,6 +7,7 @@ import '../../../Bloc/AttendanceBloc/attendance_bloc.dart';
 import '../../../Bloc/FactoryBloc/factory_bloc.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/flutter_font_styles.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../utils/app_routes.dart';
 import '../../../widgets/custom_snackbar.dart';
@@ -24,6 +25,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Set<String> factoryNames = {};
   String? selectedFactoryName;
   bool isLoadingFactory = false;
+  bool isDownload = false;
 
   @override
   void initState() {
@@ -46,15 +48,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
-  void _fetchAttendance() {
-    if (selectedFactoryName == null || selectedMonthYear == null) return;
+  void _fetchAttendance({bool? isDownload = false}) {
+    if (selectedFactoryName == null) return;
+
+    final monthYear = selectedMonthYear ?? DateTime.now();
 
     context.read<AttendanceBloc>().add(FetchAttendanceEventHandler(
-      month: selectedMonthYear!.month,
-      year: selectedMonthYear!.year,
+      month: monthYear.month,
+      year: monthYear.year,
       factoryName: selectedFactoryName!,
+      isDownload: isDownload ?? false
     ));
   }
+
 
   String get monthYearLabel {
     if (selectedMonthYear == null) return 'Select Month/Year';
@@ -106,6 +112,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ),
                   SizedBox(width: width * 0.04),
                   _buildIconContainer(width, height, _pickMonthYear, imagePath: ImageAssets.calender),
+                  SizedBox(width: width * 0.04),
+                  SizedBox(
+                    width: width * 0.25,
+                    child: PrimaryButton(
+                      text: 'Save',
+                      onPressed: () {
+                        setState(() {
+                          isDownload = true; // trigger download param
+                        });
+                        _fetchAttendance(isDownload : true);
+                      },
+                    ),
+                  )
                 ],
               ),
               AppDimensions.h20(context),

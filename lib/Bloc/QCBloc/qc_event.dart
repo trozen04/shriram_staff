@@ -26,6 +26,7 @@ final class GetAllQcEventHandler extends QcEvent {
   String? toDate;
   String? status;
   String? factory;
+  bool? isDownload;
 
   GetAllQcEventHandler({
     this.page,
@@ -35,6 +36,7 @@ final class GetAllQcEventHandler extends QcEvent {
     this.toDate,
     this.status,
     this.factory,
+    this.isDownload,
   });
 }
 
@@ -74,6 +76,7 @@ class getFinalQcEventHandler extends QcEvent {
   String? toDate;
   String? status;
   String? factory;
+  bool isDownload; // <--- add this
 
   getFinalQcEventHandler({
     this.page,
@@ -83,5 +86,6 @@ class getFinalQcEventHandler extends QcEvent {
     this.toDate,
     this.status,
     this.factory,
+    this.isDownload = false, // default false
   });
 }

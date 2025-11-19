@@ -15,6 +15,7 @@ class SubUserCard extends StatelessWidget {
   final String? factory;
   final double height;
   final double width;
+  final List<dynamic>? authorities;
 
   const SubUserCard({
     super.key,
@@ -27,6 +28,7 @@ class SubUserCard extends StatelessWidget {
     this.factory,
     required this.height,
     required this.width,
+    required this.authorities,
   });
 
   @override
@@ -83,8 +85,14 @@ class SubUserCard extends StatelessWidget {
                 _buildInfoRow(icon: Icons.email_outlined, value: email!),
 
               AppDimensions.h10(context),
+              if(qcType != null && qcType!.isNotEmpty)
               _buildInfoRow(imagePath: ImageAssets.qcPng, value: qcType!),
-              //_buildInfoRow(imagePath: ImageAssets.qcPng, value: factory!!),
+              if (authorities != null && authorities!.isNotEmpty)
+                _buildInfoRow(
+                  icon: Icons.verified_user, // or any relevant icon
+                  value: authorities!.join(', '), // show as comma-separated string
+                ),
+
             ],
           ),
         ],
@@ -112,6 +120,7 @@ class SubUserCard extends StatelessWidget {
           child: Text(
             value,
             style: AppTextStyles.cardText,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),

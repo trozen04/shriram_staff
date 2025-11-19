@@ -12,6 +12,7 @@ import '../../../Utils/app_routes.dart';
 import '../../../utils/app_colors.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/filter_popup.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../widgets/custom_snackbar.dart';
 import '../../../utils/flutter_font_styles.dart';
@@ -26,7 +27,7 @@ class PurchaseRequestScreen extends StatefulWidget {
 class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
+  bool isDownload = false;
   Timer? _debounce;
   DateTimeRange? selectedDateRange;
   String? selectedStatus;
@@ -66,7 +67,8 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
     String? status,
     String? fromDate,
     String? toDate,
-    String? factoryId, // now passing factory name
+    String? factoryId,
+    bool? isDownload,
   }) {
     context.read<PurchaseRequestBloc>().add(
       purchaseRequest(
@@ -76,7 +78,8 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
         status: status,
         fromDate: fromDate,
         toDate: toDate,
-        factoryName: factoryId, // sending name
+        factoryName: factoryId,
+        isDownload: isDownload ?? false,
       ),
     );
   }
@@ -261,11 +264,43 @@ class _PurchaseRequestScreenState extends State<PurchaseRequestScreen> {
           ),
           child: Column(
             children: [
-              /// 🔍 Search + Factory Dropdown
-              ReusableSearchField(
-                controller: searchController,
-                hintText: 'Search by Truck No./Farmer/Broker',
-                onChanged: _onSearchChanged,
+              /// Search + Download button
+
+              Row(
+                children: [
+                  Expanded(
+                    child: ReusableSearchField(
+                      controller: searchController,
+                      hintText: 'Search by Truck No./Farmer/Broker',
+                      onChanged: _onSearchChanged,
+                    ),
+                  ),
+                  AppDimensions.w10(context),
+                  SizedBox(
+                    width: width * 0.25,
+                    child: PrimaryButton(
+                      text: 'Save',
+                      onPressed: () {
+                        setState(() {
+                          isDownload = true; // trigger download param
+                        });
+
+                        _fetchData(
+                          page: 1,
+                          fromDate: selectedDateRange != null
+                              ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.start)
+                              : null,
+                          toDate: selectedDateRange != null
+                              ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.end)
+                              : null,
+                          status: selectedStatus,
+                          query: searchQuery,
+                          isDownload: true, // pass flag
+                        );
+                      },
+                    ),
+                  )
+                ],
               ),
 
               AppDimensions.h20(context),

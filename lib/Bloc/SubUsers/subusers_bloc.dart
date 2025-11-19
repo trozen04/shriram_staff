@@ -77,7 +77,7 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
           "email": event.email,
           "mobileno": event.phone,
           "role": event.role,
-          "authority": event.authority,
+          "authority": event.authorities,
           "salary": event.salary,
           "factory": event.factoryId,
           "address": event.address,
@@ -85,6 +85,7 @@ class SubusersBloc extends Bloc<SubusersEvent, SubusersState> {
           "confirmPassword": event.confirmPassword,
         };
 
+        developer.log('body subuser: $body');
         final response = await http.post(
           Uri.parse(url),
           headers: {

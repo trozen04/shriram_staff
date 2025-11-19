@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../Constants/ApiConstants.dart';
 import '../../utils/pref_utils.dart';
 
@@ -14,19 +17,25 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
     // 🔹 Get all expenses
     on<GetAllExpenseEventHandler>((event, emit) async {
-      emit(ExpenseLoadingState());
       try {
         final url = ApiConstants.baseUrl + ApiConstants.getAllExpense;
         final token = PrefUtils.getToken();
+
         final queryParams = <String, String>{};
 
         if (event.page != null) queryParams['page'] = event.page.toString();
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.fromDate != null) queryParams['fromdate'] = event.fromDate!;
         if (event.toDate != null) queryParams['todate'] = event.toDate!;
-        if (event.factoryName  != null) queryParams['factoryname'] = event.factoryName !;
+        if (event.factoryName != null) queryParams['factoryname'] = event.factoryName!;
+        if (event.isDownload == true) queryParams['download'] = "pdf";
 
         final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit LoadingState only for non-PDF requests
+        if (event.isDownload == false) {
+          emit(ExpenseLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -38,10 +47,25 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
         developer.log('GetAllExpense URL: $uri\nResponse: ${response.body}');
 
-        final responseData = jsonDecode(response.body);
+        final contentType = response.headers['content-type'] ?? '';
 
+        // PDF handling
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/expense_report.pdf');
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return;
+        }
+
+        // Normal JSON response
+        final responseData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
-          emit(ExpenseSuccessState(expenseData: responseData['data'] ?? [], isCreate: false));
+          emit(ExpenseSuccessState(
+            expenseData: responseData['data'] ?? [],
+            isCreate: false,
+          ));
         } else {
           emit(ExpenseErrorState(
             message: responseData['message'] ?? 'Failed to fetch expenses.',

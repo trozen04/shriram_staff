@@ -4,6 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../Constants/ApiConstants.dart';
 import '../../utils/pref_utils.dart';
 
@@ -15,11 +17,9 @@ class PurchaseRequestBloc
   PurchaseRequestBloc() : super(PurchaseRequestInitial()) {
 
     on<PurchaseRequestEventHandler>((event, emit) async {
-      emit(PurchaseRequestLoadingState());
       try {
         final url = ApiConstants.baseUrl + ApiConstants.allPurchaseRequest;
         final userToken = PrefUtils.getToken();
-        developer.log('API userToken: $userToken');
 
         final queryParams = <String, String>{};
 
@@ -27,13 +27,17 @@ class PurchaseRequestBloc
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factoryName != null && event.factoryName!.isNotEmpty) queryParams['factoryname'] = event.factoryName!;
-        // Build final URI safely
-        final uri = Uri.parse(
-          url,
-        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit LoadingState only if not downloading
+        if (event.isDownload == false) {
+          emit(PurchaseRequestLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -42,33 +46,36 @@ class PurchaseRequestBloc
             'Authorization': 'Bearer $userToken',
           },
         );
-        developer.log('API queryParams: $queryParams');
-        developer.log('API URL: $uri');
-        developer.log('response: ${response.statusCode}\n${response.body}');
+
+        final contentType = response.headers['content-type'] ?? '';
+
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/purchase_request.pdf');
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // skip emitting any other state
+        }
+
+        // normal JSON response
         final responseData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(PurchaseRequestSuccessState(purchaseRequestData: responseData));
         } else {
-          emit(
-            PurchaseRequestErrorState(
-              message:
-                  responseData['message'] ??
-                  'No records found. Please try adjusting your filters or search.',
-            ),
-          );
+          emit(PurchaseRequestErrorState(
+            message: responseData['message'] ?? 'No records found. Please try adjusting your filters or search.',
+          ));
         }
       } catch (e) {
-        emit(
-          PurchaseRequestErrorState(
-            message: 'Oops! Something went wrong. Please try again later.',
-          ),
-        );
+        emit(PurchaseRequestErrorState(
+          message: 'Oops! Something went wrong. Please try again later.',
+        ));
       }
     });
 
 
     on<purchaseRequest>((event, emit) async {
-      emit(PurchaseRequestLoadingState());
       try {
         final url = ApiConstants.baseUrl + ApiConstants.allAllPurchase;
         final userToken = PrefUtils.getToken();
@@ -80,13 +87,17 @@ class PurchaseRequestBloc
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factoryName != null && event.factoryName!.isNotEmpty) queryParams['factoryname'] = event.factoryName!;
-        // Build final URI safely
-        final uri = Uri.parse(
-          url,
-        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit LoadingState only for non-PDF requests
+        if (event.isDownload == false) {
+          emit(PurchaseRequestLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -95,27 +106,37 @@ class PurchaseRequestBloc
             'Authorization': 'Bearer $userToken',
           },
         );
+
         developer.log('API queryParams: $queryParams');
         developer.log('API URL: $uri');
         developer.log('response: ${response.statusCode}\n${response.body}');
+
+        final contentType = response.headers['content-type'] ?? '';
+
+        // PDF handling
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/purchase_request.pdf');
+          await file.writeAsBytes(bytes);
+          await OpenFile.open(file.path);
+          return; // Skip emitting any other state
+        }
+
+        // Normal JSON response
         final responseData = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(PurchaseRequestSuccessState(purchaseRequestData: responseData));
         } else {
-          emit(
-            PurchaseRequestErrorState(
-              message:
-                  responseData['message'] ??
-                  'No records found. Please try adjusting your filters or search.',
-            ),
-          );
+          emit(PurchaseRequestErrorState(
+            message: responseData['message'] ??
+                'No records found. Please try adjusting your filters or search.',
+          ));
         }
       } catch (e) {
-        emit(
-          PurchaseRequestErrorState(
-            message: 'Oops! Something went wrong. Please try again later.',
-          ),
-        );
+        emit(PurchaseRequestErrorState(
+          message: 'Oops! Something went wrong. Please try again later.',
+        ));
       }
     });
 

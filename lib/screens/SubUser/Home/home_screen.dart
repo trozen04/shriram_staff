@@ -7,6 +7,7 @@ import 'package:shree_ram_staff/utils/image_assets.dart';
 import 'package:shree_ram_staff/widgets/custom_app_bar.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../utils/app_routes.dart';
+import '../../../utils/pref_utils.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../Bloc/SalesBloc/sales_bloc.dart';
 import '../../../widgets/custom_snackbar.dart';
@@ -29,7 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final bloc = context.read<SalesBloc>();
 
     if (bloc.lastReportData == null) { // <- store last fetched data in Bloc
-      _getReportData(); // only fetch if no cached data
+      if (PrefUtils.getAuthority().contains('Report')) {
+        _getReportData();
+      }
     } else {
       reportData = bloc.lastReportData!; // restore cached data
     }
@@ -118,83 +121,118 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Delivery',
                     imagePath: ImageAssets.deliveryImage,
                     ontap: () {
-                      Navigator.pushNamed(context, AppRoutes.deliveryPage);
+                      if (PrefUtils.getAuthority().contains('Delivery')) {
+                        Navigator.pushNamed(context, AppRoutes.deliveryPage);
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Delivery!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                   ActionButton(
                     title: 'Final QC',
                     imagePath: ImageAssets.qc,
                     ontap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.deliveryPage,
-                        arguments: true,
-                      );
+                      if (PrefUtils.getAuthority().contains('Finalqc')) {
+                        Navigator.pushNamed(context, AppRoutes.deliveryPage, arguments: true);
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Final QC!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                   ActionButton(
                     title: 'Billing',
                     imagePath: ImageAssets.billing,
                     ontap: () {
-                      Navigator.pushNamed(context, AppRoutes.billingScreen);
+                      if (PrefUtils.getAuthority().contains('Billing')) {
+                        Navigator.pushNamed(context, AppRoutes.billingScreen);
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Billing!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                   ActionButton(
                     title: 'Factory',
                     imagePath: ImageAssets.factory,
                     ontap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.factoryScreen,
-                        arguments: null,
-                      );
+                      if (PrefUtils.getAuthority().contains('Factory')) {
+                        Navigator.pushNamed(context, AppRoutes.factoryScreen, arguments: null);
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Factory!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                   ActionButton(
                     title: 'Sales',
                     imagePath: ImageAssets.sales,
                     ontap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.salesScreen,
-                        arguments: false,
-                      );
+                      if (PrefUtils.getAuthority().contains('Sales')) {
+                        Navigator.pushNamed(context, AppRoutes.salesScreen, arguments: false);
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Sales!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                   ActionButton(
                     title: 'Report',
                     imagePath: ImageAssets.report,
                     ontap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.reportScreen,
-                        arguments: {'reportData': null},
-                      );
+                      if (PrefUtils.getAuthority().contains('Report')) {
+                        Navigator.pushNamed(context, AppRoutes.reportScreen, arguments: {'reportData': null});
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: "You don't have access to Report!",
+                          isError: true,
+                        );
+                      }
                     },
                   ),
                 ],
               ),
               AppDimensions.h20(context),
-              Text('Report', style: AppTextStyles.appbarTitle),
-              AppDimensions.h10(context),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomIconButton(
-                    text: formatDateRange(selectedDateRange),
-                    imagePath: ImageAssets.calender,
-                    width: width,
-                    height: height,
-                    onTap: _pickDate,
-                  ),
-                  const SizedBox.shrink(),
-                ],
-              ),
-              AppDimensions.h20(context),
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ReportTable(data: reportData),
-              AppDimensions.h20(context),
+              if (PrefUtils.getAuthority().contains('Report')) ...[
+                Text('Report', style: AppTextStyles.appbarTitle),
+                AppDimensions.h10(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomIconButton(
+                      text: formatDateRange(selectedDateRange),
+                      imagePath: ImageAssets.calender,
+                      width: width,
+                      height: height,
+                      onTap: _pickDate,
+                    ),
+                    const SizedBox.shrink(),
+                  ],
+                ),
+                AppDimensions.h20(context),
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ReportTable(data: reportData),
+                AppDimensions.h20(context),
+              ]
+
             ],
           ),
         ),

@@ -11,6 +11,7 @@ import '../../../utils/app_routes.dart';
 import '../../../utils/flutter_font_styles.dart';
 import '../../../utils/app_colors.dart';
 import '../../../widgets/custom_app_bar.dart';
+import '../../../widgets/primary_and_outlined_button.dart';
 import '../../../widgets/reusable_functions.dart';
 import '../../../widgets/custom_snackbar.dart';
 import '../../../widgets/filter_popup.dart'; // for showStatusFilterDialog()
@@ -28,7 +29,7 @@ class _SalesScreenState extends State<SalesScreen> {
   DateTimeRange? selectedDateRange;
   ScrollController scrollController = ScrollController();
   Timer? _debounce;
-
+  bool isDownload = false;
   List<dynamic> salesData = [];
   bool isLoading = false;
   bool hasMore = true;
@@ -66,7 +67,7 @@ class _SalesScreenState extends State<SalesScreen> {
     });
   }
 
-  void _fetchSales({bool refresh = false}) {
+  void _fetchSales({bool refresh = false, bool? isDownload = false}) {
     if (refresh) {
       salesData.clear();
       currentPage = 1;
@@ -97,6 +98,7 @@ class _SalesScreenState extends State<SalesScreen> {
           toDate: selectedDateRange?.end.toIso8601String(),
           status: normalizedStatus,
           factory: selectedFactoryId,
+          isDownload: isDownload ?? false
         ),
       );
     } else {
@@ -111,6 +113,7 @@ class _SalesScreenState extends State<SalesScreen> {
           fromDate: selectedDateRange?.start.toIso8601String(),
           toDate: selectedDateRange?.end.toIso8601String(),
           status: normalizedStatus,
+            isDownload: isDownload ?? false
         ),
       );
     }
@@ -261,10 +264,37 @@ class _SalesScreenState extends State<SalesScreen> {
               child: Column(
                 children: [
                   // 🔍 Search
-                  ReusableSearchField(
-                    controller: searchController,
-                    hintText: 'Search by Truck No./Farmer/Broker',
-                    onChanged: _onSearchChanged,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ReusableSearchField(
+                          controller: searchController,
+                          hintText: 'Search by Truck No./Farmer/Broker',
+                          onChanged: _onSearchChanged,
+                        ),
+                      ),
+
+                      if(widget.isSuperUser!) ...[
+                        AppDimensions.w10(context),
+                        SizedBox(
+                          width: width * 0.25,
+                          child: PrimaryButton(
+                            text: 'Save',
+                            onPressed: () {
+                              setState(() {
+                                isDownload = true;
+                                currentPage--;
+                              });
+
+                              _fetchSales(
+                                isDownload: true,
+                              );
+                            },
+                          ),
+                        )
+                      ]
+
+                    ],
                   ),
 
                   AppDimensions.h20(context),

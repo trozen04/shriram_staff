@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shree_ram_staff/Bloc/PurchaseRequest/purchase_request_bloc.dart';
+import 'package:shree_ram_staff/widgets/primary_and_outlined_button.dart';
 import '../../../Bloc/QCBloc/qc_bloc.dart';
 import '../../../Constants/app_dimensions.dart';
 import '../../../Utils/image_assets.dart';
@@ -26,7 +27,7 @@ class DeliveryQcPage extends StatefulWidget {
 class _DeliveryQcPageState extends State<DeliveryQcPage> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
+  bool isDownload = false;
   DateTimeRange? selectedDateRange;
   bool isLoading = false;
   bool isFetchingMore = false;
@@ -74,6 +75,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
     String? toDate,
     String? status,
     String? query,
+    bool isDownload = false,
   }) {
     setState(() {
       currentPage = page;
@@ -87,7 +89,6 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
       }
     }
     if (widget.isQCPage) {
-      // 🧾 Add logs to verify what’s being sent
       developer.log('🔹 Fetching Data - QC Page: ${widget.isQCPage}');
       developer.log('➡️ Page: $page');
       developer.log('➡️ Limit: $limit');
@@ -103,7 +104,8 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
           toDate: toDate,
           status: normalizedStatus,
           search: query,
-        ),
+        isDownload: isDownload,
+      ),
       );
     } else {
       context.read<PurchaseRequestBloc>().add(
@@ -114,6 +116,7 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
           toDate: toDate,
           status: normalizedStatus,
           search: query,
+          isDownload: isDownload,
         ),
       );
     }
@@ -291,12 +294,48 @@ class _DeliveryQcPageState extends State<DeliveryQcPage> {
           child: Column(
             children: [
               // 🔍 Search
-              ReusableSearchField(
-                controller: searchController,
-                hintText: widget.isQCPage
-                    ? 'Search Sample No./Farmer/Broker'
-                    : 'Search by Truck No./Farmer/Broker',
-                onChanged: _onSearchChanged,
+              Row(
+                children: [
+                  Expanded(
+                    child: ReusableSearchField(
+                      controller: searchController,
+                      hintText: widget.isQCPage
+                          ? 'Search Sample No./Farmer/Broker'
+                          : 'Search by Truck No./Farmer/Broker',
+                      onChanged: _onSearchChanged,
+                    ),
+                  ),
+
+                  if(!widget.isQCPage) ...[
+                    AppDimensions.w10(context),
+                    SizedBox(
+                      width: width * 0.25,
+                      child: PrimaryButton(
+                        text: 'Save',
+                        onPressed: () {
+                          setState(() {
+                            isDownload = true; // trigger download param
+                          });
+
+                          _fetchData(
+                            page: 1,
+                            fromDate: selectedDateRange != null
+                                ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.start)
+                                : null,
+                            toDate: selectedDateRange != null
+                                ? DateFormat('yyyy-MM-dd').format(selectedDateRange!.end)
+                                : null,
+                            status: selectedStatus,
+                            query: searchQuery,
+                            isDownload: true, // pass flag
+                          );
+                        },
+                      ),
+                    )
+                  ],
+
+
+                ],
               ),
               AppDimensions.h20(context),
 

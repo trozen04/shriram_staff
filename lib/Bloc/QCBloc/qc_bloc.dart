@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../Constants/ApiConstants.dart';
 import '../../utils/pref_utils.dart';
@@ -31,6 +33,8 @@ class QcBloc extends Bloc<QcEvent, QcState> {
           "discolor": event.discolor,
           "transportId": event.transportId,
         };
+
+        
 
         developer.log('Request Body: $body');
 
@@ -62,27 +66,30 @@ class QcBloc extends Bloc<QcEvent, QcState> {
 
     ///Get All QC
     on<GetAllQcEventHandler>((event, emit) async {
-      emit(GetAllQcLoadingState());
       try {
         final url = ApiConstants.baseUrl + ApiConstants.getAllQC;
         developer.log('url: $url');
         final token = PrefUtils.getToken();
         developer.log('token : $token');
-        final queryParams = <String, String>{};
 
+        final queryParams = <String, String>{};
         if (event.page != null) queryParams['page'] = event.page.toString();
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
-        // Build final URI safely
+        if (event.isDownload == true) queryParams['download'] = "pdf";
+
         developer.log('🧾 Query Params: $queryParams');
 
-        final uri = Uri.parse(
-          url,
-        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // ✅ Emit Loading only if not downloading
+        if (event.isDownload == false) {
+          emit(GetAllQcLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -93,19 +100,36 @@ class QcBloc extends Bloc<QcEvent, QcState> {
         );
         developer.log('response: ${response.body}');
 
-        final data = jsonDecode(response.body);
+        final contentType = response.headers['content-type'] ?? '';
 
+        // ✅ Handle PDF download separately
+        if (event.isDownload == true && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/qc_report.pdf');
+          await file.writeAsBytes(bytes);
+
+          await OpenFile.open(file.path);
+
+          // Skip emitting any other state for download
+          return;
+        }
+
+        // Normal JSON response
+        final data = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(GetAllQcSuccessState(responseData: data));
         } else {
-          emit(GetAllQcErrorState(message: data['message'] ?? 'Oops! Something went wrong. Please try again later.'));
+          emit(GetAllQcErrorState(
+            message: data['message'] ?? 'Oops! Something went wrong. Please try again later.',
+          ));
         }
       } catch (e) {
         developer.log('catchError : ${e.toString()}');
         emit(GetAllQcErrorState(
           message: 'Oops! Something went wrong. Please try again later.',
-        ),
-        );
+        ));
       }
     });
 
@@ -210,27 +234,30 @@ class QcBloc extends Bloc<QcEvent, QcState> {
 
     ///Get Final QC
     on<getFinalQcEventHandler>((event, emit) async {
-      emit(getFinalQcLoadingState());
       try {
         final url = ApiConstants.baseUrl + ApiConstants.getFinalQc;
         developer.log('url: $url');
         final token = PrefUtils.getToken();
         developer.log('token : $token');
-        final queryParams = <String, String>{};
 
+        final queryParams = <String, String>{};
         if (event.page != null) queryParams['page'] = event.page.toString();
         if (event.limit != null) queryParams['limit'] = event.limit.toString();
         if (event.search != null && event.search!.isNotEmpty) queryParams['search'] = event.search!;
         if (event.fromDate != null && event.fromDate!.isNotEmpty) queryParams['fromdate'] = event.fromDate!;
-        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['toDate'] = event.toDate!;
+        if (event.toDate != null && event.toDate!.isNotEmpty) queryParams['todate'] = event.toDate!;
         if (event.status != null && event.status!.isNotEmpty) queryParams['status'] = event.status!;
         if (event.factory != null && event.factory!.isNotEmpty) queryParams['factoryname'] = event.factory!;
-        // Build final URI safely
+        if (event.isDownload) queryParams['download'] = "pdf";
+
         developer.log('🧾 Query Params: $queryParams');
 
-        final uri = Uri.parse(
-          url,
-        ).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+        final uri = Uri.parse(url).replace(queryParameters: queryParams.isEmpty ? null : queryParams);
+
+        // Emit loading only if not downloading
+        if (!event.isDownload) {
+          emit(getFinalQcLoadingState());
+        }
 
         final response = await http.get(
           uri,
@@ -241,19 +268,36 @@ class QcBloc extends Bloc<QcEvent, QcState> {
         );
         developer.log('response: ${response.body}');
 
-        final data = jsonDecode(response.body);
+        final contentType = response.headers['content-type'] ?? '';
 
+        // Handle PDF download
+        if (event.isDownload && contentType.contains('application/pdf')) {
+          final bytes = response.bodyBytes;
+
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/final_qc_report.pdf');
+          await file.writeAsBytes(bytes);
+
+          await OpenFile.open(file.path);
+
+          // Skip emitting any state for download
+          return;
+        }
+
+        // Normal JSON response
+        final data = jsonDecode(response.body);
         if (response.statusCode == 200 || response.statusCode == 201) {
           emit(getFinalQcSuccessState(responseData: data));
         } else {
-          emit(getFinalQcErrorState(message: data['message'] ?? 'Oops! Something went wrong. Please try again later.'));
+          emit(getFinalQcErrorState(
+            message: data['message'] ?? 'Oops! Something went wrong. Please try again later.',
+          ));
         }
       } catch (e) {
         developer.log('catchError : ${e.toString()}');
         emit(getFinalQcErrorState(
           message: 'Oops! Something went wrong. Please try again later.',
-        ),
-        );
+        ));
       }
     });
 

@@ -8,9 +8,10 @@ class GetAllExpenseEventHandler extends ExpenseEvent {
   final int? limit;
   final String? fromDate;
   final String? toDate;
-  final String? factoryName; // <-- changed from factoryId
+  final String? factoryName;
+  final bool? isDownload;
 
-  GetAllExpenseEventHandler({this.page, this.limit, this.fromDate, this.toDate, this.factoryName});
+  GetAllExpenseEventHandler({this.page, this.limit, this.fromDate, this.toDate, this.factoryName, this.isDownload});
 }
 
 
